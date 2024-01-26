@@ -1,0 +1,11 @@
+.heading{
+  width: max-content;
+  margin: 0;
+}
+
+.knob-container{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 2px;
+}

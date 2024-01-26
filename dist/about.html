@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="description" content="trane" />
+  <meta charset="utf-8">
+  <title>[trane] - about</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="">
+  <link rel="stylesheet" href="index.css">
+  <script src="index.js"></script>
+</head>
+
+<body class="about-area">
+	<p> trane wouldn't be around if not for the following people </p>
+  <p> <a href="https://ianthehenry.com/">Ian Henry</a> and his wonderful book <a href="https://janet.guide">Janet For Mortals</a>. Ian's amazing work on <a href="https://toodle.studio">toodle.studio</a> helped birth this</p>
+	<p><a href="http://sam.aaron.name/">Sam Aaron</a> and his work on <a href="https://sonic-pi.net/">Sonic Pi</a>. Quite a few features of trane originate there.</p>
+	<p><a href="https://bakpakin.com/">Calvin Rose</a> for creating the Janet Language</p>
+	<p>Thanks also to all the contributors to <a href="https://janet-lang.org/">Janet</a></p>
+	<div></div>
+  <p>If you want to learn more then message me on <a href="https://mastodon.social/@gregson">mastodon</a></p>
+	<div></div>
+	<p>You can change your keybindings below</p>
+</body>
+<script> 
+const keybindingsElement = document.createElement("select")
+keybindingsElement.innerText = "Change your keybindings: "
+keybindingsElement.className = "settings-keybindings"
+document.body.appendChild(keybindingsElement)
+
+const selectedOption = localStorage.getItem("keybindings")
+const options = ["default", "vim", "emacs"]
+options.forEach(option => {
+  keybindingsElement.appendChild(new Option(option, option, option === selectedOption, option === selectedOption))
+})
+
+keybindingsElement.addEventListener("change", () => localStorage.setItem("keybindings", keybindingsElement.value))
+
+</script>
+
+</html>

@@ -1,0 +1,8 @@
+dist/samples
+dist/impulses
+dist/*.js
+dist/*.css
+build/*.jimage
+build/*.js
+node_modules
+
