@@ -308,7 +308,7 @@ int main() {
     JanetTable *lookup = env_lookup_table(janet_core_env(NULL), "load-image-dict");
 
     size_t image_length;
-    unsigned char *image = read_file("tranes.jimage", &image_length);
+    unsigned char *image = read_file("trane.jimage", &image_length);
 
     Janet environment = janet_unmarshal(image, image_length, 0, lookup, NULL);
     if (!janet_checktype(environment, JANET_TABLE)) {
