@@ -32,10 +32,23 @@ const defaultCode = `# Hello
 # Have a look at the about page for more info: https://lisp.trane.studio/about.html
 `
 
+async function loadTrackURL(){
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackURL = urlParams.get('t')
+  let trackString
+
+  if(trackURL){
+    trackString = await fetch(trackURL)
+  }
+  return trackString?.text()
+}
+
 async function initCodeEditor(el, onCodeChange){
 
     const savedScript = await loadSavedScript()
     const keybindings = await loadKeybindings()
+
+    const trackFromURL = await loadTrackURL()
 
     let keybindingsExtention 
     if(keybindings === "vim"){
@@ -63,7 +76,7 @@ async function initCodeEditor(el, onCodeChange){
     keybindingsExtention ? extensions.push(keybindingsExtention()) : null
 
     editor = new EditorView({
-        doc: savedScript || defaultCode,
+        doc: trackFromURL || savedScript || defaultCode,
         extensions,
         parent: el,
     })
