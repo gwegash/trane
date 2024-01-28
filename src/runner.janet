@@ -1,3 +1,5 @@
+# Lots here is taken from https://github.com/ianthehenry/toodle.studio
+
 (use ./globals)
 
 (defn- zip-all [t predicates]

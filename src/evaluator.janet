@@ -1,3 +1,5 @@
+# Lots here is taken from https://github.com/ianthehenry/toodle.studio
+
 (use ./globals)
 
 (def- template-env (make-env root-env))

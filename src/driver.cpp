@@ -1,3 +1,4 @@
+// A lot of this is taken (gratefully) from https://github.com/ianthehenry/toodle.studio
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #include <string>
