@@ -1,7 +1,9 @@
 import {EditorView, basicSetup} from "codemirror"
+import {keymap} from "@codemirror/view"
 import {janet} from "codemirror-lang-janet"
 import { vim } from "@replit/codemirror-vim"
 import { emacs } from "@replit/codemirror-emacs"
+import { Prec } from "@codemirror/state";
 
 import {basicDark} from "./dark_theme"
 
@@ -13,7 +15,7 @@ const defaultCode = `# Hello
 # Trane is a music playground 
 # It's written in Janet, a lisp-like language
 
-# To execute the code below, press Alt+Enter. (⌘+Enter on Mac)
+# To execute the code below, press Alt+Enter. (⌥+Enter on Mac)
 
 (chain 
   (sample :hello-sample "samples/Cmin 7th 3.wav" 36)
@@ -43,7 +45,7 @@ async function loadTrackURL(){
   return trackString?.text()
 }
 
-async function initCodeEditor(el, onCodeChange){
+async function initCodeEditor(el, onCodeChange, onCodeReload){
 
     const savedScript = await loadSavedScript()
     const keybindings = await loadKeybindings()
@@ -66,6 +68,12 @@ async function initCodeEditor(el, onCodeChange){
                 onCodeChange()
             }
         }),
+
+        Prec.highest(
+            keymap.of([
+              { key: "Alt-Enter", run: onCodeReload }
+            ])
+          ),
         EditorView.theme({
           "&": {minHeight: "10rem", flexBasis: "10rem", flexGrow: "1"},
           ".cm-scroller": {overflow: "auto"},
@@ -74,6 +82,8 @@ async function initCodeEditor(el, onCodeChange){
     ]
 
     keybindingsExtention ? extensions.push(keybindingsExtention()) : null
+
+
 
     editor = new EditorView({
         doc: trackFromURL || savedScript || defaultCode,

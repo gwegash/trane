@@ -34,7 +34,7 @@ async function main(runtime: Module){
     document.body.appendChild(codeElement)
     document.body.appendChild(instrumentElement)
 
-    await initCodeEditor(codeElement, onChange)
+    await initCodeEditor(codeElement, onChange, onCodeReload)
     window.editor = editor
     onChange()
 
@@ -64,13 +64,6 @@ async function onCodeReload(){
         console.log("tried to reload without an image")
     }
 }
-
-document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if(e.key == "Enter" && (e.altKey || e.metaKey || e.shiftKey)){
-        onCodeReload()
-	e.preventDefault()
-    }
-})
 
 document.addEventListener("DOMContentLoaded", (_) => {
 
