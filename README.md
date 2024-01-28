@@ -1,9 +1,11 @@
-# Trane
+# [Trane](https://lisp.trane.studio/?t=tracks/etude.janet)
 
-A musical lisp thing
+A musical lisp thing.
+
 This is still very much a WIP.
 
 ## Installing
+You'll need a copy of [nvm](https://github.com/nvm-sh/nvm)
 
 ```
 nvm use
