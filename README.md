@@ -1,6 +1,7 @@
 # Trane
 
 A musical lisp thing
+This is still very much a WIP.
 
 ## Installing
 
@@ -15,6 +16,11 @@ npm install
 ```
 npm run dev
 ```
+
+### Current known issues/bugs
+
+* The attack/release knobs are a slight hack. I'd like to be able to include attack/release parameter within the `(play ...)` macro
+    * The attack/release knobs are a bit broken on chrome at the moment as a result.
 
 ## Acknowledgements
 * Ian Henry and his wonderful book [Janet For Mortals](https://janet.guide). The js-janet interop is a modified version to the one running in https://toodle.studio
