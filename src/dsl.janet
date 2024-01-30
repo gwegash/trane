@@ -91,8 +91,8 @@
   ~(inst ,:reverb ,name ,impulse)
 )
 
-(defmacro Dlay [name delayTime feedback]
-  ~(inst ,:Dlay ,name ,delayTime ,feedback)
+(defmacro Dlay [name delayTime]
+  ~(inst ,:Dlay ,name ,delayTime)
 )
 
 (defmacro distortion [name amount]

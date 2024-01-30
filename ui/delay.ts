@@ -3,7 +3,11 @@ import {bpm} from "./index"
 
 class Delay extends Effect {
     
+    //TODO we need to unify these names with the DSL, will allow for easier feature development	
     friendlyName = "Dlay"
+    params = [
+        {name: "feedback", path: "gainNode.gain", min: 0, max: 1},
+    ]
 
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
@@ -16,12 +20,18 @@ class Delay extends Effect {
 
         this.inputNode = this.webAudioNodes.delay
         this.outputNode = this.webAudioNodes.delay
+
+        this.knobsEl = document.createElement("div")
+        this.knobsEl.className = "knobs"
+        this.el.appendChild(this.knobsEl)
+
+        this.resolveParams()  //always call me after settings up your webAudioNodes!
+        this.setupKnobs()
     }
 
-    async setup(delayTime, feedback = 0.5){
+    async setup(delayTime){
         const delayTime_s = parseFloat(delayTime)
         this.webAudioNodes.delay.delayTime.value = (delayTime_s/60.0)*bpm
-        this.webAudioNodes.gainNode.gain.value = feedback
     }
 }
 

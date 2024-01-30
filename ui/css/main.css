@@ -74,6 +74,7 @@ table {
   padding: 1px;
   margin: 1px;
   font-family: 'ibmvga';
+  align-items: center;
 }
 
 .knobs {
