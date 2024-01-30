@@ -1,4 +1,6 @@
 # [Trane](https://lisp.trane.studio/?t=tracks/etude.janet)
+![trane screenshot](https://lisp.trane.studio/tracks/screenshot.png)
+
 
 A musical lisp thing.
 
