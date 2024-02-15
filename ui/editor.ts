@@ -24,7 +24,7 @@ const defaultCode = `# Hello
 )
 
 (live_loop :player
-  (play (pick [12 24 36]) :hello-sample :dur 64)
+  (play (pick 12 24 36) :hello-sample :dur 64)
   #(target :hello-filter :frequency (rand 50 10000) 10)
   (sleep 6)
 )
