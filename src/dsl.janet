@@ -10,6 +10,24 @@
   )
 )
 
+(defn note [quality]
+  (cond
+   (number? quality) quality
+   (keyword? quality) (get midi_notes quality)
+   (errorf "not a note %q" quality)
+  )
+)
+
+(defn chord [root quality]
+  (def rootNum (note root))
+  (map (fn [n] (+ n rootNum)) (get chord_qualities quality))
+)
+
+(defn notes [& qualities]
+  (map note qualities)
+)
+
+
 (defmacro sleep [length]
   ~(setdyn :current-time (+ (dyn :current-time) ,length))
 )
@@ -66,6 +84,10 @@
   ~(change ,instName ,paramIdx ,to ,:cType (- ,k_))
 )
 
+(defn rep [num times]
+  [;(array/new-filled times num)]
+)
+
 (defmacro wire [from to]
   (def fromInst (eval from))
   (def toInst (eval to))
@@ -104,7 +126,8 @@
 )
 
 (defmacro sample [name sample_url sample_pitch]
-  ~(inst ,:pitched_sampler ,name ,sample_url ,sample_pitch)
+  (def n (note sample_pitch))
+  ~(inst ,:pitched_sampler ,name ,sample_url ,n)
 )
 
 (defmacro drums [name & sample_urls]
@@ -131,13 +154,18 @@
   ~(inst ,:biquad ,name ,filterType)
 )
 
-(defn play_ [note channel &named vel dur]
-  (if (or (array? note) (tuple? note)) ## multiple notes, ie chord
-    (array/concat ;(map (fn [n] (play_ n channel :vel vel :dur dur)) note))
+(defn lfo [around amp periodBeats]
+  (+ around (* amp (math/sin (/ (dyn :current-time) (* periodBeats math/pi)))))
+)
+
+(defn play_ [pitch channel &named vel dur]
+  (if (or (array? pitch) (tuple? pitch)) ## multiple notes, ie chord
+    (array/concat ;(map (fn [n] (play_ n channel :vel vel :dur dur)) pitch))
     (do 
+      (def pitch_ (note pitch))
       (def vel_ (if vel vel 1.0))
       (def dur_ (if dur dur -1.0))
-      @[[channel note vel_ (dyn :current-time) dur_]]
+      @[[channel pitch_ vel_ (dyn :current-time) dur_]]
     )
   )
 )
@@ -161,7 +189,7 @@
 # TODO maybe better as a macro?
 (defn P [pattern lengthBeats]
   (cond 
-    (or (number? pattern) (nil? pattern)) @[[pattern lengthBeats]]
+    (or (number? pattern) (nil? pattern) (string? pattern) (keyword? pattern)) @[[pattern lengthBeats]]
     (or (tuple? pattern) (array? pattern)) (do
       (def elementLength (/ lengthBeats (length pattern))) 
       (squish-rests (array/concat ;(map (fn [element] (P element elementLength)) pattern)))
@@ -179,8 +207,8 @@
   )
 )
 
-(defmacro pick [pitches]
-  ~(get ,pitches (math/rng-int (get self :rng) (length ,pitches)))
+(defmacro pick [& pitches]
+  ~(get [,;pitches] (math/rng-int (get self :rng) (length [,;pitches])))
 )
 
 (defmacro rand [lo hi]
@@ -196,19 +224,6 @@
 
 (defmacro seed [seed]
   ~(set (self :rng) (math/rng ,seed))
-)
-
-(defn note [quality]
-  (get midi_notes quality)
-)
-
-(defn chord [root quality]
-  (def rootNum (note root))
-  (map (fn [n] (+ n rootNum)) (get chord_qualities quality))
-)
-
-(defn notes [& qualities]
-  (map note qualities)
 )
 
 (defmacro live_loop [name & instructions]
