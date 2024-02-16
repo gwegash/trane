@@ -73,17 +73,17 @@ const tutorInstructions : Array<ITutorInstruction> = [
   {
     condition: (_) => true,
     codeBlock: { text: `
-(live_loop :player
-  (play (pick 12 24 36) :hello-sample :dur 64)
-  #(target :hello-filter :frequency (rand 50 10000) 10)
-  (sleep 6)
+(live_loop :player                                       # loop forever
+  (play (pick 12 24 36) :hello-sample :dur 64)           # pick a random note in 3 octaves, send it to our sampler, play for at most 64 beats
+  #(target :hello-filter :frequency (rand 50 10000) 10)  
+  (sleep 6)                                              # sleep for 6 beats
 )
 `, timePerKey: 1.0/60},
     where: (code) => code.length,
   },
   {
     condition: (_) => true,
-    codeBlock: { text: "\n# Try executing the code below. (Alt+Enter or ⌥+Enter)\n", timePerKey: 1.0/30},
+    codeBlock: { text: "\n# Lovely. I reckon you're going to hear some distortion and clipping soon.\n# The sample is a touch too loud. Try turning it down with the gain knob on the right\n", timePerKey: 1.0/30},
     where: (code) => code.length,
     timeUntilNext: 1,
   },
