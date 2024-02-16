@@ -6,6 +6,7 @@ import {init as initLoopManager, codeReload} from "./loop_manager"
 import {OutputChannel} from "./errors"
 import {editor} from "./editor"
 import {background} from "./dark_theme"
+import {tutor, continueTutorial} from "./tutor"
 import "./css/main.css"
 
 const bpm = 162
@@ -37,6 +38,9 @@ async function main(runtime: Module){
     await initCodeEditor(codeElement, onChange, onCodeReload)
     window.editor = editor
     onChange()
+    if(tutor !== undefined){
+      continueTutorial()
+    }
 
     const outputChannelElement = document.createElement("pre")
     outputChannelElement.className = "output-channel"
@@ -50,6 +54,9 @@ function onChange(){
     if (!result.isError){
         compiledImage = result.image
     }
+    else{
+        compiledImage = undefined
+    }
 }
 
 async function onCodeReload(){
@@ -57,6 +64,9 @@ async function onCodeReload(){
     if(compiledImage){
 	saveCurrentScript()
         const { environment, lloop_names, instrument_mappings } = janetRuntime.trane_start(compiledImage)
+        if(tutor !== undefined){
+          continueTutorial()
+        }
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
     }
