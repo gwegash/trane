@@ -54,7 +54,7 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
 
     const trackFromURL = await loadTrackURL()
 
-    const tutorDoc = tutor !== undefined ? "#" : undefined
+    const tutorDoc = tutor !== null ? "#" : undefined
 
     let keybindingsExtention 
     if(keybindings === "vim"){

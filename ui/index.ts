@@ -35,12 +35,17 @@ async function main(runtime: Module){
     document.body.appendChild(codeElement)
     document.body.appendChild(instrumentElement)
 
+    const infoElement = document.createElement("a")
+    infoElement.href = "/about.html"
+    infoElement.innerText = "i"
+    infoElement.className = "info"
+    
+    document.body.appendChild(infoElement)
+
     await initCodeEditor(codeElement, onChange, onCodeReload)
     window.editor = editor
     onChange()
-    if(tutor !== undefined){
-      continueTutorial()
-    }
+    continueTutorial()
 
     const outputChannelElement = document.createElement("pre")
     outputChannelElement.className = "output-channel"
@@ -62,13 +67,11 @@ function onChange(){
 async function onCodeReload(){
     console.log("got code reload message")
     if(compiledImage){
-	saveCurrentScript()
+        saveCurrentScript()
         const { environment, lloop_names, instrument_mappings } = janetRuntime.trane_start(compiledImage)
-        if(tutor !== undefined){
-          continueTutorial()
-        }
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
+        continueTutorial()
     }
     else{
         console.log("tried to reload without an image")
