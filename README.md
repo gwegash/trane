@@ -1,13 +1,14 @@
 # [Trane](https://lisp.trane.studio/?t=tracks/etude.janet)
 ![trane screenshot](https://lisp.trane.studio/tracks/screenshot.png)
 
-
 A musical lisp thing.
 
 This is still very much a WIP.
 
+## [docs](docs/) / [examples](https://github.com/gwegash/tracks)
+
 ## Installing
-You'll need a copy of [nvm](https://github.com/nvm-sh/nvm)
+You'll need a copy of [nvm](https://github.com/nvm-sh/nvm) and [emsdk](https://github.com/emscripten-core/emsdk)
 
 ```
 nvm use

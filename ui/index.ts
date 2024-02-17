@@ -6,6 +6,7 @@ import {init as initLoopManager, codeReload} from "./loop_manager"
 import {OutputChannel} from "./errors"
 import {editor} from "./editor"
 import {background} from "./dark_theme"
+import {tutor, continueTutorial} from "./tutor"
 import "./css/main.css"
 
 const bpm = 162
@@ -34,9 +35,17 @@ async function main(runtime: Module){
     document.body.appendChild(codeElement)
     document.body.appendChild(instrumentElement)
 
+    const infoElement = document.createElement("a")
+    infoElement.href = "/about.html"
+    infoElement.innerText = "i"
+    infoElement.className = "info"
+    
+    document.body.appendChild(infoElement)
+
     await initCodeEditor(codeElement, onChange, onCodeReload)
     window.editor = editor
     onChange()
+    continueTutorial()
 
     const outputChannelElement = document.createElement("pre")
     outputChannelElement.className = "output-channel"
@@ -50,15 +59,19 @@ function onChange(){
     if (!result.isError){
         compiledImage = result.image
     }
+    else{
+        compiledImage = undefined
+    }
 }
 
 async function onCodeReload(){
     console.log("got code reload message")
     if(compiledImage){
-	saveCurrentScript()
+        saveCurrentScript()
         const { environment, lloop_names, instrument_mappings } = janetRuntime.trane_start(compiledImage)
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
+        continueTutorial()
     }
     else{
         console.log("tried to reload without an image")

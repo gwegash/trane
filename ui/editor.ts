@@ -5,6 +5,8 @@ import { vim } from "@replit/codemirror-vim"
 import { emacs } from "@replit/codemirror-emacs"
 import { Prec } from "@codemirror/state";
 
+import { tutor } from "./tutor";
+
 import {basicDark} from "./dark_theme"
 
 import localforage from "localforage"
@@ -52,6 +54,8 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
 
     const trackFromURL = await loadTrackURL()
 
+    const tutorDoc = tutor !== null ? "#" : undefined
+
     let keybindingsExtention 
     if(keybindings === "vim"){
       keybindingsExtention = vim
@@ -86,7 +90,7 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
 
 
     editor = new EditorView({
-        doc: trackFromURL || savedScript || defaultCode,
+        doc: tutorDoc || trackFromURL || savedScript || defaultCode,
         extensions,
         parent: el,
     })

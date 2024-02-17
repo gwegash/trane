@@ -101,6 +101,15 @@ table {
   margin: 1px;
 }
 
+.info{
+  border: solid 1px gray;
+  position: absolute;
+  font-family: 'ibmvga';
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+}
+
 .select{
   appearance: none;
 }
