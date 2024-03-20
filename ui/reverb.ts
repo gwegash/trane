@@ -1,4 +1,5 @@
 import {Effect} from "./effect"
+import {loadSample} from "./utils"
 
 class ConvolutionReverb extends Effect {
     
@@ -15,8 +16,7 @@ class ConvolutionReverb extends Effect {
 
     async setup(impulseURL){
       if(this.impulseURL != impulseURL){
-          const response = await fetch(impulseURL); //TODO write a generalised version of this that takes local:// into account
-          const arraybuffer = await response.arrayBuffer();
+          const arraybuffer = await loadSample(impulseURL);
           this.impulse = await this.audioContext.decodeAudioData(arraybuffer)
           this.webAudioNodes.convolver.buffer = this.impulse
           this.impulseURL = impulseURL

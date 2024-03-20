@@ -18,8 +18,8 @@ class Delay extends Effect {
         this.webAudioNodes.gainNode.gain.value = 0.5
         this.webAudioNodes.delay.connect(this.webAudioNodes.gainNode)
 
-        this.inputNode = this.webAudioNodes.delay
-        this.outputNode = this.webAudioNodes.delay
+        this.inputNode = this.webAudioNodes.gainNode
+        this.outputNode = this.webAudioNodes.gainNode
 
         this.knobsEl = document.createElement("div")
         this.knobsEl.className = "knobs"
@@ -30,8 +30,8 @@ class Delay extends Effect {
     }
 
     async setup(delayTime){
-        const delayTime_s = parseFloat(delayTime)
-        this.webAudioNodes.delay.delayTime.value = (delayTime_s/60.0)*bpm
+        const delayTime_beats = parseFloat(delayTime)
+        this.webAudioNodes.delay.delayTime.setTargetAtTime((delayTime_beats/bpm)*60, this.audioContext.currentTime + 0.01, 0.1)
     }
 }
 
