@@ -31,6 +31,7 @@ interface WebAudioNodes {
   waveshaper? : WaveShaperNode
   compressor? : DynamicsCompressorNode
   pannerNode? : StereoPannerNode
+	mediaStreamNode?: MediaStreamAudioSourceNode
 }
 
 class GraphNode {
