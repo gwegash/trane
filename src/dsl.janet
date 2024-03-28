@@ -117,12 +117,20 @@
   ~(inst ,:Dlay ,name ,delayTime)
 )
 
+(defmacro looper [name loopTime]
+  ~(inst ,:looper ,name ,loopTime)
+)
+
 (defmacro distortion [name amount]
   ~(inst ,:distortion ,name ,amount)
 )
 
 (defmacro compressor [name]
   ~(inst ,:compressor ,name)
+)
+
+(defmacro line_in [name]
+  ~(inst ,:line_in ,name)
 )
 
 (defmacro sample [name sample_url sample_pitch]

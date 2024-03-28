@@ -8,8 +8,10 @@ import {Delay} from "./delay"
 import {Distortion} from "./distortion"
 import {Gain} from "./gain"
 import {Output} from "./master_out"
+import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
 import {MIDIInst} from "./midi_inst"
+import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
 import type {Instrument} from "./instruments"
 import {Wire} from "./wire"
@@ -58,11 +60,17 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     else if(friendlyName == "panner"){
         return new Panner(context, instrumentEl, name)
     }
+    else if(friendlyName == "looper"){
+        return new LoopInstrument(context, instrumentEl, name)
+    }
     else if(friendlyName == "wire"){
         return new Wire(name)
     }
     else if(friendlyName == "midi"){
         return new MIDIInst(context, instrumentEl, name)
+    }
+    else if(friendlyName == "line_in"){
+        return new LineIn(context, instrumentEl, name)
     }
 }
 
@@ -70,6 +78,8 @@ async function initAudio(bpmIn, instrumentElement : DOMElement) {
     context = new AudioContext()
     instrumentEl = instrumentElement
     bpm = bpmIn //TODO hack hack, import this from somewhere
+    // init worklet modules
+    await context.audioWorklet.addModule("loop_worker.js")
 }
 
 async function newInstrumentMappings(new_instrument_mappings){

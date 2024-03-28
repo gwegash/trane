@@ -67,6 +67,7 @@ class Knob {
     this.containerEl.className = "knob-container"
     this.containerEl.appendChild(this.headingEl)
     this.containerEl.appendChild(this.canvas)
+    this.containerEl.style.userSelect = 'none'
     parentEl.appendChild(this.containerEl)
 
     this.ctx = this.canvas.getContext("2d")
