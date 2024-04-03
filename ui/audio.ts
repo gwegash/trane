@@ -78,6 +78,8 @@ async function initAudio(bpmIn, instrumentElement : DOMElement) {
     context = new AudioContext()
     instrumentEl = instrumentElement
     bpm = bpmIn //TODO hack hack, import this from somewhere
+    // init worklet modules
+    await context.audioWorklet.addModule("loop_worker.js")
 }
 
 async function newInstrumentMappings(new_instrument_mappings){
