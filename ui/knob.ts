@@ -6,6 +6,8 @@ const SIZE_PX = 40
 const KNOB_START_ROTATION = Math.PI/8
 const KNOB_SENSITIVITY = 1/200 //vertical pixels before sweeping through the whole range
 const KNOB_TIME_CONSTANT = 1/10000
+const KNOB_KNOTCH_LENGTH = 0.5 //How much of the circle the indicator shows
+const CC_PRINT_TIMEOUT = 1 //Stop showing the message 1s after midi
 
 class Knob {
   parameter
@@ -26,11 +28,19 @@ class Knob {
   mouseStart
   mouseMoveEvent
 
+  hovered = false
+  clicked = false
+  lastCCChange = 0
+
   getRotation(){
     const normalised = this.logScale ? 
       (Math.log2(this.parameter.value) - this.logMin)/(this.logMax-this.logMin) :
       (this.parameter.value - this.min)/(this.max-this.min)
     return lerp(2*Math.PI - KNOB_START_ROTATION, KNOB_START_ROTATION, normalised)
+  }
+
+  shouldDrawParamValue(){
+    return this.hovered || this.clicked || this.audioContext.currentTime < this.lastCCChange + CC_PRINT_TIMEOUT
   }
 
   setFromCC(byteVal){
@@ -39,6 +49,8 @@ class Knob {
     const target = this.logScale ? 
       Math.pow(2, this.logMin + (this.logMax-this.logMin)*normalised) :
       this.min + (this.max-this.min)*normalised
+
+    this.lastCCChange = this.audioContext.currentTime
 
     this.parameter.setTargetAtTime(target, this.audioContext.currentTime, KNOB_TIME_CONSTANT)
   }
@@ -81,6 +93,7 @@ class Knob {
       }
       else{ //move the param
         this.mouseStart = e.pageY
+        this.clicked = true
 
         const startVal = this.logScale ? Math.log2(this.parameter.value) : this.parameter.value
 
@@ -98,25 +111,43 @@ class Knob {
 
         //eslint-disable-next-line
         document.addEventListener("mouseup", (e) => {
+          this.clicked = false
           document.removeEventListener("mousemove", onMouseMove)
         }, {once: true})
+
       }
-      //e.preventDefault();
+    })
+
+    //eslint-disable-next-line
+    this.canvas.addEventListener("mouseover", (e) => {
+      this.hovered = true
+
+      this.canvas.addEventListener("mouseleave", (e) => {
+        this.hovered = false
+      }, {once: true})
     })
   }
 
   draw(){
     this.ctx.clearRect(0, 0, SIZE_PX, SIZE_PX)
 
-    this.ctx.font = "10px ibmvga"
 
     this.ctx.beginPath()
     const radius = SIZE_PX/2 - 6
     this.ctx.arc(SIZE_PX/2, SIZE_PX/2, radius, 0, 2 * Math.PI)
-    this.ctx.moveTo(SIZE_PX/2, SIZE_PX/2)
+
+    const knotchLength = this.shouldDrawParamValue() ? KNOB_KNOTCH_LENGTH : 0
+    this.ctx.moveTo(SIZE_PX/2 + Math.sin(this.getRotation())*radius*knotchLength, SIZE_PX/2 + Math.cos(this.getRotation())*radius*knotchLength)
     this.ctx.lineTo(SIZE_PX/2 + Math.sin(this.getRotation())*radius, SIZE_PX/2 + Math.cos(this.getRotation())*radius)
     this.ctx.stroke()
 
+    if(this.shouldDrawParamValue()){
+      const valueString = `${this.parameter.value.toFixed(2)}`
+      const maxTextWidth = this.ctx.measureText(valueString).width
+      this.ctx.fillText(valueString, SIZE_PX/2 - maxTextWidth/2, SIZE_PX/2 + 5)
+    }
+
+    this.ctx.font = "10px ibmvga"
     this.ctx.fillText(`${this.min}`, 1, SIZE_PX)
 
     const maxTextWidth = this.ctx.measureText(`${this.max}`).width
