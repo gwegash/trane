@@ -197,8 +197,8 @@
 # TODO maybe better as a macro?
 (defn P [pattern lengthBeats]
   (cond 
-    (or (number? pattern) (nil? pattern) (string? pattern) (keyword? pattern)) @[[pattern lengthBeats]]
-    (or (tuple? pattern) (array? pattern)) (do
+    (or (array? pattern) (number? pattern) (nil? pattern) (string? pattern) (keyword? pattern)) @[[pattern lengthBeats]]
+    (tuple? pattern) (do
       (def elementLength (/ lengthBeats (length pattern))) 
       (squish-rests (array/concat ;(map (fn [element] (P element elementLength)) pattern)))
     )
