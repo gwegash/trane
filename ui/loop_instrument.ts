@@ -1,5 +1,5 @@
 import {Effect} from "./effect"
-import {bpm} from "./index"
+import {bpm} from "./master_out"
 
 class LoopInstrument extends Effect {
     friendlyName = "looper"

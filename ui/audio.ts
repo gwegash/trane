@@ -21,7 +21,6 @@ let instruments
 const instrumentsByName = {} //a mapping from instrumentName to 
 let context
 let instrumentEl
-let bpm
 
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     if(friendlyName == "out"){
@@ -74,10 +73,9 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     }
 }
 
-async function initAudio(bpmIn, instrumentElement : DOMElement) {
+async function initAudio(instrumentElement : DOMElement) {
     context = new AudioContext()
     instrumentEl = instrumentElement
-    bpm = bpmIn //TODO hack hack, import this from somewhere
     // init worklet modules
     await context.audioWorklet.addModule("loop_worker.js")
 }
@@ -105,7 +103,7 @@ async function newInstrumentMappings(new_instrument_mappings){
             argsList.push(instrument_mapping.args.get(j))
         }
 
-        inst.setup(...argsList)
+        await inst.setup(...argsList)
 
         newInstruments[instrument_mapping.channel] = inst
     }
@@ -129,6 +127,7 @@ function deleteInstrument(name){ //TODO should delete an instrument after some t
 }
 
 function play(channel, note, vel, startTime, dur){ //seconds
+    console.debug("playing: ", {channel, note, vel, startTime, dur})
     if(channel >= 0){ //TODO rename this to routeEvent or something, it handles changes and plays
         instruments[channel].play(note, startTime, dur)
     }

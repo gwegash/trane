@@ -9,22 +9,16 @@ import {background} from "./dark_theme"
 import {tutor, continueTutorial} from "./tutor"
 import "./css/main.css"
 
-const bpm = 162
 let janetRuntime
 let compiledImage //the image that is compiling, but not yet ready been pushed to the running loops, TODO MAYBE set this to null/undefined if the compilation hasn't succeeded? 
 let outputChannel : OutputChannel
-
-function addAboutSection(){
-
-}
 
 async function main(runtime: Module){
     console.log("wasup")
     janetRuntime = runtime
 
     const instrumentElement = document.createElement("div")
-    initAudio(bpm, instrumentElement)
-    initLoopManager()
+    initAudio(instrumentElement)
     instrumentElement.className = "instruments"
     instrumentElement.style.background = background
     instrumentElement.style.color = 'white'
@@ -42,7 +36,7 @@ async function main(runtime: Module){
     
     document.body.appendChild(infoElement)
 
-    await initCodeEditor(codeElement, onChange, onCodeReload)
+    await initCodeEditor(codeElement, onChange, onCodeReload, onStop)
     window.editor = editor
     onChange()
     continueTutorial()
@@ -53,9 +47,15 @@ async function main(runtime: Module){
     outputChannel.target = outputChannelElement
 }
 
-function onChange(){
+function onStop(){ //TODO this is very wasetful
+  onChange(" ") //empty code reload
+  onCodeReload(false) //reload but don't save the script
+  onChange() //recompile the previous code
+}
+
+function onChange(code: string | undefined){
     outputChannel.clearErrors()
-    const result = runtime.trane_compile(editor.state.doc.toString())
+    const result = runtime.trane_compile(code ? code : editor.state.doc.toString())
     if (!result.isError){
         compiledImage = result.image
     }
@@ -64,10 +64,10 @@ function onChange(){
     }
 }
 
-async function onCodeReload(){
+async function onCodeReload(saveScript: boolean = true){
     console.log("got code reload message")
     if(compiledImage){
-        saveCurrentScript()
+        saveScript && saveCurrentScript()
         const { environment, lloop_names, instrument_mappings } = janetRuntime.trane_start(compiledImage)
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     }
 })
 
-export {bpm, janetRuntime}
+export {janetRuntime}
 
 if(DEV){
     new EventSource("/esbuild").addEventListener("change", () => location.reload())

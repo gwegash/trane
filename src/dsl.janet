@@ -27,6 +27,11 @@
   (map note qualities)
 )
 
+(defmacro bpm [beatsPerMinute]
+  # slightly hacky, but it keeps out interface small:
+  # push global parameters onto the arguments of the default out instrument. Kinda makes sense.
+  (array/push (get (dyn *instruments*) :out) (describe beatsPerMinute))
+)
 
 (defmacro sleep [length]
   ~(setdyn :current-time (+ (dyn :current-time) ,length))

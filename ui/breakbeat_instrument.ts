@@ -1,5 +1,5 @@
 import {Sampler} from "./sampler_generic"
-import {bpm} from "./index"
+import {bpm} from "./master_out"
 
 class BreakbeatSampler extends Sampler {
 

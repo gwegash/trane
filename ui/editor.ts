@@ -47,7 +47,7 @@ async function loadTrackURL(){
   return trackString?.text()
 }
 
-async function initCodeEditor(el, onCodeChange, onCodeReload){
+async function initCodeEditor(el, onCodeChange, onCodeReload, onStop){
 
     const savedScript = await loadSavedScript()
     const keybindings = await loadKeybindings()
@@ -75,7 +75,8 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
 
         Prec.highest(
             keymap.of([
-              { key: "Alt-Enter", run: onCodeReload }
+              { key: "Alt-Enter", run: onCodeReload },
+              { key: "Ctrl-Alt-s", run: onStop }
             ])
           ),
         EditorView.theme({
