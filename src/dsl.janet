@@ -88,12 +88,26 @@
   [;(array/new-filled times num)]
 )
 
-(defmacro wire [from to]
-  (def fromInst (eval from))
-  (def toInst (eval to))
-  (assert (get (dyn *instruments*) fromInst) (string "from inst not found: " fromInst))
-  (assert (get (dyn *instruments*) toInst) (string "to inst not found: " toInst))
-  ~(inst ,:wire ,(string fromInst "->wire->" toInst) ,fromInst ,toInst) #TODO assert to can recieve audio, ie is an effect
+(defmacro wire [from to &opt toParam]
+  (def fromInstName (eval from))
+  (def toInstName (eval to))
+
+  (def toInst (get (dyn *instruments*) toInstName))
+  (assert toInst (string "dest instrument not found: " toInstName))
+  (assert (get (dyn *instruments*) fromInstName) (string "source inst not found: " fromInstName))
+
+  (if toParam (do 
+    (def instType (get toInst 1))
+    (def instMap (get *inst_params* instType))
+    (assert instMap (string "instrument type not found " instType))
+
+    (def paramIdx (get instMap toParam))
+    (assert (or (not toParam) paramIdx) (string "paramater " toParam " does not exist in instrument " instType))
+    )
+  )
+
+  # TODO assert to can recieve audio, ie is an effect
+  ~(inst ,:wire ,(string fromInstName "->wire->" toInstName ;(if toParam ["," toParam] [])) ,fromInstName ,toInstName ,toParam)
 )
 
 (defmacro chain [& forms]
@@ -166,8 +180,8 @@
   ~(inst ,:oscillator ,name ,wave_type)
 )
 
-(defn lfo [around amp periodBeats]
-  (+ around (* amp (math/sin (/ (dyn :current-time) (* periodBeats math/pi)))))
+(defmacro lfo [name wave_type]
+  ~(inst ,:lfo ,name ,wave_type)
 )
 
 (defn play_ [pitch channel &named vel dur]

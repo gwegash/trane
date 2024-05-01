@@ -11,15 +11,17 @@ import {Output} from "./master_out"
 import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
 import {Oscillator} from "./oscillator"
+import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
 import type {Instrument} from "./instruments"
+import type {Effect} from "./effect"
 import {Wire} from "./wire"
 import "./css/fonts.css"
 
 let instruments
-const instrumentsByName = {} //a mapping from instrumentName to 
+const instrumentsByName: Record<string, Effect> = {} //a mapping from instrumentName to 
 let context
 let instrumentEl
 let bpm
@@ -60,6 +62,9 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     }
     else if(friendlyName == "oscillator"){
         return new Oscillator(context, instrumentEl, name)
+    }
+    else if(friendlyName == "lfo"){
+        return new LFO(context, instrumentEl, name)
     }
     else if(friendlyName == "panner"){
         return new Panner(context, instrumentEl, name)
@@ -121,6 +126,7 @@ async function newInstrumentMappings(new_instrument_mappings){
     instsToDelete?.forEach(inst => deleteInstrument(inst.name))
 
     instruments = newInstruments
+    window.instruments = instruments
 }
 
 function deleteInstrument(name){ //TODO should delete an instrument after some time (for now lets just set up a time after which all sounds should have stopped)
