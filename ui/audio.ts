@@ -10,6 +10,7 @@ import {Gain} from "./gain"
 import {Output} from "./master_out"
 import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
+import {Oscillator} from "./oscillator"
 import {MIDIInst} from "./midi_inst"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
@@ -57,6 +58,9 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     else if(friendlyName == "biquad"){
         return new Biquad(context, instrumentEl, name)
     }
+    else if(friendlyName == "oscillator"){
+        return new Oscillator(context, instrumentEl, name)
+    }
     else if(friendlyName == "panner"){
         return new Panner(context, instrumentEl, name)
     }
@@ -77,7 +81,7 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
 async function initAudio(bpmIn, instrumentElement : DOMElement) {
     context = new AudioContext()
     instrumentEl = instrumentElement
-    bpm = bpmIn //TODO hack hack, import this from somewhere
+    bpm = bpmIn // TODO hack hack, import this from somewhere
     // init worklet modules
     await context.audioWorklet.addModule("loop_worker.js")
 }
@@ -110,7 +114,7 @@ async function newInstrumentMappings(new_instrument_mappings){
         newInstruments[instrument_mapping.channel] = inst
     }
 
-    //handle deletion of instruments that have gone
+    // handle deletion of instruments that have gone
 
     const instsToDelete = instruments?.filter((maybeOldInst : Instrument) => !newInstruments.find(newInst => newInst.name == maybeOldInst.name))
 
@@ -121,7 +125,6 @@ async function newInstrumentMappings(new_instrument_mappings){
 
 function deleteInstrument(name){ //TODO should delete an instrument after some time (for now lets just set up a time after which all sounds should have stopped)
 //  
-
     console.log("deleting instrument " + name)
     const inst = instrumentsByName[name]
     instrumentsByName[name] = undefined

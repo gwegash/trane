@@ -162,6 +162,10 @@
   ~(inst ,:biquad ,name ,filterType)
 )
 
+(defmacro oscillator [name wave_type]
+  ~(inst ,:oscillator ,name ,wave_type)
+)
+
 (defn lfo [around amp periodBeats]
   (+ around (* amp (math/sin (/ (dyn :current-time) (* periodBeats math/pi)))))
 )

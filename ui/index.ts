@@ -19,7 +19,6 @@ function addAboutSection(){
 }
 
 async function main(runtime: Module){
-    console.log("wasup")
     janetRuntime = runtime
 
     const instrumentElement = document.createElement("div")
