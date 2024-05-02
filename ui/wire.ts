@@ -7,6 +7,8 @@ class Wire{
     to : string
     toParam: string
 
+    friendlyName = "wire"
+
     constructor(name){
         this.name = name
     }

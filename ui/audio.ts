@@ -11,6 +11,7 @@ import {Output} from "./master_out"
 import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
 import {Oscillator} from "./oscillator"
+import {Constant} from "./constant"
 import {Scope} from "./scope"
 import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
@@ -60,6 +61,9 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     }
     else if(friendlyName == "biquad"){
         return new Biquad(context, instrumentEl, name)
+    }
+    else if(friendlyName == "constant"){
+        return new Constant(context, instrumentEl, name)
     }
     else if(friendlyName == "oscillator"){
         return new Oscillator(context, instrumentEl, name)
@@ -153,6 +157,14 @@ function play(channel, note, vel, startTime, dur){ //seconds
         instruments[channelIndex].change(paramIndex, vel, note, startTime, dur)
     }
 }
+
+function instruments2GraphViz(){
+  return instruments.filter(inst => inst.friendlyName == "wire").map(wire => {
+    return `\"${wire.from}\" -> \"${wire.to}\" [label = \"${wire.toParam ? ":" + wire.toParam : "" }\"];`
+  }).join("\n")
+}
+
+window.instruments2GraphViz = instruments2GraphViz
 
 export {
     initAudio,

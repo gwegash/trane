@@ -20,5 +20,8 @@
     :panner @{
       :pan 0
     }
+    :oscillator @{
+      :frequency 0
+    }
   }
 )
