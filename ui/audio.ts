@@ -11,6 +11,7 @@ import {Output} from "./master_out"
 import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
 import {Oscillator} from "./oscillator"
+import {Scope} from "./scope"
 import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
 import {LineIn} from "./line_in_inst"
@@ -65,6 +66,9 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     }
     else if(friendlyName == "lfo"){
         return new LFO(context, instrumentEl, name)
+    }
+    else if(friendlyName == "scope"){
+        return new Scope(context, instrumentEl, name)
     }
     else if(friendlyName == "panner"){
         return new Panner(context, instrumentEl, name)
