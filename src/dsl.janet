@@ -188,6 +188,10 @@
   ~(inst ,:scope ,name)
 )
 
+(defmacro constant [name]
+  ~(inst ,:constant ,name)
+)
+
 (defn play_ [pitch channel &named vel dur]
   (if (or (array? pitch) (tuple? pitch)) ## multiple notes, ie chord
     (array/concat ;(map (fn [n] (play_ n channel :vel vel :dur dur)) pitch))
