@@ -54,7 +54,7 @@
   (def fiber-env (fiber/getenv current_loop))
 
   # The dynamic bindings we want to use
-  (def new-fiber-env @{:current-time start_beat})
+  (def new-fiber-env @{:current-time start_beat :instruments (env *instruments*)})
 
   (fiber/setenv current_loop (table/setproto new-fiber-env fiber-env))
 

@@ -3,11 +3,16 @@
 (use ./euclid)
 (use ./params)
 
-(defn- nicedescribe [x]
-  (if (string? x)
-    x
-    (describe x)
+(defmacro nicedescribe [x]
+  ~(if (string? ,x)
+    ,x
+    (describe ,x)
   )
+)
+
+(defn uclid [pat n steps]
+  (def hits (euclid n steps))
+  (map (fn [step] (if step pat :tie)) hits)
 )
 
 (defn note [quality]
@@ -27,43 +32,54 @@
   (map note qualities)
 )
 
-
 (defmacro sleep [length]
   ~(setdyn :current-time (+ (dyn :current-time) ,length))
 )
 
 #instruments! TODO default arguments
 (defmacro inst [instType name & args]
-  (assert (not (get (dyn *instruments*) name)) (string "instrument already declared: " name))
-  (put (dyn *instruments*) name @[(length (dyn *instruments*)) instType ;(map nicedescribe args)])
-  name
+  ~(do
+    (assert (not (get (dyn ,*instruments*) ,name)) (string "instrument already declared: " ,name))
+    (put (dyn ,*instruments*) ,name @[(length (dyn ,*instruments*)) ,instType ,;(map nicedescribe args)])
+    ,name
+  )
 )
 
-(defn encodeParam [inst instParam]
-  (- (inc (+ (blshift inst 5) instParam)))
+(defmacro encodeParam [inst instParam]
+  ~(- (inc (+ (blshift ,inst 5) ,instParam)))
 )
 
-(defn change_ [channel to &named cType dur]
-  (def cType_ (if cType cType -0.01))
-  (def dur_ (if dur dur -1.0))
-  [channel to cType_ (dyn :current-time) dur_]
+(defmacro change_ [channel to &named cType dur]
+  (with-syms [$cType $dur]
+    ~(let [,$cType (if ,cType ,cType -0.01) ,$dur (if ,dur ,dur -1.0)]
+      (tuple ,channel ,to ,$cType (dyn :current-time) ,$dur)
+    )
+  )
 )
 
+## Eww, this is very nested, refactor me pleaaaaase
 (defmacro change [instName param to & rest]
-  (def inst (get (dyn *instruments*) instName))
-  
-  (def instChannel (first inst))
-  (assert instChannel (string "instrument not found: " instName))
+  (with-syms [$inst $instChannel $instMap $paramIdx]
+    ~(let [,$inst (get (dyn ,*instruments*) ,instName)]
+      (let [,$instChannel (first ,$inst)]
+        (if ,$instChannel
+          (assert ,$instChannel (string "instrument not found: " ,instName ))
+          (pp (dyn ,*instruments*))
+        )
 
-  (def instType (get inst 1))
-  (def instMap (get *inst_params* instType))
-  (assert instMap (string "instrument type not found " instType))
+        (let [,$instChannel (first ,$inst)]
+          (let [,$instMap (get ,*inst_params* (get ,$inst 1))]
+            (assert ,$instMap (string "instrument type not found " (get ,$inst 1)))
 
-  (def paramIdx (get instMap param))
-  (assert paramIdx (string "paramater " param " does not exist in instrument " instType))
-
-  (def channelEncoded (encodeParam instChannel paramIdx))
-  ~(array/push (get self :notes) (change_ ,channelEncoded ,to ,;rest))
+            (let [,$paramIdx (get ,$instMap ,param)]
+              (assert ,$paramIdx (string "paramater " ,param " does not exist in instrument " (get ,$inst 1)))
+              (array/push (get self :notes) (change_ (encodeParam ,$instChannel ,$paramIdx) ,to ,;rest))
+            )
+          )
+        )
+      )
+    )
+  )
 )
 
 (defmacro lin [instName paramIdx to] # see change() in instruments.ts
@@ -79,35 +95,37 @@
 )
 
 (defmacro target [instName paramIdx to k] # see change() in instruments.ts
-  (def k_ (if k k 0.01))
-  (assert (> k_ 0) "time constant must be positive")
-  ~(change ,instName ,paramIdx ,to ,:cType (- ,k_))
+  (with-syms [$k]
+    ~(let [,$k (if ,k ,k 0.01)]
+      (assert (> ,$k 0) "time constant must be positive")
+      (change ,instName ,paramIdx ,to ,:cType (- ,$k))
+    )
+  )
 )
 
 (defn rep [num times]
-  [;(array/new-filled times num)]
+  (array/new-filled times num)
 )
 
 (defmacro wire [from to &opt toParam]
-  (def fromInstName (eval from))
-  (def toInstName (eval to))
+  (with-syms [$fromInstName $toInstName $toInst $instType $instMap]
+    ~(let [,$fromInstName ,from ,$toInstName ,to]
+      (assert (get (dyn ,*instruments*) ,$toInstName) (string "dest instrument not found: " ,$toInstName))
+      (assert (get (dyn ,*instruments*) ,$fromInstName) (string "source inst not found: " ,$fromInstName))
 
-  (def toInst (get (dyn *instruments*) toInstName))
-  (assert toInst (string "dest instrument not found: " toInstName))
-  (assert (get (dyn *instruments*) fromInstName) (string "source inst not found: " fromInstName))
+      (if ,toParam 
+        (let [,$instType (get (get (dyn ,*instruments*) ,$toInstName) 1)]  
+          (let [,$instMap (get ,*inst_params* ,$instType)]  
+            (assert ,$instMap (string "instrument type not found " ,$instType))
+            (assert (or (not ,toParam) (get ,$instMap ,toParam)) (string "paramater " ,toParam " does not exist in instrument " ,$instType))
+          )
+        )
+      )
 
-  (if toParam (do 
-    (def instType (get toInst 1))
-    (def instMap (get *inst_params* instType))
-    (assert instMap (string "instrument type not found " instType))
-
-    (def paramIdx (get instMap toParam))
-    (assert (or (not toParam) paramIdx) (string "paramater " toParam " does not exist in instrument " instType))
+      # TODO assert to can recieve audio, ie is an effect
+      (inst ,:wire (string ,$fromInstName "->wire->" ,$toInstName ;(if ,toParam ["," ,toParam] [])) ,;[$fromInstName $toInstName toParam])
     )
   )
-
-  # TODO assert to can recieve audio, ie is an effect
-  ~(inst ,:wire ,(string fromInstName "->wire->" toInstName ;(if toParam ["," toParam] [])) ,fromInstName ,toInstName ,toParam)
 )
 
 (defmacro chain [& forms]
@@ -193,8 +211,9 @@
 )
 
 (defn play_ [pitch channel &named vel dur]
-  (if (or (array? pitch) (tuple? pitch)) ## multiple notes, ie chord
-    (array/concat ;(map (fn [n] (play_ n channel :vel vel :dur dur)) pitch))
+  (cond
+    (or (array? pitch) (tuple? pitch)) (array/concat ;(map (fn [n] (play_ n channel :vel vel :dur dur)) pitch))
+    (= pitch :rest) @[]
     (do 
       (def pitch_ (note pitch))
       (def vel_ (if vel vel 1.0))
@@ -206,12 +225,12 @@
 
 (defn squish-rest-reducer [accum el]
   (def [currentNote currentLen] el)
-  (if currentNote # not a rest 
-    (array/push accum el)
-    (do # else pop a value off the stack push it back on with the rest length added on
+  (match currentNote
+    :tie (do # else pop a value off the stack push it back on with the tie length added on
       (def [lastNote lastNoteLen] (array/pop accum))
       (array/push accum [lastNote (+ lastNoteLen currentLen)])
     )
+    _ (array/push accum el)
   )
 )
 
@@ -223,8 +242,8 @@
 # TODO maybe better as a macro?
 (defn P [pattern lengthBeats]
   (cond 
-    (or (array? pattern) (number? pattern) (nil? pattern) (string? pattern) (keyword? pattern)) @[[pattern lengthBeats]]
-    (tuple? pattern) (do
+    (or (number? pattern) (nil? pattern) (string? pattern) (keyword? pattern)) @[[pattern lengthBeats]]
+    (or (array? pattern) (tuple? pattern)) (do
       (def elementLength (/ lengthBeats (length pattern))) 
       (squish-rests (array/concat ;(map (fn [element] (P element elementLength)) pattern)))
     )

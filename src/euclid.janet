@@ -1,4 +1,4 @@
-(defn euclid [steps pulses]
+(defn euclid [pulses steps]
   (if (> pulses steps)
     (array/new-filled steps 0)
     (do  
