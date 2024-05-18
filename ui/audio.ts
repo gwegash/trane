@@ -8,15 +8,22 @@ import {Delay} from "./delay"
 import {Distortion} from "./distortion"
 import {Gain} from "./gain"
 import {Output} from "./master_out"
+import {LoopInstrument} from "./loop_instrument"
 import {Biquad} from "./biquad"
+import {Oscillator} from "./oscillator"
+import {Constant} from "./constant"
+import {Scope} from "./scope"
+import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
+import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
 import type {Instrument} from "./instruments"
+import type {Effect} from "./effect"
 import {Wire} from "./wire"
 import "./css/fonts.css"
 
 let instruments
-const instrumentsByName = {} //a mapping from instrumentName to 
+const instrumentsByName: Record<string, Effect> = {} //a mapping from instrumentName to 
 let context
 let instrumentEl
 let bpm
@@ -55,8 +62,23 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     else if(friendlyName == "biquad"){
         return new Biquad(context, instrumentEl, name)
     }
+    else if(friendlyName == "constant"){
+        return new Constant(context, instrumentEl, name)
+    }
+    else if(friendlyName == "oscillator"){
+        return new Oscillator(context, instrumentEl, name)
+    }
+    else if(friendlyName == "lfo"){
+        return new LFO(context, instrumentEl, name)
+    }
+    else if(friendlyName == "scope"){
+        return new Scope(context, instrumentEl, name)
+    }
     else if(friendlyName == "panner"){
         return new Panner(context, instrumentEl, name)
+    }
+    else if(friendlyName == "looper"){
+        return new LoopInstrument(context, instrumentEl, name)
     }
     else if(friendlyName == "wire"){
         return new Wire(name)
@@ -64,12 +86,17 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
     else if(friendlyName == "midi"){
         return new MIDIInst(context, instrumentEl, name)
     }
+    else if(friendlyName == "line_in"){
+        return new LineIn(context, instrumentEl, name)
+    }
 }
 
 async function initAudio(bpmIn, instrumentElement : DOMElement) {
     context = new AudioContext()
     instrumentEl = instrumentElement
-    bpm = bpmIn //TODO hack hack, import this from somewhere
+    bpm = bpmIn // TODO hack hack, import this from somewhere
+    // init worklet modules
+    await context.audioWorklet.addModule("loop_worker.js")
 }
 
 async function newInstrumentMappings(new_instrument_mappings){
@@ -100,18 +127,18 @@ async function newInstrumentMappings(new_instrument_mappings){
         newInstruments[instrument_mapping.channel] = inst
     }
 
-    //handle deletion of instruments that have gone
+    // handle deletion of instruments that have gone
 
     const instsToDelete = instruments?.filter((maybeOldInst : Instrument) => !newInstruments.find(newInst => newInst.name == maybeOldInst.name))
 
     instsToDelete?.forEach(inst => deleteInstrument(inst.name))
 
     instruments = newInstruments
+    window.instruments = instruments
 }
 
 function deleteInstrument(name){ //TODO should delete an instrument after some time (for now lets just set up a time after which all sounds should have stopped)
 //  
-
     console.log("deleting instrument " + name)
     const inst = instrumentsByName[name]
     instrumentsByName[name] = undefined
@@ -130,6 +157,14 @@ function play(channel, note, vel, startTime, dur){ //seconds
         instruments[channelIndex].change(paramIndex, vel, note, startTime, dur)
     }
 }
+
+function instruments2GraphViz(){
+  return instruments.filter(inst => inst.friendlyName == "wire").map(wire => {
+    return `\"${wire.from}\" -> \"${wire.to}\" [label = \"${wire.toParam ? ":" + wire.toParam : "" }\"];`
+  }).join("\n")
+}
+
+window.instruments2GraphViz = instruments2GraphViz
 
 export {
     initAudio,

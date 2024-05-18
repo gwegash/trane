@@ -17,21 +17,23 @@ interface Param {
     min: number
     max: number
     logScale: boolean
+    isWorklet?: boolean //AudioworkletNodes, unlike regular audioNodes place their parameters in a ParameterMap, which makes resolution a bit trickier
 }
 
-interface WebAudioNodes {
-  biquadNode? : BiquadFilterNode
-  voices? : Map<number, Voice>
-  gainNode? : GainNode
-  attackNode? : ConstantSourceNode
-  releaseNode? : ConstantSourceNode
-  bufferSources? : Array<BufferSource>
-  convolver? : ConvolverNode
-  delay? : DelayNode
-  waveshaper? : WaveShaperNode
-  compressor? : DynamicsCompressorNode
-  pannerNode? : StereoPannerNode
-}
+type WebAudioNodes  = Record<any, AudioNode | AudioWorkletNode>
+//  biquadNode? : BiquadFilterNode
+//  voices? : Map<number, Voice>
+//  gainNode? : GainNode
+//  attackNode? : ConstantSourceNode
+//  releaseNode? : ConstantSourceNode
+//  bufferSources? : Array<BufferSource>
+//  convolver? : ConvolverNode
+//  delay? : DelayNode
+//  waveshaper? : WaveShaperNode
+//  compressor? : DynamicsCompressorNode
+//  pannerNode? : StereoPannerNode
+//  mediaStreamNode?: MediaStreamAudioSourceNode
+//}
 
 class GraphNode {
     audioContext: AudioContext
@@ -65,10 +67,26 @@ class GraphNode {
 
     setupKnobs(){ //TODO knob deletion
         this.params.forEach(param => {
-            const splitPath = param.path.split(".")
-            const resolvedParam = resolvePath(this.webAudioNodes, splitPath)
+            const resolvedParam = this.resolveParam(param)
             new Knob(this.audioContext, this.knobsEl, resolvedParam, param.name, param.min, param.max, param.logScale)
         })
+    }
+
+    /*
+     * Resolves this effects parameters, puts a reference to each audio param inside of resolvedParams in the order they appear in params for fast lookup at play time.
+     */
+    resolveParam(param: Parameter){
+      if(!param.isWorklet){
+        const splitPath = param.path.split(".")
+        const resolvedParam = resolvePath(this.webAudioNodes, splitPath)
+        return resolvedParam
+      }
+      else{
+        const splitPath = param.path.split(".") // worklet paths are of the form "node.param"
+        const node = this.webAudioNodes[splitPath[0]]
+        const resolvedParam = node.parameters.get(splitPath[1])
+        return resolvedParam
+      }
     }
 
     /*
@@ -78,9 +96,8 @@ class GraphNode {
         this.resolvedParams = []
 
         this.params.forEach(param => {
-            const splitPath = param.path.split(".")
-            const resolvedParam = resolvePath(this.webAudioNodes, splitPath)
-            this.resolvedParams.push(resolvedParam)
+          const resolvedParam = this.resolveParam(param)
+          this.resolvedParams.push(resolvedParam)
         })
     }
 

@@ -21,6 +21,10 @@ class Sampler extends Instrument {
 
     playheads : Set<Playhead>
 
+    params = [
+        {name: "gain", path: "gainNode.gain", min: 0.001, max: 10, logScale: true}, 
+    ]
+
     constructor(context : AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
         this.playheads = new Set()
@@ -84,7 +88,8 @@ class Sampler extends Instrument {
         this.ctx.strokeStyle = "white"
         this.draw()
 
-        const gainKnob = new Knob(this.audioContext, this.knobsEl, this.webAudioNodes.gainNode.gain, "gain", 0, 4)
+	this.resolveParams()
+	this.setupKnobs()
     }
 
     draw(){

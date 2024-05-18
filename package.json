@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild ui/index.ts --external:module --alias:wasm-runtime=./build/wasm.js --bundle --minify --outdir=dist --allow-overwrite --loader:.woff2=dataurl --define:DEV=false && cp -rvf dist/* ../music-site-dist/",
-    "dev": "esbuild ui/index.ts --external:module --sourcemap --alias:wasm-runtime=./build/wasm.js --bundle --outdir=dist --allow-overwrite --watch --loader:.woff2=dataurl --servedir=dist --define:DEV=true"
+    "build": "esbuild ui/index.ts loop_worker=ui/worklets/loop_worker.js --external:module --alias:wasm-runtime=./build/wasm.js --bundle --minify --outdir=dist --allow-overwrite --loader:.woff2=dataurl --define:DEV=false && cp -rvf dist/* ../music-site-dist/",
+    "dev": "esbuild ui/index.ts loop_worker=ui/worklets/loop_worker.js --external:module --sourcemap --alias:wasm-runtime=./build/wasm.js --bundle --outdir=dist --allow-overwrite --watch --loader:.woff2=dataurl --servedir=dist --define:DEV=true"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
+    "@typescript/lib-dom": "npm:@types/web@^0.0.142",
     "esbuild": "^0.19.3",
     "eslint": "^8.54.0"
   }
