@@ -3,9 +3,9 @@ import {bpm} from "./index"
 
 class BreakbeatSampler extends Sampler {
 
+    static friendlyName = "breakbeat_sampler"
     length_bars = 8 //default to two bars
     numSlices = 4
-    friendlyName = "breakbeat_sampler"
 
     constructor(context : AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)

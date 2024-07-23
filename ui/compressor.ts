@@ -2,7 +2,7 @@ import {Effect} from "./effect"
 
 class Compressor extends Effect {
 
-    friendlyName = "compressor"
+    static friendlyName = "compressor"
     params = [
         {name: "threshold", path: "compressor.threshold", min: -100, max: 0},
         {name: "knee", path: "compressor.knee", min: 0, max: 40},

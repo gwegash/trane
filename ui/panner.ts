@@ -3,7 +3,7 @@ import {Knob} from "./knob"
 
 class Panner extends Effect {
 
-    friendlyName = "panner"
+    static friendlyName = "panner"
 
     params = [
         {name: "pan", path: "pannerNode.pan", min: -1, max: 1}, 

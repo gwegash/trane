@@ -3,8 +3,8 @@ import {note_to_frequency} from "./utils"
 
 class PitchedSampler extends Sampler {
 
+    static friendlyName = "pitched_sampler"
     samplePitch : number
-    friendlyName = "pitched_sampler"
 
     addVoice(){
     

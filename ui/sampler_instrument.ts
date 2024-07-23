@@ -8,7 +8,7 @@ interface SampleBuffer {
 
 class Sampler extends Instrument {
 
-    friendlyName = "drums"
+    static friendlyName = "drums"
 
     settings = {
         detune: 0,

@@ -3,7 +3,7 @@ import {Knob} from "./knob"
 
 class Gain extends Effect {
 
-    friendlyName = "gain"
+    static friendlyName = "gain"
 
     params = [
         {name: "gain", path: "gainNode.gain", min: 0.001, max: 10.0, logScale: true},

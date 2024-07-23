@@ -1,6 +1,6 @@
 import {lerp} from "./utils"
 import {registerCC} from "./midi_manager"
-import "./css/knob.css"
+//import "./css/knob.css"
 
 const SIZE_PX = 40
 const KNOB_START_ROTATION = Math.PI/8

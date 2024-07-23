@@ -3,9 +3,10 @@ import {loadSample} from "./utils"
 
 class ConvolutionReverb extends Effect {
     
+    static friendlyName = "reverb"
+
     impulse: AudioBuffer
     impulseURL: string
-    friendlyName = "reverb"
     
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)

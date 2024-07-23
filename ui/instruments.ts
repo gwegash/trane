@@ -36,15 +36,15 @@ type WebAudioNodes  = Record<any, AudioNode | AudioWorkletNode>
 //}
 
 class GraphNode {
+    static friendlyName : string //name given in the language
+    static params : Array<Param>
     audioContext: AudioContext
     webAudioNodes : WebAudioNodes = {}
     outputNode: AudioNode
     name : string
     el : Element
     knobsEl : Element
-    params : Array<Param>
     resolvedParams : Array<AudioParam>
-    friendlyName : string //name given in the language
   
     constructor(context : AudioContext, parentEl : Element, name : string){
         this.audioContext = context

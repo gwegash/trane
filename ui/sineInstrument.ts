@@ -1,13 +1,13 @@
 import {Instrument} from "./instruments"
 import {Knob} from "./knob"
 import {note_to_frequency} from "./utils"
-import "./css/synth.css"
+//import "./css/synth.css"
 
 
 // oscillators[i] -> envelopeGain -> gain -> output
 class SawSynth extends Instrument {
 
-    friendlyName = "synth"
+    static friendlyName = "synth"
     oscillatorType = "sawtooth"
 
     /*

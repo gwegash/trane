@@ -2,7 +2,7 @@ import {Effect} from "./effect"
 import {bpm} from "./index"
 
 class LoopInstrument extends Effect {
-    friendlyName = "looper"
+    static friendlyName = "looper"
 
     params = [
         {name: "latency", path: "loopNode.latency", isWorklet: true}, //min max are correct on the processor

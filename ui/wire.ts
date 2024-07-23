@@ -2,12 +2,12 @@ import {instrumentsByName} from "./audio"
 import {registerMidiNoteInput, deregisterMidiNoteInput} from "./midi_manager"
 
 class Wire{
+    static friendlyName = "wire"
+
     name: string
     from : string
     to : string
     toParam: string
-
-    friendlyName = "wire"
 
     constructor(name){
         this.name = name

@@ -2,7 +2,7 @@ import {Effect} from "./effect"
 
 class LineIn extends Effect { //TODO this isn't really an effect. 
 
-    friendlyName = "line_in"
+    static friendlyName = "line_in"
 
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
@@ -14,7 +14,7 @@ class LineIn extends Effect { //TODO this isn't really an effect.
 
     async setup(){
       if (!this.webAudioNodes.mediaStreamNode){
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: {autoGainControl: false, echoCancellation: false, noiseSuppression: false, latency: 0.003, channelCount: 1}, video: false })
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: {autoGainControl: false, echoCancellation: false, noiseSuppression: false, latency: 0.0, channelCount: 1}, video: false })
         this.webAudioNodes.mediaStreamNode = this.audioContext.createMediaStreamSource(stream)
         this.webAudioNodes.mediaStreamNode?.connect(this.webAudioNodes.gainNode)
       }

@@ -9,7 +9,7 @@ import {background} from "./dark_theme"
 import {tutor, continueTutorial} from "./tutor"
 import "./css/main.css"
 
-const bpm = 118
+const bpm = 119
 let janetRuntime
 let compiledImage //the image that is compiling, but not yet ready been pushed to the running loops, TODO MAYBE set this to null/undefined if the compilation hasn't succeeded? 
 let outputChannel : OutputChannel

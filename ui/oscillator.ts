@@ -4,7 +4,7 @@ import {resolvePath} from "./utils"
 
 class Oscillator extends Effect {
 
-    friendlyName = "oscillator"
+    static friendlyName = "oscillator"
 
     params = [
         {name: "frequency", path: "oscillatorNode.frequency", min: 10, max: 24000, logScale: true}, 

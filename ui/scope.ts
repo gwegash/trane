@@ -5,6 +5,8 @@ import {loadSample} from "./utils"
 
 class Scope extends Effect {
 
+    static friendlyName = "scope"
+
     buffer : AudioBuffer
     canvas : Element
     ctx //TODO this is overloaded with audiocontext, rename!
@@ -12,7 +14,6 @@ class Scope extends Effect {
     width = 150
     fftSize = 2048
 
-    friendlyName = "scope"
 
     constructor(context : AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)

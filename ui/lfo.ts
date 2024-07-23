@@ -4,7 +4,7 @@ import {resolvePath} from "./utils"
 
 class LFO extends Effect {
 
-    friendlyName = "oscillator"
+    static friendlyName = "oscillator"
     params = [
         {name: "frequency", path: "oscillatorNode.frequency", min: 0.001, max: 12000, logScale: true}, 
         {name: "offset", path: "offset.offset", min: 0.001, max: 12000, logScale: true}, 

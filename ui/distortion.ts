@@ -15,8 +15,8 @@ function makeDistortionCurve(k = 50) {
 
 class Distortion extends Effect {
     
+    static friendlyName = "distortion"
     distortionCurve: Float32Array
-    friendlyName = "distortion"
     
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)

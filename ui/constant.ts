@@ -3,7 +3,7 @@ import {Knob} from "./knob"
 
 class Constant extends Effect {
 
-    friendlyName = "constant"
+    static friendlyName = "constant"
 
     params = [
         {name: "constant", path: "constantSource.offset", min: 0.001, max: 12000.0, logScale: true},

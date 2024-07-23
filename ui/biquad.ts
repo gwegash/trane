@@ -4,7 +4,7 @@ import {resolvePath} from "./utils"
 
 class Biquad extends Effect {
 
-    friendlyName = "biquad"
+    static friendlyName = "biquad"
 
     params = [
         {name: "frequency", path: "biquadNode.frequency", min: 10, max: 24000, logScale: true}, 

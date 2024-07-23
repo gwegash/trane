@@ -17,7 +17,7 @@ import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
-import type {Instrument} from "./instruments"
+import type {GraphNode, Instrument} from "./instruments"
 import type {Effect} from "./effect"
 import {Wire} from "./wire"
 import "./css/fonts.css"
@@ -28,71 +28,18 @@ let context
 let instrumentEl
 let bpm
 
+const instMap = Object.fromEntries(
+  [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
+    Delay, MIDIInst, Distortion, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
+    LoopInstrument, Wire, LineIn].map(instDef => [instDef.friendlyName, instDef]))
+
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
-    if(friendlyName == "out"){
-        return new Output(context, instrumentEl, name)
-    }
-    if(friendlyName == "synth"){
-        return new SawSynth(context, instrumentEl, name)
-    }
-    if(friendlyName == "gain"){
-        return new Gain(context, instrumentEl, name)
-    }
-    else if(friendlyName == "drums"){
-        return new Sampler(context, instrumentEl, name)
-    }
-    else if(friendlyName == "breakbeat_sampler"){
-        return new BreakbeatSampler(context, instrumentEl, name)
-    }
-    else if(friendlyName == "pitched_sampler"){
-        return new PitchedSampler(context, instrumentEl, name)
-    }
-    else if(friendlyName == "reverb"){
-        return new ConvolutionReverb(context, instrumentEl, name)
-    }
-    else if(friendlyName == "Dlay"){
-        return new Delay(context, instrumentEl, name)
-    }
-    else if(friendlyName == "distortion"){
-        return new Distortion(context, instrumentEl, name)
-    }
-    else if(friendlyName == "compressor"){
-        return new Compressor(context, instrumentEl, name)
-    }
-    else if(friendlyName == "biquad"){
-        return new Biquad(context, instrumentEl, name)
-    }
-    else if(friendlyName == "constant"){
-        return new Constant(context, instrumentEl, name)
-    }
-    else if(friendlyName == "oscillator"){
-        return new Oscillator(context, instrumentEl, name)
-    }
-    else if(friendlyName == "lfo"){
-        return new LFO(context, instrumentEl, name)
-    }
-    else if(friendlyName == "scope"){
-        return new Scope(context, instrumentEl, name)
-    }
-    else if(friendlyName == "panner"){
-        return new Panner(context, instrumentEl, name)
-    }
-    else if(friendlyName == "looper"){
-        return new LoopInstrument(context, instrumentEl, name)
-    }
-    else if(friendlyName == "wire"){
-        return new Wire(name)
-    }
-    else if(friendlyName == "midi"){
-        return new MIDIInst(context, instrumentEl, name)
-    }
-    else if(friendlyName == "line_in"){
-        return new LineIn(context, instrumentEl, name)
-    }
+  return new instMap[friendlyName](context, instrumentEl, name)
 }
 
 async function initAudio(bpmIn, instrumentElement : DOMElement) {
-    context = new AudioContext()
+    console.log(Output.friendlyName)
+    context = new AudioContext({latencyHint: 0})
     instrumentEl = instrumentElement
     bpm = bpmIn // TODO hack hack, import this from somewhere
     // init worklet modules
@@ -145,6 +92,8 @@ function deleteInstrument(name){ //TODO should delete an instrument after some t
     setTimeout(() => inst.disconnect(), 10) //disconnect all webAudioNodes after 10ms
 }
 
+
+// I think this needs a rename
 function play(channel, note, vel, startTime, dur){ //seconds
     if(channel >= 0){ //TODO rename this to routeEvent or something, it handles changes and plays
         instruments[channel].play(note, startTime, dur)
@@ -172,4 +121,5 @@ export {
     context,
     newInstrumentMappings,
     instrumentsByName,
+    instMap,
 }
