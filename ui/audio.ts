@@ -31,10 +31,15 @@ let bpm
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
     Delay, MIDIInst, Distortion, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
-    LoopInstrument, Wire, LineIn].map(instDef => [instDef.friendlyName, instDef]))
+    LoopInstrument, LineIn].map(instDef => [instDef.friendlyName, instDef]))
 
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
-  return new instMap[friendlyName](context, instrumentEl, name)
+  if(friendlyName === "wire"){
+    return new Wire(name)
+  }
+  else{
+    return new instMap[friendlyName](context, instrumentEl, name)
+  }
 }
 
 async function initAudio(bpmIn, instrumentElement : DOMElement) {

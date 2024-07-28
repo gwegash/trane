@@ -21,6 +21,10 @@ class Wire{
 
 
     setup(from, to, toParam){
+        if(this.from && from && this.to){
+          console.debug("already connected", this.from, this.to, this.toParam)
+          return
+        }
         this.from = from
         this.to = to
         this.toParam = toParam === "nil" ? undefined : toParam.slice(1) //TODO fix this, we shouldn't be getting these here
@@ -35,8 +39,8 @@ class Wire{
             // TODO this find call is inefficient, use the param index. 
             // It's what it's there for! To stop this sort of thing
             const destination = this.getDestination()
-            console.log("destination unknown", destination)
             fromInst.outputNode.connect(destination)
+            console.debug("connecting", this.from, this.to)
         }
         else{
             console.warn(`No output or input to wire together ${this.name}`)
@@ -53,6 +57,7 @@ class Wire{
         }
         if (toInst){
             const destination = this.getDestination()
+            console.debug("disconnecting", this.from, this.to)
             fromInst?.outputNode.disconnect(destination)
         }
     }
