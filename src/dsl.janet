@@ -178,6 +178,10 @@
   ~(inst ,:gain ,name)
 )
 
+(defmacro chorus [name]
+  ~(inst ,:chorus ,name)
+)
+
 (defmacro panner [name]
   ~(inst ,:panner ,name)
 )

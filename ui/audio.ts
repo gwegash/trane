@@ -15,6 +15,7 @@ import {Constant} from "./constant"
 import {Scope} from "./scope"
 import {LFO} from "./lfo"
 import {MIDIInst} from "./midi_inst"
+import {Chorus} from "./chorus"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
 import type {GraphNode, Instrument} from "./instruments"
@@ -31,7 +32,7 @@ let bpm
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
     Delay, MIDIInst, Distortion, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
-    LoopInstrument, LineIn].map(instDef => [instDef.friendlyName, instDef]))
+    LoopInstrument, Chorus, LineIn].map(instDef => [instDef.friendlyName, instDef]))
 
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
   if(friendlyName === "wire"){
