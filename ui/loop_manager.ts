@@ -15,6 +15,9 @@ interface LoopState{
 }
 
 function init(){ //requires the audioContext and runtime to be initialised
+    if(start_time_seconds){ //don't bother if we've already started
+      return
+    }
     start_time_seconds = context.currentTime
     masterLoop() //async, fires this off
 }

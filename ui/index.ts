@@ -9,10 +9,11 @@ import {background} from "./dark_theme"
 import {tutor, continueTutorial} from "./tutor"
 import "./css/main.css"
 
-const bpm = 119
+let bpm
 let janetRuntime
 let compiledImage //the image that is compiling, but not yet ready been pushed to the running loops, TODO MAYBE set this to null/undefined if the compilation hasn't succeeded? 
 let outputChannel : OutputChannel
+let instrumentElement : HTMLElement
 
 function addAboutSection(){
 
@@ -21,9 +22,7 @@ function addAboutSection(){
 async function main(runtime: Module){
     janetRuntime = runtime
 
-    const instrumentElement = document.createElement("div")
-    initAudio(bpm, instrumentElement)
-    initLoopManager()
+    instrumentElement = document.createElement("div")
     instrumentElement.className = "instruments"
     instrumentElement.style.background = background
     instrumentElement.style.color = 'white'
@@ -67,7 +66,17 @@ async function onCodeReload(){
     console.log("got code reload message")
     if(compiledImage){
         saveCurrentScript()
-        const { environment, lloop_names, instrument_mappings } = janetRuntime.trane_start(compiledImage)
+        const startResult = janetRuntime.trane_start(compiledImage)
+        const { environment, lloop_names, instrument_mappings } = startResult
+        if(startResult.bpm && startResult.bpm > 0 && bpm === undefined){
+          bpm = startResult.bpm
+        }
+        else if(bpm === undefined){ //fallback to 120bpm
+          bpm = 120
+        }
+
+        await initAudio(instrumentElement) //no-op if already initialised
+        initLoopManager() //also no-op if already initialised
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
         continueTutorial()

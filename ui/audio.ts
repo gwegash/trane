@@ -22,12 +22,12 @@ import type {GraphNode, Instrument} from "./instruments"
 import type {Effect} from "./effect"
 import {Wire} from "./wire"
 import "./css/fonts.css"
+import {bpm} from "./index"
 
 let instruments
 const instrumentsByName: Record<string, Effect> = {} //a mapping from instrumentName to 
 let context
 let instrumentEl
-let bpm
 
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
@@ -43,11 +43,15 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
   }
 }
 
-async function initAudio(bpmIn, instrumentElement : DOMElement) {
+async function initAudio(instrumentElement : DOMElement) {
+    //don't bother if we've already started the context
+    if(context){
+      return
+    }
+	
     console.log(Output.friendlyName)
     context = new AudioContext({latencyHint: 0})
     instrumentEl = instrumentElement
-    bpm = bpmIn // TODO hack hack, import this from somewhere
     // init worklet modules
     await context.audioWorklet.addModule("loop_worker.js")
 }

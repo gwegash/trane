@@ -71,6 +71,7 @@ struct StartResult {
     uintptr_t environment;
     std::vector<string> lloop_names;
     std::vector<Instrument> instrument_mappings;
+    double bpm;
 };
 
 struct ContinueResult {
@@ -170,6 +171,11 @@ StartResult trane_start(uintptr_t image_ptr) {
         keys_vec.push_back(lloop_name);
     }
 
+    //Grab the bpm
+    const Janet janetBpm = janet_table_get(envTable, janet_ckeywordv("bpm"));
+    janet_gcroot(janetBpm);
+    double bpm = janet_unwrap_number(janetBpm);
+    janet_gcunroot(janetBpm);
 
     //
     //grab instrument mappings
@@ -224,7 +230,8 @@ StartResult trane_start(uintptr_t image_ptr) {
     return (StartResult) {
         .environment = reinterpret_cast<uintptr_t>(envTable),
         .lloop_names = keys_vec,
-        .instrument_mappings = instruments_vec
+        .instrument_mappings = instruments_vec,
+        .bpm = bpm
     };
 }
 
@@ -357,6 +364,7 @@ EMSCRIPTEN_BINDINGS(module) {
         .field("environment", &StartResult::environment)
         .field("lloop_names", &StartResult::lloop_names)
         .field("instrument_mappings", &StartResult::instrument_mappings)
+        .field("bpm", &StartResult::bpm)
         ;
 
     value_object<ContinueResult>("ContinueResult")

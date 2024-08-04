@@ -23,6 +23,12 @@
   )
 )
 
+(defmacro bpm [beats_per_minute]
+  (assert (not (dyn *bpm*)) (string "bpm already defined"))
+  (assert (number? beats_per_minute) (string "bpm not a literal number"))
+  (setdyn *bpm* beats_per_minute)
+)
+
 (defn chord [root quality]
   (def rootNum (note root))
   (map (fn [n] (+ n rootNum)) (get chord_qualities quality))

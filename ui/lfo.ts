@@ -4,10 +4,9 @@ import {resolvePath} from "./utils"
 
 class LFO extends Effect {
 
-    static friendlyName = "oscillator"
+    static friendlyName = "lfo"
     params = [
-        {name: "frequency", path: "oscillatorNode.frequency", min: 0.001, max: 12000, logScale: true}, 
-        {name: "offset", path: "offset.offset", min: 0.001, max: 12000, logScale: true}, 
+        {name: "frequency", path: "oscillatorNode.frequency", min: 0.001, max: 200, logScale: true}, 
         {name: "magnitude", path: "magnitudeGain.gain", min: 0.001, max: 1000, logScale: true}, 
     ]
 
@@ -18,9 +17,7 @@ class LFO extends Effect {
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
 
-        //osc--magnitude-\
-        //                outputGain
-        //offset---------/
+        //osc-->magnitude-->outputGain
 
         this.webAudioNodes.oscillatorNode = context.createOscillator()
         this.webAudioNodes.oscillatorNode.start()
@@ -28,12 +25,8 @@ class LFO extends Effect {
         this.webAudioNodes.magnitudeGain = context.createGain()
         this.webAudioNodes.oscillatorNode.connect(this.webAudioNodes.magnitudeGain)
 
-        this.webAudioNodes.offset = context.createConstantSource()
-        this.webAudioNodes.offset.start()
-
         this.webAudioNodes.outputGain = context.createGain()
 
-        this.webAudioNodes.offset.connect(this.webAudioNodes.outputGain)
         this.webAudioNodes.magnitudeGain.connect(this.webAudioNodes.outputGain)
 
         this.outputNode = this.webAudioNodes.outputGain
