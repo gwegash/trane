@@ -184,6 +184,10 @@
   ~(inst ,:gain ,name)
 )
 
+(defmacro keyboard [name]
+  ~(inst ,:keyboard ,name)
+)
+
 (defmacro chorus [name]
   ~(inst ,:chorus ,name)
 )

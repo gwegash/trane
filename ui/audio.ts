@@ -18,6 +18,7 @@ import {MIDIInst} from "./midi_inst"
 import {Chorus} from "./chorus"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
+import {Keyboard} from "./keyboard"
 import type {GraphNode, Instrument} from "./instruments"
 import type {Effect} from "./effect"
 import {Wire} from "./wire"
@@ -25,13 +26,13 @@ import "./css/fonts.css"
 import {bpm} from "./index"
 
 let instruments
-const instrumentsByName: Record<string, Effect> = {} //a mapping from instrumentName to 
+const instrumentsByName: Record<string, GraphNode> = {} //a mapping from instrumentName to 
 let context
 let instrumentEl
 
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
-    Delay, MIDIInst, Distortion, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
+    Delay, MIDIInst, Distortion, Keyboard, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
     LoopInstrument, Chorus, LineIn].map(instDef => [instDef.friendlyName, instDef]))
 
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
@@ -132,4 +133,5 @@ export {
     newInstrumentMappings,
     instrumentsByName,
     instMap,
+    getTabIndex,
 }

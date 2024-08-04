@@ -2,6 +2,13 @@ import {base0B as atomColor} from "./dark_theme"
 import {resolvePath} from "./utils"
 import {Knob} from "./knob"
 
+let tabIndex = 0
+
+const getTabIndex = () => {
+	tabIndex += 1
+    return tabIndex
+}
+
 interface Voice {
   signal: AudioNode
   envelopeGain : GainNode
@@ -42,7 +49,7 @@ class GraphNode {
     webAudioNodes : WebAudioNodes = {}
     outputNode: AudioNode
     name : string
-    el : Element
+    el : HTMLElement
     knobsEl : Element
     resolvedParams : Array<AudioParam>
   
@@ -159,4 +166,4 @@ class Instrument extends GraphNode{
     }
 }
 
-export {GraphNode, Instrument, WebAudioNodes, Param}
+export {GraphNode, Instrument, WebAudioNodes, Param, getTabIndex}

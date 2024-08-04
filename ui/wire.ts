@@ -1,4 +1,5 @@
 import {instrumentsByName} from "./audio"
+import {Keyboard} from "./keyboard"
 import {registerMidiNoteInput, deregisterMidiNoteInput} from "./midi_manager"
 
 class Wire{
@@ -35,6 +36,9 @@ class Wire{
         if(from === ":midi"){
             registerMidiNoteInput(to, toInst)
         }
+	else if (fromInst instanceof Keyboard){
+            fromInst.registerEvents(toInst)
+        }
         else if (fromInst.outputNode && toInst.inputNode){
             // TODO this find call is inefficient, use the param index. 
             // It's what it's there for! To stop this sort of thing
@@ -54,6 +58,9 @@ class Wire{
 
         if (this.from === ":midi"){
             deregisterMidiNoteInput(this.to)
+        }
+	else if (fromInst instanceof Keyboard){
+            fromInst.deregisterEvents(toInst)
         }
         if (toInst){
             const destination = this.getDestination()
