@@ -77,11 +77,13 @@ class Keyboard extends Effect {
             }
         })
         window.addEventListener("keyup", (event: KeyboardEvent) => {
-            this.pressedKeys.delete(event.key)
-            if(keyToSemitone[event.key] !== undefined){
-                this.noteRegistrations.forEach(inst => {
-                    inst.play(this.baseKey + keyToSemitone[event.key], this.audioContext.currentTime, 0) // negative time is forever
-                })
+            if(this.pressedKeys.has(event.key)){
+                this.pressedKeys.delete(event.key)
+                if(keyToSemitone[event.key] !== undefined){
+                    this.noteRegistrations.forEach(inst => {
+                        inst.play(this.baseKey + keyToSemitone[event.key], this.audioContext.currentTime, 0) // negative time is forever
+                    })
+                }
             }
         })
 

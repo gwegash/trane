@@ -23,12 +23,12 @@ import type {GraphNode, Instrument} from "./instruments"
 import type {Effect} from "./effect"
 import {Wire} from "./wire"
 import "./css/fonts.css"
-import {bpm} from "./index"
+import {bpm, instrumentElement as instrumentEl} from "./index"
 
 let instruments
 const instrumentsByName: Record<string, GraphNode> = {} //a mapping from instrumentName to 
 let context
-let instrumentEl
+let nullGain //for chrome based implementation details on constant sources
 
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
@@ -44,7 +44,7 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
   }
 }
 
-async function initAudio(instrumentElement : DOMElement) {
+async function initAudio() {
     //don't bother if we've already started the context
     if(context){
       return
@@ -52,7 +52,10 @@ async function initAudio(instrumentElement : DOMElement) {
 	
     console.log(Output.friendlyName)
     context = new AudioContext({latencyHint: 0})
-    instrumentEl = instrumentElement
+    nullGain = context.createGain()
+    nullGain.gain.value = 0.0
+    nullGain.connect(context.destination)
+
     // init worklet modules
     await context.audioWorklet.addModule("loop_worker.js")
 }
@@ -134,4 +137,5 @@ export {
     instrumentsByName,
     instMap,
     getTabIndex,
+    nullGain,
 }

@@ -1,6 +1,7 @@
 import {Instrument} from "./instruments"
 import {Knob} from "./knob"
 import {note_to_frequency} from "./utils"
+import {nullGain} from "./audio"
 //import "./css/synth.css"
 
 
@@ -45,44 +46,63 @@ class SawSynth extends Instrument {
 
         this.webAudioNodes.attackNode = context.createConstantSource()
         this.webAudioNodes.attackNode.start()
+        this.webAudioNodes.attackNode.connect(nullGain)
         this.webAudioNodes.releaseNode = context.createConstantSource()
         this.webAudioNodes.releaseNode.start()
+        this.webAudioNodes.releaseNode.connect(nullGain)
 
         this.webAudioNodes.attackNode.offset.value = 0.01
         this.webAudioNodes.releaseNode.offset.value = 0.01
 
         //instantiate our oscillators
-        this.webAudioNodes.voices = new Map()
+        this.webAudioNodes.voices = {}
 
         this.setupUI()
     }
 
     setup(oscillator_type){
         this.oscillatorType = oscillator_type
-        for (let osc of this.webAudioNodes.voices.values()){
+        for (let osc of Object.values(this.webAudioNodes.voices)){
             osc.signal.type = oscillator_type
         }
     }
 
     //TODO oscillator cleanup
-    play(note, startTime, dur){ //seconds
-
-        let voice = this.webAudioNodes.voices.get(note)
-        if (!voice) {
+    play(note, startTime, dur){ //seconds dur === 0 means noteOff, dur<0 means noteOn. Else play for duration
+        let voice
+        if(dur > 0){
             voice = this.addVoice()
-            this.webAudioNodes.voices.set(note, voice)
         }
+        else if(dur < 0){
+            voice = this.addVoice()
+            this.webAudioNodes.voices[note] = voice
+        }
+        else {
+            voice = this.webAudioNodes.voices[note]
+            delete this.webAudioNodes.voices[note] // this is on its way out
+            setTimeout(() => this.removeVoice(voice), 5000) //5 second deletion? might eat into release time
+        }
+
         const frequency = note_to_frequency(note)
+        voice.signal.frequency.setTargetAtTime(frequency, startTime, 0.001)
 
-        voice.signal.frequency.setValueAtTime(frequency, startTime)
-
-        voice.envelopeGain.gain.cancelScheduledValues(startTime)
-        voice.envelopeGain.gain.setValueAtTime(0, startTime)
-        voice.envelopeGain.gain.linearRampToValueAtTime(1, startTime + this.webAudioNodes.attackNode.offset.value)
-    
-        if(dur >= 0){
+        if(dur > 0){
+            voice.envelopeGain.gain.setValueAtTime(0, startTime)
+            voice.envelopeGain.gain.linearRampToValueAtTime(1, startTime + Math.min(this.webAudioNodes.attackNode.offset.value, dur))
+            voice.envelopeGain.gain.setValueAtTime(1, startTime + dur)
             voice.envelopeGain.gain.linearRampToValueAtTime(0, startTime + dur + this.webAudioNodes.releaseNode.offset.value)
+
+            setTimeout(() => this.removeVoice(voice), (dur + this.webAudioNodes.releaseNode.offset.value)*1000 + 3000) //3 second just to be sure
         }
+        else if(dur < 0){
+            voice.envelopeGain.gain.setValueAtTime(0, startTime)
+            voice.envelopeGain.gain.linearRampToValueAtTime(1, startTime + this.webAudioNodes.attackNode.offset.value)
+        }
+        else if(dur === 0){
+            voice.envelopeGain.gain.linearRampToValueAtTime(0, startTime + this.webAudioNodes.releaseNode.offset.value)
+        }
+
+    
     }
 
     setupUI(){

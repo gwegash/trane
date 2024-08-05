@@ -150,7 +150,7 @@ class Instrument extends GraphNode{
     disconnect(){
         Object.values(this.webAudioNodes).forEach(node => {
             if(!node.disconnect){
-                node.forEach(n => {
+                Object.values(node).forEach(n => {
                     if(isVoice(n)){
                         n.signal.stop()
                         n.signal.disconnect()

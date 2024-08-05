@@ -75,7 +75,7 @@ async function onCodeReload(){
           bpm = 120
         }
 
-        await initAudio(instrumentElement) //no-op if already initialised
+        await initAudio() //no-op if already initialised
         initLoopManager() //also no-op if already initialised
         await newInstrumentMappings(instrument_mappings)
         codeReload(environment, lloop_names)
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     }
 })
 
-export {bpm, janetRuntime}
+export {bpm, instrumentElement, janetRuntime}
 
 if(DEV){
     new EventSource("/esbuild").addEventListener("change", () => location.reload())
