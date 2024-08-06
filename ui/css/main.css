@@ -128,7 +128,7 @@ table {
     flex-grow: 1;
 }
 
-.err {
+.janet-err {
   font-family: 'ibmvga';
   color: red;
   font-size: larger;

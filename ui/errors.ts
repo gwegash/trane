@@ -21,7 +21,7 @@ class OutputChannel {
       }
     } else {
       const span = document.createElement('span');
-      span.classList.toggle('err', isErr);
+      span.classList.toggle('janet-err', isErr);
       span.appendChild(document.createTextNode(text));
       span.appendChild(document.createTextNode('\n'));
       this._target.appendChild(span);

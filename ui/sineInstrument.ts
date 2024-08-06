@@ -92,7 +92,7 @@ class SawSynth extends Instrument {
             voice.envelopeGain.gain.setValueAtTime(1, startTime + dur)
             voice.envelopeGain.gain.linearRampToValueAtTime(0, startTime + dur + this.webAudioNodes.releaseNode.offset.value)
 
-            setTimeout(() => this.removeVoice(voice), (dur + this.webAudioNodes.releaseNode.offset.value)*1000 + 3000) //3 second just to be sure
+            setTimeout(() => this.removeVoice(voice), (startTime - this.audioContext.currentTime + dur + this.webAudioNodes.releaseNode.offset.value)*1000 + 3000) //3 second just to be sure
         }
         else if(dur < 0){
             voice.envelopeGain.gain.setValueAtTime(0, startTime)

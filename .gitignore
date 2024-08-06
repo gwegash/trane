@@ -2,7 +2,10 @@ dist/samples
 dist/impulses
 dist/*.js
 dist/*.css
+dist/tracks
 build/*.jimage
 build/*.js
 node_modules
+test/python/env
+test/python/__pycache__
 

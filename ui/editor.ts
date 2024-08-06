@@ -87,8 +87,6 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
 
     keybindingsExtention ? extensions.push(keybindingsExtention()) : null
 
-
-
     editor = new EditorView({
         doc: tutorDoc || trackFromURL || savedScript || defaultCode,
         extensions,

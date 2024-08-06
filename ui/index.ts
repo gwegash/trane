@@ -30,6 +30,7 @@ async function main(runtime: Module){
     //initialize code UI
     const codeElement = document.createElement("div")
     codeElement.className = "code"
+    codeElement.id = "code"
     document.body.appendChild(codeElement)
     document.body.appendChild(instrumentElement)
 
@@ -49,6 +50,8 @@ async function main(runtime: Module){
     outputChannelElement.className = "output-channel"
     codeElement.appendChild(outputChannelElement)
     outputChannel.target = outputChannelElement
+
+    DEBUG && onCodeReload()
 }
 
 function onChange(){
