@@ -23,6 +23,11 @@ class Panner extends Effect {
         this.setupKnobs()
     }
 
+    async setup({pan}){
+        this.updateParamIfChanged(0, pan)
+        return this
+    }
+
 }
 
 export {Panner}

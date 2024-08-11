@@ -14,13 +14,13 @@ class BreakbeatSampler extends Sampler {
         this.setupUI()
     }
 
-    async setup(breakbeatURL, length_bars, slices){ //TODO make bpm dynamic
-        this.length_bars = parseFloat(length_bars)
+    async setup({url, length_beats, slices}){ //TODO make bpm dynamic
+        this.length_bars = parseFloat(length_beats)
         const parsedSlices = slices.slice(1, -1).split(" ").map(slice => parseFloat(slice))
         this.sampleStart = parsedSlices[0]
         this.sampleEnd = parsedSlices[parsedSlices.length - 1]
         this.slices = parsedSlices.slice(0, -1) //ignore last slice, it's the end marker, not an onset
-        super.setup(breakbeatURL)
+        super.setup(url)
         return this
     }
 

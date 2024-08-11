@@ -13,6 +13,10 @@ import localforage from "localforage"
 
 let editor
 
+//TODO move evaluator to a web worker
+const evaluateAfter_ms = 300 //stops thrashing of the evaluator and keeps good scheduling
+let reloadEvent
+
 const defaultCode = `# Hello
 # Trane is a music playground 
 # It's written in Janet, a lisp-like language
@@ -69,7 +73,8 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
         janet(),
         EditorView.updateListener.of(function(viewUpdate: ViewUpdate) {
             if (viewUpdate.docChanged) {
-                onCodeChange()
+                reloadEvent && clearTimeout(reloadEvent)
+                reloadEvent = setTimeout(onCodeChange, evaluateAfter_ms)
             }
         }),
 

@@ -10,10 +10,6 @@ class Oscillator extends Effect {
         {name: "frequency", path: "oscillatorNode.frequency", min: 10, max: 24000, logScale: true}, 
     ]
 
-    setup(oscillator_type){
-        this.webAudioNodes.oscillatorNode.type = oscillator_type
-    }
-
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
         this.webAudioNodes.oscillatorNode = context.createOscillator()
@@ -28,6 +24,12 @@ class Oscillator extends Effect {
         this.resolveParams()  //always call me after settings up your webAudioNodes!
         this.setupKnobs()
     }
+
+    async setup({wave, frequency}){
+        this.webAudioNodes.oscillatorNode.type = wave ? wave : "sine"
+        this.updateParamIfChanged(0, frequency)
+    }
+
 }
 
 export {Oscillator}

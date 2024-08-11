@@ -155,16 +155,16 @@
   ~(inst ,:Dlay ,name :delay_time ,delay_time :feedback ,feedback)
 )
 
-(defmacro looper [name loopTime]
-  ~(inst ,:looper ,name ,loopTime)
+(defmacro looper [name &named loop_time]
+  ~(inst ,:looper ,name :loop_time ,loop_time)
 )
 
-(defmacro distortion [name amount]
-  ~(inst ,:distortion ,name ,amount)
+(defmacro distortion [name &named amount]
+  ~(inst ,:distortion ,name :amount ,amount)
 )
 
-(defmacro compressor [name]
-  ~(inst ,:compressor ,name)
+(defmacro compressor [name &named threshold knee ratio attack release]
+  ~(inst ,:compressor ,name :threshold ,threshold :knee ,knee :ratio ,ratio :attack ,attack :release ,release)
 )
 
 (defmacro line_in [name]
@@ -183,8 +183,8 @@
   ~(inst ,:drums ,name ,;sample_urls)
 )
 
-(defmacro gain [name]
-  ~(inst ,:gain ,name)
+(defmacro gain [name &named gain]
+  ~(inst ,:gain ,name :gain ,gain)
 )
 
 (defmacro keyboard [name]
@@ -195,11 +195,11 @@
   ~(inst ,:chorus ,name)
 )
 
-(defmacro panner [name]
-  ~(inst ,:panner ,name)
+(defmacro panner [name &named pan]
+  ~(inst ,:panner ,name :pan ,pan)
 )
 
-(defmacro breakbeat [name sample_url length_beats slices]
+(defmacro breakbeat [name &named url length_beats slices]
   (with-syms [$slices]
     ~(let [,$slices 
            (cond 
@@ -208,33 +208,33 @@
              (error "slices not a number of slices or tuple of slice times")
            )
            ]
-       (inst ,:breakbeat_sampler ,name ,sample_url ,length_beats ,$slices)
+       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices)
      )
   )
 )
 
-(defmacro synth [name wave_type]
-  ~(inst ,:synth ,name ,wave_type)
+(defmacro synth [name &named wave]
+  ~(inst ,:synth ,name :wave ,wave)
 )
 
-(defmacro biquad [name filterType]
-  ~(inst ,:biquad ,name ,filterType)
+(defmacro biquad [name &named filter_type frequency detune Q gain]
+  ~(inst ,:biquad ,name :filter_type ,filter_type :frequency ,frequency :detune ,detune :Q ,Q :gain ,gain)
 )
 
-(defmacro oscillator [name wave_type]
-  ~(inst ,:oscillator ,name ,wave_type)
+(defmacro oscillator [name &named wave frequency]
+  ~(inst ,:oscillator ,name :wave ,wave :frequency ,frequency)
 )
 
-(defmacro lfo [name wave_type]
-  ~(inst ,:lfo ,name ,wave_type)
+(defmacro lfo [name &named wave frequency magnitude]
+  ~(inst ,:lfo ,name :wave ,wave :frequency ,frequency :magnitude ,magnitude)
 )
 
 (defmacro scope [name]
   ~(inst ,:scope ,name)
 )
 
-(defmacro constant [name]
-  ~(inst ,:constant ,name)
+(defmacro constant [name &named constant]
+  ~(inst ,:constant ,name :constant ,constant)
 )
 
 (defn play_ [pitch channel &named vel dur]

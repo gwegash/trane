@@ -25,8 +25,13 @@ class Distortion extends Effect {
         this.outputNode = this.webAudioNodes.waveshaper
     }
 
-    async setup(distortionAmount){
-        this.distortionCurve = makeDistortionCurve(parseFloat(distortionAmount))
+    async setup({amount}){
+	    let parsedAmount = parseFloat(amount)
+        if(!parsedAmount){
+            parsedAmount = 10
+        }
+
+        this.distortionCurve = makeDistortionCurve(parsedAmount)
         this.webAudioNodes.waveshaper.curve = this.distortionCurve
     }
 }

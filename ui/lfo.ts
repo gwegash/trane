@@ -10,10 +10,6 @@ class LFO extends Effect {
         {name: "magnitude", path: "magnitudeGain.gain", min: 0.001, max: 1000, logScale: true}, 
     ]
 
-    setup(oscillator_type){
-        this.webAudioNodes.oscillatorNode.type = oscillator_type
-    }
-
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
 
@@ -36,6 +32,13 @@ class LFO extends Effect {
 
         this.resolveParams()  //always call me after settings up your webAudioNodes!
         this.setupKnobs()
+    }
+
+    async setup({wave, frequency, magnitude}){
+        this.webAudioNodes.oscillatorNode.type = wave ? wave : "sine"
+        this.updateParamIfChanged(0, frequency)
+        this.updateParamIfChanged(1, magnitude)
+        return this
     }
 }
 

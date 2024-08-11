@@ -24,6 +24,11 @@ class Gain extends Effect {
         this.setupKnobs()
     }
 
+    async setup({gain}){
+        this.updateParamIfChanged(0, gain)
+        return this
+    }
+
 }
 
 export {Gain}

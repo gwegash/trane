@@ -13,10 +13,6 @@ class Biquad extends Effect {
         {name: "gain", path: "biquadNode.gain", min: -40, max: 40},
     ]
 
-    setup(filterType){
-        this.webAudioNodes.biquadNode.type = filterType
-    }
-
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
         this.webAudioNodes.biquadNode = context.createBiquadFilter()
@@ -29,6 +25,16 @@ class Biquad extends Effect {
 
         this.resolveParams()  //always call me after settings up your webAudioNodes!
         this.setupKnobs()
+    }
+
+    async setup({filter_type, frequency, detune, Q, gain}){
+        this.webAudioNodes.biquadNode.type = filter_type ? filter_type : "lowpass"
+        this.updateParamIfChanged(0, frequency)
+        this.updateParamIfChanged(1, detune)
+        this.updateParamIfChanged(2, Q)
+        this.updateParamIfChanged(3, gain)
+
+        return this
     }
 }
 

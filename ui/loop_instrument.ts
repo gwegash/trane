@@ -33,10 +33,11 @@ class LoopInstrument extends Effect {
 
     }
 
-    async setup(loopTime){
-        const delayTime_beats = parseFloat(loopTime)
+    async setup({loop_time}){
+        const delayTime_beats = parseFloat(loop_time)
         const loopTime_s = (delayTime_beats/bpm)*60
         this.webAudioNodes.loopNode.port.postMessage({loopTime_s})
+	return this
     }
 }
 

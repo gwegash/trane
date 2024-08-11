@@ -60,10 +60,10 @@ class SawSynth extends Instrument {
         this.setupUI()
     }
 
-    setup(oscillator_type){
-        this.oscillatorType = oscillator_type
+    setup({wave}){
+        this.oscillatorType = wave
         for (let osc of Object.values(this.webAudioNodes.voices)){
-            osc.signal.type = oscillator_type
+            osc.signal.type = wave
         }
     }
 

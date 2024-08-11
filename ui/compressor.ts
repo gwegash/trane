@@ -25,6 +25,14 @@ class Compressor extends Effect {
         this.setupKnobs()
     }
 
+    async setup({threshold, knee, ratio, attack, release}){
+        this.updateParamIfChanged(0, threshold)
+        this.updateParamIfChanged(1, knee)
+        this.updateParamIfChanged(2, ratio)
+        this.updateParamIfChanged(3, attack)
+        this.updateParamIfChanged(4, release)
+        return this
+    }
 }
 
 export {Compressor}
