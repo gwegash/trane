@@ -5,7 +5,7 @@ class ConvolutionReverb extends Effect {
     
     static friendlyName = "reverb"
 
-    impulse: AudioBuffer
+    impulseBuffer: AudioBuffer
     impulseURL: string
     
     constructor(context: AudioContext, parentEl : Element, name : string){
@@ -15,13 +15,14 @@ class ConvolutionReverb extends Effect {
         this.outputNode = this.webAudioNodes.convolver
     }
 
-    async setup(impulseURL){
-      if(this.impulseURL != impulseURL){
-          const arraybuffer = await loadSample(impulseURL);
-          this.impulse = await this.audioContext.decodeAudioData(arraybuffer)
-          this.webAudioNodes.convolver.buffer = this.impulse
-          this.impulseURL = impulseURL
+    async setup({impulse}){
+      if(this.impulseURL != impulse){
+          const arraybuffer = await loadSample(impulse);
+          this.impulseBuffer = await this.audioContext.decodeAudioData(arraybuffer)
+          this.webAudioNodes.convolver.buffer = this.impulseBuffer
+          this.impulseURL = impulse
       }
+      return this
     }
     
 }

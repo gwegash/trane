@@ -13,7 +13,7 @@ You'll need a copy of [nvm](https://github.com/nvm-sh/nvm) and [emsdk](https://g
 ```
 nvm use
 npm install
-./scripts
+./scripts/build-jimage
 ```
 
 ## Running
@@ -24,8 +24,7 @@ npm run dev
 
 ### Current known issues/bugs
 
-* The attack/release knobs are a slight hack. I'd like to be able to include attack/release parameter within the `(play ...)` macro
-    * The attack/release knobs are a bit broken on chrome at the moment as a result.
+* The attack/release knobs sometimes freeze up on chrome.
 
 ## Acknowledgements
 * Ian Henry and his wonderful book [Janet For Mortals](https://janet.guide). The js-janet interop is a modified version to the one running in https://toodle.studio

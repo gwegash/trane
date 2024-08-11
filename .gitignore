@@ -8,4 +8,7 @@ build/*.js
 node_modules
 test/python/env
 test/python/__pycache__
+scripts/create-parameters.js
+jpm_tree
 
+*.tested

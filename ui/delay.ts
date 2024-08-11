@@ -7,7 +7,7 @@ class Delay extends Effect {
     static friendlyName = "Dlay"
 
     params = [
-        {name: "feedback", path: "gainNode.gain", min: 0, max: 1},
+        {name: "feedback", path: "gainNode.gain", min: 0, max: 1, lastValue: 0.5},
     ]
 
     constructor(context: AudioContext, parentEl : Element, name : string){
@@ -30,9 +30,14 @@ class Delay extends Effect {
         this.setupKnobs()
     }
 
-    async setup(delayTime){
-        const delayTime_beats = parseFloat(delayTime)
+    async setup({delay_time, feedback}){
+        let delayTime_beats = parseFloat(delay_time)
+        if(!delayTime_beats){
+            delayTime_beats = 0.75
+        }
         this.webAudioNodes.delay.delayTime.setTargetAtTime((delayTime_beats/bpm)*60, this.audioContext.currentTime + 0.01, 0.1)
+
+        this.updateParamIfChanged(0, feedback)
     }
 }
 

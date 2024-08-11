@@ -24,23 +24,11 @@ interface Param {
     min: number
     max: number
     logScale: boolean
+    lastValue: number //sets the last value this was changed from the instrument definition. We set the param to this value if the setup() function recieves a different value to this one. We don't want to always override in case this is performance. Also the initial value that the node is set to
     isWorklet?: boolean //AudioworkletNodes, unlike regular audioNodes place their parameters in a ParameterMap, which makes resolution a bit trickier
 }
 
 type WebAudioNodes  = Record<any, AudioNode | AudioWorkletNode>
-//  biquadNode? : BiquadFilterNode
-//  voices? : Map<number, Voice>
-//  gainNode? : GainNode
-//  attackNode? : ConstantSourceNode
-//  releaseNode? : ConstantSourceNode
-//  bufferSources? : Array<BufferSource>
-//  convolver? : ConvolverNode
-//  delay? : DelayNode
-//  waveshaper? : WaveShaperNode
-//  compressor? : DynamicsCompressorNode
-//  pannerNode? : StereoPannerNode
-//  mediaStreamNode?: MediaStreamAudioSourceNode
-//}
 
 class GraphNode {
     static friendlyName : string //name given in the language
@@ -77,6 +65,17 @@ class GraphNode {
             const resolvedParam = this.resolveParam(param)
             new Knob(this.audioContext, this.knobsEl, resolvedParam, param.name, param.min, param.max, param.logScale)
         })
+    }
+
+    updateParamIfChanged(paramIndex, newVal){
+        if(newVal === "nil"){
+            return
+        }
+        const parsed = parseFloat(newVal)
+        if(parsed !== this.params[paramIndex].lastValue){
+            this.params[paramIndex].lastValue = parsed
+            this.resolvedParams[paramIndex].setTargetAtTime(parsed, this.audioContext.currentTime, 0.01)
+        }
     }
 
     /*

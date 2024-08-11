@@ -6,7 +6,7 @@
   "scripts": {
     "build": "esbuild ui/index.ts loop_worker=ui/worklets/loop_worker.js --define:DEBUG=false --external:module --alias:wasm-runtime=./build/wasm.js --bundle --minify --outdir=dist --allow-overwrite --loader:.woff2=dataurl --define:DEV=false && cp -rvf dist/* ../music-site-dist/",
     "dev": "esbuild ui/index.ts loop_worker=ui/worklets/loop_worker.js --define:DEBUG=true --external:module --sourcemap --alias:wasm-runtime=./build/wasm.js --bundle --outdir=dist --allow-overwrite --watch --loader:.woff2=dataurl --servedir=dist --define:DEV=true",
-    "create-parameters": "esbuild scripts/create-parameters.ts --platform=node --external:module --alias:wasm-runtime=./build/wasm.js --bundle --outdir=scripts --allow-overwrite --loader:.woff2=dataurl --tree-shaking=true --define:DEV=false"
+    "create-parameters": "esbuild scripts/create-parameters.ts --platform=node --external:module --alias:wasm-runtime=./build/wasm.js --bundle --outdir=scripts --allow-overwrite --loader:.woff2=dataurl --tree-shaking=true --define:DEV=false && npx scripts/create-parameters.js"
   },
   "author": "",
   "license": "ISC",

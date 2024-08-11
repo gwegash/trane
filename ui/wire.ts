@@ -21,7 +21,7 @@ class Wire{
     }
 
 
-    setup(from, to, toParam){
+    setup({from, to, toParam}){
         if(this.from && from && this.to){
           console.debug("already connected", this.from, this.to, this.toParam)
           return

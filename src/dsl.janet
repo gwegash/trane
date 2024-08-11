@@ -4,9 +4,9 @@
 (use ./params)
 
 (defmacro nicedescribe [x]
-  ~(if (string? ,x)
-    ,x
-    (describe ,x)
+  ~(if 
+     (string? ,x) ,x
+     (string/format "%n" ,x)
   )
 )
 
@@ -129,7 +129,7 @@
       )
 
       # TODO assert to can recieve audio, ie is an effect
-      (inst ,:wire (string ,$fromInstName "->wire->" ,$toInstName ;(if ,toParam ["," ,toParam] [])) ,;[$fromInstName $toInstName toParam])
+      (inst ,:wire (string ,$fromInstName "->wire->" ,$toInstName ;(if ,toParam ["," ,toParam] [])) :from ,$fromInstName :to ,$toInstName :toParam ,toParam)
     )
   )
 )
@@ -147,12 +147,12 @@
 )
 
 
-(defmacro reverb [name impulse]
-  ~(inst ,:reverb ,name ,impulse)
+(defmacro reverb [name &named impulse]
+  ~(inst ,:reverb ,name :impulse ,impulse)
 )
 
-(defmacro Dlay [name delayTime]
-  ~(inst ,:Dlay ,name ,delayTime)
+(defmacro Dlay [name &named delay_time feedback]
+  ~(inst ,:Dlay ,name :delay_time ,delay_time :feedback ,feedback)
 )
 
 (defmacro looper [name loopTime]
@@ -171,9 +171,12 @@
   ~(inst ,:line_in ,name)
 )
 
-(defmacro sample [name sample_url sample_pitch]
-  (def n (note sample_pitch))
-  ~(inst ,:pitched_sampler ,name ,sample_url ,n)
+(defmacro sample [name &named url pitch gain attack release]
+  (with-syms [$note]
+   ~(let [,$note (note ,pitch)]
+      (inst :pitched_sampler ,name :url ,url :pitch ,$note :gain ,gain :attack ,attack :release ,release)
+    )
+  )
 )
 
 (defmacro drums [name & sample_urls]
@@ -196,8 +199,18 @@
   ~(inst ,:panner ,name)
 )
 
-(defmacro breakbeat [name sample_url length_beats num_slices]
-  ~(inst ,:breakbeat_sampler ,name ,sample_url ,length_beats ,num_slices)
+(defmacro breakbeat [name sample_url length_beats slices]
+  (with-syms [$slices]
+    ~(let [,$slices 
+           (cond 
+             (int? ,slices) (tuple ;(map (fn [x] (/ x ,slices)) (range 0 (+ ,slices 1))))
+             (tuple? ,slices) ,slices
+             (error "slices not a number of slices or tuple of slice times")
+           )
+           ]
+       (inst ,:breakbeat_sampler ,name ,sample_url ,length_beats ,$slices)
+     )
+  )
 )
 
 (defmacro synth [name wave_type]

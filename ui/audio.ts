@@ -78,12 +78,12 @@ async function newInstrumentMappings(new_instrument_mappings){
             instrumentsByName[instrument_mapping.name] = inst
         }
 
-        const argsList: string[] = [] //call setup on already-instantiated instruments. TODO notice if an instrument has changed type
-        for (let j = 1; j<instrument_mapping.args.size(); j++){
-            argsList.push(instrument_mapping.args.get(j))
+        const argsMap = {} //call setup on already-instantiated instruments. TODO notice if an instrument has changed type
+        for (let j = 1; j<instrument_mapping.args.size(); j+=2){
+            argsMap[instrument_mapping.args.get(j).slice(1)] = instrument_mapping.args.get(j+1)
         }
 
-        inst.setup(...argsList)
+        inst.setup(argsMap)
 
         newInstruments[instrument_mapping.channel] = inst
     }

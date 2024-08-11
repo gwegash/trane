@@ -9,6 +9,7 @@ interface Playhead {
     playbackRate : number
 }
 
+// All sample times/quantities are normalised to the length of the sample
 // samplers -> hpf -> lpf -> gain -> output
 class Sampler extends Instrument {
 
@@ -33,7 +34,6 @@ class Sampler extends Instrument {
         this.webAudioNodes.gainNode.gain.value = 1.0
         this.outputNode = this.webAudioNodes.gainNode
 
-        this.setupUI()
     }
 
     async setup(sampleURL){
@@ -56,18 +56,21 @@ class Sampler extends Instrument {
         setTimeout(() => this.playheads.delete(playhead), ((playhead.startTime - this.audioContext.currentTime) + playhead.dur)*1000 + 50)
     }
 
-    playSample(startTime, dur, timeInAudio, rate){
+    playSample(startTime, dur, timeInAudio, rate, envelopeNode : AudioNode | undefined = undefined){
         if(this.buffer){
             const player = this.audioContext.createBufferSource()
             player.playbackRate.value = rate
-            player.connect(this.webAudioNodes.gainNode)
+            player.connect(envelopeNode ? envelopeNode : this.webAudioNodes.gainNode)
             player.buffer = this.buffer
+            player.loop = dur < 0
             player.start(startTime, timeInAudio)
-            player.stop(startTime + dur)
+            if(dur >= 0){
+                player.stop(startTime + dur)
+            }
 
             this.addPlayhead({startTime, dur, startTimeInAudio: timeInAudio, playbackRate: player.playbackRate.value}) //TODO looping do i even want looping? surely easier to say na and leave the user to loop
+            return player
         }
-
     }
 
     setupUI(){
@@ -98,6 +101,7 @@ class Sampler extends Instrument {
         this.ctx.font = "5px pixeled"
 
         this.ctx.beginPath()
+        this.ctx.setLineDash([])
         this.ctx.moveTo(0, this.height/2)
 
         //draw our waveform

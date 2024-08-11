@@ -35,5 +35,3 @@
 
 (peg/match test-patt "lol*4 eh*5")
 (peg/match test-patt "eh*5 eh*4")
-#(tuple 1 2 3)
-

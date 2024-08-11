@@ -5,6 +5,10 @@
       :Q 2
       :gain 3
     }
+    :chorus @{
+      :rate 0
+      :amount 1
+    }
     :compressor @{
       :threshold 0
       :knee 1
@@ -21,13 +25,22 @@
     :gain @{
       :gain 0
     }
-    :oscillator @{
+    :lfo @{
       :frequency 0
+      :magnitude 1
     }
     :looper @{
       :latency 0
     }
+    :oscillator @{
+      :frequency 0
+    }
     :panner @{
       :pan 0
+    }
+    :pitched_sampler @{
+      :gain 0
+      :attack 1
+      :release 2
     }
 })
