@@ -29,7 +29,8 @@ class Sampler extends Instrument {
         this.buffers = []
     }
 
-    async setup(...samples){
+    async setup({hits}){
+        const samples = hits.slice(1,-1).split(" ").map(str => str.replaceAll("\"", ""))
         const newBuffers = Array(samples.length)
         await Promise.all(samples.map(async (sampleURL, i) => {
             const sampleBuffer: SampleBuffer = {}

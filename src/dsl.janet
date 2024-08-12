@@ -179,8 +179,8 @@
   )
 )
 
-(defmacro drums [name & sample_urls]
-  ~(inst ,:drums ,name ,;sample_urls)
+(defmacro drums [name &named hits]
+  ~(inst ,:drums ,name :hits ,hits)
 )
 
 (defmacro gain [name &named gain]

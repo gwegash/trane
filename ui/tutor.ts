@@ -39,12 +39,12 @@ const tutorInstructions : Array<ITutorInstruction> = [
   {
     condition: (_) => true,
     codeBlock: { text: `
-(chain                                                   # chain these together
-  (sample :hello-sample "samples/Cmin 7th 3.wav" :C3)    # create a sampler
-#  (biquad :hello-filter "lowpass")                       # create a lowpass filter
-  :out                                                   # plug them into the output
+(chain                                                               # chain these together
+  (sample :hello-sample :url "samples/Cmin 7th 3.wav" :pitch :C3)    # create a sampler
+#  (biquad :hello-filter :filter_type "lowpass")                      # create a lowpass filter
+  :out                                                               # plug them into the output
 )
-`, timePerKey: 1.0/60},
+`, timePerKey: 1.0/30},
     where: (code) => code.length,
   },
   {
@@ -79,7 +79,7 @@ const tutorInstructions : Array<ITutorInstruction> = [
 #  (target :hello-filter :frequency (rand 50 10000) 10)   # change the filter cutoff to a random frequency 
   (sleep 6)                                              # sleep for 6 beats
 )
-`, timePerKey: 1.0/60},
+`, timePerKey: 1.0/30},
     where: (code) => code.length,
   },
   {
@@ -117,10 +117,21 @@ async function continueTutorial(){
     const whereInDoc = currentInstruction.where(code)
     // Insert text at the start of the document
 
-    for (let i = 0; i<currentInstruction.codeBlock.text.length; i++){
+    //reduces-concats spaces to avoid the whitespace timeout
+    const codeBlockReduced = currentInstruction.codeBlock.text
+        .split("")
+        .reduce((accum, val) => {
+            val === " " ? accum.push(accum.pop() + " ") : accum.push(val)
+            return accum
+        }, [""])
+
+    let currentWritePos = whereInDoc 
+    for (let i = 0; i<codeBlockReduced.length; i++){
       editor.dispatch({
-        changes: {from: whereInDoc + i, insert: currentInstruction.codeBlock.text[i]}
+        changes: {from: currentWritePos, insert: codeBlockReduced[i]}
       })
+
+      currentWritePos += codeBlockReduced[i].length
       await sleep(currentInstruction.codeBlock.timePerKey)
     } 
     programCounter++

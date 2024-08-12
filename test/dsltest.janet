@@ -130,3 +130,15 @@
                  ":release"
                  "nil"]})
 )
+
+(deftest: loop_body "test_drum_inst" [context]
+  (drums :drum :hits ["1" "2" "3" "4"])
+  (test (dyn *instruments*)
+    @{:drum @[2
+              :drums
+              ":hits"
+              "(\"1\" \"2\" \"3\" \"4\")"]
+      :midi @[1 :midi]
+      :out @[0 :out]})
+)
+
