@@ -7,7 +7,7 @@ class PitchedSampler extends Sampler {
     static friendlyName = "pitched_sampler"
     samplePitch : number
     params = [
-	    {name: "gain", path: "gainNode.gain", min: 0.1, max: 10, lastValue: 1.0},
+	    {name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0},
 	    {name: "attack", path: "attackNode.offset", min: 0, max: 1, lastValue: 0.01},
 	    {name: "release", path: "releaseNode.offset",min: 0, max: 1, lastValue: 0.01},
     ]
@@ -33,7 +33,7 @@ class PitchedSampler extends Sampler {
     constructor(context : AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
 	    this.params = [
-		    {name: "gain", path: "gainNode.gain", min: 0.1, max: 10, lastValue: 1.0},
+		    {name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0},
 		    {name: "attack", path: "attackNode.offset", min: 0, max: 1, lastValue: 0.01},
 		    {name: "release", path: "releaseNode.offset",min: 0, max: 1, lastValue: 0.01},
 	    ]

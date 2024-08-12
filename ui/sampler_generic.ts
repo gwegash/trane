@@ -23,7 +23,7 @@ class Sampler extends Instrument {
     playheads : Set<Playhead>
 
     params = [
-        {name: "gain", path: "gainNode.gain", min: 0.001, max: 10, logScale: true}, 
+        {name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true}, 
     ]
 
     constructor(context : AudioContext, parentEl : Element, name : string){
