@@ -213,8 +213,8 @@
   )
 )
 
-(defmacro synth [name &named wave]
-  ~(inst ,:synth ,name :wave ,wave)
+(defmacro synth [name &named wave gain attack release]
+  ~(inst ,:synth ,name :wave ,wave :gain ,gain :attack ,attack :release ,release)
 )
 
 (defmacro biquad [name &named filter_type frequency detune Q gain]

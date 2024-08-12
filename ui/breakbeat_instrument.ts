@@ -7,7 +7,8 @@ class BreakbeatSampler extends Sampler {
     length_bars = 8 //default to two bars
     sampleStart = 0
     sampleEnd = 1
-    slices = [this.sampleStart, this.sampleEnd]
+    slices = [this.sampleStart]
+    slicesWithEnd = [this.sampleStart, this.sampleEnd] //for visualisation
 
     constructor(context : AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
@@ -20,6 +21,7 @@ class BreakbeatSampler extends Sampler {
         this.sampleStart = parsedSlices[0]
         this.sampleEnd = parsedSlices[parsedSlices.length - 1]
         this.slices = parsedSlices.slice(0, -1) //ignore last slice, it's the end marker, not an onset
+        this.slicesWithEnd = [...this.slices, this.sampleEnd]
         super.setup(url)
         return this
     }
@@ -32,7 +34,16 @@ class BreakbeatSampler extends Sampler {
             //Don't include the end (last slice point) in this 
             const sliceTime = this.slices[(note % this.slices.length)] * this.buffer.duration
 
-            this.playSample(startTime, dur, sliceTime, playbackRate)
+            //we get a noteOn, we just want to play the slice that they refer to, nothing else
+            let playDur = dur
+            if(dur < 0){
+                //      seconds?        multiplier
+                const sliceTime = this.slices[(note % this.slices.length)] * this.buffer.duration
+                const nextSliceTime = this.slicesWithEnd[(note % this.slices.length) + 1] * this.buffer.duration
+                playDur = (nextSliceTime - sliceTime)/playbackRate
+            }
+
+            this.playSample(startTime, playDur, sliceTime, playbackRate)
         }
     }
 

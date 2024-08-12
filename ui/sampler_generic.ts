@@ -19,6 +19,7 @@ class Sampler extends Instrument {
     height = 65
     width = 350
     sampleURL : string
+    loop = false
 
     playheads : Set<Playhead>
 
@@ -62,7 +63,7 @@ class Sampler extends Instrument {
             player.playbackRate.value = rate
             player.connect(envelopeNode ? envelopeNode : this.webAudioNodes.gainNode)
             player.buffer = this.buffer
-            player.loop = dur < 0
+            player.loop = this.loop
             player.start(startTime, timeInAudio)
             if(dur >= 0){
                 player.stop(startTime + dur)

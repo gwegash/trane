@@ -11,6 +11,12 @@ class SawSynth extends Instrument {
     static friendlyName = "synth"
     oscillatorType = "sawtooth"
 
+    params = [
+	    {name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0},
+	    {name: "attack", path: "attackNode.offset", min: 0, max: 1, lastValue: 0.01},
+	    {name: "release", path: "releaseNode.offset",min: 0, max: 1, lastValue: 0.01},
+    ]
+
     /*
      * Adds an oscillatorEnvelope to the WebAudioNodes
      */
@@ -60,11 +66,14 @@ class SawSynth extends Instrument {
         this.setupUI()
     }
 
-    setup({wave}){
+    setup({wave, gain, attack, release}){
         this.oscillatorType = wave
         for (let osc of Object.values(this.webAudioNodes.voices)){
             osc.signal.type = wave
         }
+	this.updateParamIfChanged(0, gain)
+	this.updateParamIfChanged(1, attack)
+	this.updateParamIfChanged(2, release)
     }
 
     //TODO oscillator cleanup
@@ -99,6 +108,8 @@ class SawSynth extends Instrument {
             voice.envelopeGain.gain.linearRampToValueAtTime(1, startTime + this.webAudioNodes.attackNode.offset.value)
         }
         else if(dur === 0){
+            voice.envelopeGain.gain.cancelScheduledValues(startTime)
+            voice.envelopeGain.gain.setValueAtTime(voice.envelopeGain.gain.value, startTime)
             voice.envelopeGain.gain.linearRampToValueAtTime(0, startTime + this.webAudioNodes.releaseNode.offset.value)
         }
 
@@ -110,9 +121,8 @@ class SawSynth extends Instrument {
         this.knobsEl = document.createElement("div")
         this.knobsEl.className = "knobs"
         this.el.appendChild(this.knobsEl)
-        const gainKnob = new Knob(this.audioContext, this.knobsEl, this.webAudioNodes.gainNode.gain, "gain", 0, 1)
-        const attackKnob = new Knob(this.audioContext, this.knobsEl, this.webAudioNodes.attackNode.offset, "attack", 0, 1)
-        const releaseKnob = new Knob(this.audioContext, this.knobsEl, this.webAudioNodes.releaseNode.offset, "release", 0, 1)
+	this.resolveParams()
+	this.setupKnobs()
     }
 }
 

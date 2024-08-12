@@ -43,4 +43,9 @@
       :attack 1
       :release 2
     }
+    :synth @{
+      :gain 0
+      :attack 1
+      :release 2
+    }
 })

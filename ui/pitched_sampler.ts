@@ -107,6 +107,8 @@ class PitchedSampler extends Sampler {
             voice.signal = this.playSample(startTime, dur + this.webAudioNodes.releaseNode.offset.value, 0, playbackRate, voice.envelopeGain)
         }
         else if(dur === 0){
+            voice.envelopeGain.gain.cancelScheduledValues(startTime)
+            voice.envelopeGain.gain.setValueAtTime(voice.envelopeGain.gain.value, startTime)
             voice.envelopeGain.gain.linearRampToValueAtTime(0, startTime + this.webAudioNodes.releaseNode.offset.value)
         }
 

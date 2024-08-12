@@ -11,7 +11,7 @@
     (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1>))) 
 
 (test-macro (synth :synth "sawtooth")
-  (inst :synth :synth :wave nil))
+  (inst :synth :synth :wave nil :gain nil :attack nil :release nil))
 
 (deftest-type loop_body
   :setup (fn [] (do 
