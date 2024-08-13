@@ -18,6 +18,7 @@ import {MIDIInst} from "./midi_inst"
 import {Chorus} from "./chorus"
 import {LineIn} from "./line_in_inst"
 import {Panner} from "./panner"
+import {LadderFilter} from "./ladder_filter"
 import {Keyboard} from "./keyboard"
 import type {GraphNode, Instrument} from "./instruments"
 import type {Effect} from "./effect"
@@ -33,7 +34,7 @@ let nullGain //for chrome based implementation details on constant sources
 const instMap = Object.fromEntries(
   [Output, SawSynth, Gain, Sampler, BreakbeatSampler, PitchedSampler, ConvolutionReverb, 
     Delay, MIDIInst, Distortion, Keyboard, Compressor, Biquad, Constant, Oscillator, LFO, Scope, Panner, 
-    LoopInstrument, Chorus, LineIn].map(instDef => [instDef.friendlyName, instDef]))
+    LoopInstrument, Chorus, LineIn, LadderFilter].map(instDef => [instDef.friendlyName, instDef]))
 
 function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
   if(friendlyName === "wire"){
@@ -44,6 +45,14 @@ function friendlyNameToInstrument(friendlyName, name) { //TODO refactor this
   }
 }
 
+async function initWorklets(){
+	await Promise.all(
+        [
+            "loop_worker.js", //TODO rename to worklet
+            "filter_worklet.js",
+        ].map(async worker_url => await context.audioWorklet.addModule(worker_url))
+    )
+}
 async function initAudio() {
     //don't bother if we've already started the context
     if(context){
@@ -57,7 +66,7 @@ async function initAudio() {
     nullGain.connect(context.destination)
 
     // init worklet modules
-    await context.audioWorklet.addModule("loop_worker.js")
+    await initWorklets()
 }
 
 async function newInstrumentMappings(new_instrument_mappings){

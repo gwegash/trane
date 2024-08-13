@@ -233,6 +233,10 @@
   ~(inst ,:scope ,name)
 )
 
+(defmacro ladder [name]
+  ~(inst ,:ladder_filter ,name)
+)
+
 (defmacro constant [name &named constant]
   ~(inst ,:constant ,name :constant ,constant)
 )
