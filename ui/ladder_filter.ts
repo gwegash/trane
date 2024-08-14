@@ -4,6 +4,11 @@ import filterWasm from "../src/cpp/ladder_filter.wasm"
 class LadderFilter extends Effect {
     static friendlyName = "ladder_filter"
 
+    params = [
+        {name: "cutoff", path: "filterNode.cutoff", isWorklet: true, min: 40, max: 12000, logScale: true},
+        {name: "Q", path: "filterNode.Q", isWorklet: true}, 
+    ]
+
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
 
@@ -12,7 +17,7 @@ class LadderFilter extends Effect {
           "filter-processor"
         )
 
-        filterNode.port.postMessage(filterWasm.buffer) //load the wasm in the worker
+        filterNode.port.postMessage({"wasm": filterWasm.buffer}) //load the wasm in the worker
 
         this.webAudioNodes.filterNode = filterNode
 
@@ -23,11 +28,9 @@ class LadderFilter extends Effect {
         this.knobsEl.className = "knobs"
         this.el.appendChild(this.knobsEl)
 
-        //this.resolveParams()  //always call me after settings up your webAudioNodes!
-        //this.setupKnobs()
+        this.resolveParams()  //always call me after settings up your webAudioNodes!
+        this.setupKnobs()
     }
-
-    
 
     async setup({}){
         return this

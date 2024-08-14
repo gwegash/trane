@@ -25,6 +25,10 @@
     :gain @{
       :gain 0
     }
+    :ladder_filter @{
+      :cutoff 0
+      :Q 1
+    }
     :lfo @{
       :frequency 0
       :magnitude 1

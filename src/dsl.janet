@@ -109,6 +109,23 @@
   )
 )
 
+(defmacro time []
+  ~(dyn :current-time)
+)
+
+
+(defn quantiseModulo [modTime measure] ## This could be a terrible idea.
+  # float64 eps?? probably a bit generous
+  (if (< (math/abs (- modTime measure)) 1e-20)
+     0
+     modTime
+   ) 
+)
+
+(defmacro til [when_beats]
+  ~(quantiseModulo (- ,when_beats (mod (time) ,when_beats)) ,when_beats)
+)
+
 (defn rep [num times]
   (array/new-filled times num)
 )

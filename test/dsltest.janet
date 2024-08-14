@@ -142,3 +142,21 @@
       :out @[0 :out]})
 )
 
+(deftest: loop_body "test_til" [context]
+  (setdyn :current-time 0)
+  (test (dyn :current-time) 0)
+  (sleep 1)
+  (test (dyn :current-time) 1)
+  (test (time) 1)
+  (test (til 8) 7)
+  (sleep 7)
+  (test (til 8) 0)
+  (sleep 7.999999)
+  (sleep (til 8))
+  (test (til 8) 0)
+  (sleep 8)
+  (test (til 8) 0)
+)
+
+
+

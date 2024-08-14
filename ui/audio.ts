@@ -60,7 +60,7 @@ async function initAudio() {
     }
 	
     console.log(Output.friendlyName)
-    context = new AudioContext({latencyHint: 0})
+    context = new AudioContext({sampleRate: 48000, latencyHint: 0})
     nullGain = context.createGain()
     nullGain.gain.value = 0.0
     nullGain.connect(context.destination)
