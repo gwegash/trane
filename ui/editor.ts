@@ -24,8 +24,8 @@ const defaultCode = `# Hello
 # To execute the code below, press Alt+Enter. (⌥+Enter on Mac)
 
 (chain 
-  (sample :hello-sample "samples/Cmin 7th 3.wav" 36)
-  #(biquad :hello-filter "lowpass")
+  (sample :hello-sample :url "samples/Cmin 7th 3.wav" :pitch :c3)
+  #(biquad :hello-filter :filter_type "lowpass")
   :out
 )
 
