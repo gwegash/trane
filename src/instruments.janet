@@ -1,25 +1,10 @@
-(use ./globals)
-
-(defmacro nicedescribe [x]
-  ~(if 
-     (string? ,x) ,x
-     (string/format "%n" ,x)
-  )
-)
-
-(defmacro inst [instType name & args]
-  ~(do
-    (assert (not (get (dyn ,*instruments*) ,name)) (string "instrument already declared: " ,name))
-    (put (dyn ,*instruments*) ,name @[(length (dyn ,*instruments*)) ,instType ,;(map nicedescribe args)])
-    ,name
-  )
-)
+(use ./dsl_helpers)
 
 (defmacro reverb 
   ````Creates a convolution reverb module with a given `name`
   Grabs an impulse from the URL of the `impulse` parameter
 
-  ## Example
+  **Example**
   ```
   (reverb :hello-verb :impulse "http://impulses.com/big_impulse.wav")
   ```
@@ -30,10 +15,10 @@
 
 (defmacro Dlay 
   ````Creates a delay module with a given `name`
-  `delay_time` is given in beats
-  `feedback` is a number
+  * `delay_time` is given in beats
+  * `feedback` is a number
 
-  ## Example
+  **Example**
   ```
   # Creates a delay module with a delay line length of 0.75 beats and a feedback of 50%
   (Dlay :hello-delay :delay_time 0.75 :feedback 0.5)
@@ -47,7 +32,7 @@
   ````Creates a looping module with a given `name`
   `loop_time` is given in beats
 
-  ## Example
+  **Example**
   ```
   # Creates a looping module with a loop time of 4 beats
   (looper :hello-looper :loop_time 4)

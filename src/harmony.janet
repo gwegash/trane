@@ -1,6 +1,6 @@
 #gratefully taken from https://github.com/yuma-m/pychord/blob/44d3db5c075efdda4e7b4ecdb9cdef074b2aab0d/pychord/constants/qualities.py
 
-(def chord_qualities @{
+(def- chord_qualities @{
   :5 [0 7]
   :maj [0 4 7]
   :m [0 3 7]
@@ -94,7 +94,7 @@
   }
 )
 
-(def midi_notes @{
+(def- midi_notes @{
     :c 0 
     :db 1 
     :cs 1 
@@ -513,4 +513,47 @@
     :B9 119
     :Cb9 119
   }
+)
+
+(defn note 
+  ````Returns a MIDI note that corresponds to the given `quality`
+
+  **Example**
+  ```
+  (note :c4) # -> 48
+  ```
+  ````
+  [quality]
+  (cond
+   (number? quality) quality
+   (keyword? quality) (get midi_notes quality)
+   (errorf "not a note %q" quality)
+  )
+)
+
+(defn chord
+  ````Returns a MIDI chord of a given root and quality
+  
+  For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/src/harmony.janet#L3)
+
+  **Example**
+  ```
+  (chord :C3 :min) # -> @[36 39 43]
+  ```
+  ````
+  [root quality]
+  (def rootNum (note root))
+  (map (fn [n] (+ n rootNum)) (get chord_qualities quality))
+)
+
+(defn notes
+  ````A mapped version of note
+  
+  **Example**
+  ```
+  (notes :c3 :e3 :g3) # -> @[36 40 43]
+  ```
+  ````
+  [& qualities]
+  (map note qualities)
 )
