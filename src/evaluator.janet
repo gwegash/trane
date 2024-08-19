@@ -3,7 +3,7 @@
 (use ./globals)
 
 (def- template-env (make-env root-env))
-(each module ["./helpers" "./dsl" "./euclid"]
+(each module ["./helpers" "./dsl" "./instruments" "./euclid"]
   (merge-module template-env (require module)))
 
 (defn- chunk-string [str]
