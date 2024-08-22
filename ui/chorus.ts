@@ -9,6 +9,7 @@ class Chorus extends Effect {
     params = [
         {name: "rate", path: "lfo.frequency", min: 0.1, max: 10},
         {name: "amount", path: "lfoGain.gain", min: 0.001, max: 0.01},
+        {name: "wet-dry", path: "wetDryPanner.pan", min: -1, max: 1},
     ]
 
     constructor(context: AudioContext, parentEl : Element, name : string){
@@ -20,22 +21,24 @@ class Chorus extends Effect {
         this.webAudioNodes.lfoGain = context.createGain()
         this.webAudioNodes.mixGain = context.createGain()
 
-	this.webAudioNodes.splitGain.connect(this.webAudioNodes.delay)
+        this.webAudioNodes.splitGain.connect(this.webAudioNodes.delay)
 
-	this.webAudioNodes.delay.delayTime.value = 0.014
-	this.webAudioNodes.lfo.frequency.value = 0.2
-	this.webAudioNodes.lfoGain.gain.value = 0.004
-	this.webAudioNodes.lfo.connect(this.webAudioNodes.lfoGain)
-	this.webAudioNodes.lfoGain.connect(this.webAudioNodes.delay.delayTime)
+        this.webAudioNodes.delay.delayTime.value = 0.014
+        this.webAudioNodes.lfo.frequency.value = 0.2
+        this.webAudioNodes.lfoGain.gain.value = 0.004
+        this.webAudioNodes.lfo.connect(this.webAudioNodes.lfoGain)
+        this.webAudioNodes.lfoGain.connect(this.webAudioNodes.delay.delayTime)
 
-	//mix the result
-	this.webAudioNodes.mixGain.gain.value = 0.5
-	this.webAudioNodes.delay.connect(this.webAudioNodes.mixGain)
-	this.webAudioNodes.splitGain.connect(this.webAudioNodes.mixGain)
+        //mix the result
+        this.webAudioNodes.mixGain.gain.value = 0.5
+        this.webAudioNodes.delay.connect(this.webAudioNodes.mixGain)
+        this.webAudioNodes.splitGain.connect(this.webAudioNodes.mixGain)
 
 
         this.inputNode = this.webAudioNodes.splitGain
         this.outputNode = this.webAudioNodes.mixGain
+
+        this.createWetDry()
 
         this.knobsEl = document.createElement("div")
         this.knobsEl.className = "knobs"

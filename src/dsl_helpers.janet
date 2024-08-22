@@ -1,6 +1,8 @@
 (use ./harmony)
 (use ./globals)
 
+(def self @{:notes @[] :rng (math/rng)}) #just to keep the DSL working inside and outside of live-loops #overridden by runner 
+
 (defmacro nicedescribe [x]
   ~(if 
      (string? ,x) ,x
