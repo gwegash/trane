@@ -79,7 +79,9 @@ class BreakbeatSampler extends Sampler {
 
     draw(){
         super.draw()
-        this.drawSlices()
+        if(this.buffer){
+            this.drawSlices()
+        }
         window.requestAnimationFrame(this.draw.bind(this))
     }
 }

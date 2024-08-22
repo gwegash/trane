@@ -1,7 +1,7 @@
 import InitializeWasm from "wasm-runtime"
 import type {Module} from "wasm-runtime"
 import {initAudio, newInstrumentMappings} from "./audio"
-import {initCodeEditor, saveCurrentScript} from "./editor"
+import {initCodeEditor, saveCurrentScript, scheduleCompilation} from "./editor"
 import {init as initLoopManager, codeReload} from "./loop_manager"
 import {OutputChannel} from "./errors"
 import {editor} from "./editor"
@@ -66,6 +66,7 @@ function onChange(){
 }
 
 async function onCodeReload(){
+    scheduleCompilation(0, onChange) //TODO this is a bit wasteful. In reality we need to check if there have been any edits to the buffer since the last compilation and schedule one if so.
     console.log("got code reload message")
     if(compiledImage){
         saveCurrentScript()

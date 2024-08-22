@@ -47,9 +47,15 @@ class Sampler extends Instrument {
 
     async loadSample(sampleURLRaw){
         const buffer = await loadSample(sampleURLRaw)
-        const decoded = await this.audioContext.decodeAudioData(buffer)
-        this.buffer = decoded
-        this.sampleURL = sampleURLRaw
+        if(buffer){
+            const decoded = await this.audioContext.decodeAudioData(buffer)
+            this.buffer = decoded
+            this.sampleURL = sampleURLRaw
+        }
+        else{
+            this.buffer = undefined
+            this.sampleURL = undefined
+        }
     }
 
     addPlayhead(playhead : Playhead){
@@ -119,19 +125,36 @@ class Sampler extends Instrument {
                 this.ctx.lineTo(x, this.height/2 + this.webAudioNodes.gainNode.gain.value*PCMBuffer[sample]*this.height/2)
                 x++
             }
-        }
 
-        this.playheads.forEach(playhead => {
-            if(this.audioContext.currentTime >= playhead.startTime && this.audioContext.currentTime < playhead.startTime + playhead.dur){ //we're at a time where this should be playing!
+            this.playheads.forEach(playhead => {
+                if(this.audioContext.currentTime >= playhead.startTime && this.audioContext.currentTime < playhead.startTime + playhead.dur){ //we're at a time where this should be playing!
                 const playheadX = this.width * (playhead.startTimeInAudio + (this.audioContext.currentTime - playhead.startTime)*playhead.playbackRate)/this.buffer.duration
                 this.ctx.moveTo(playheadX, 0)
                 this.ctx.lineTo(playheadX, this.height)
-            }
-        })
+                }
+            })
+            this.ctx.stroke()
 
+        }
+        else{
+            const eyeWidth = 10 
+            const eyeHeight = 20
+            const frownHeight = 10 
+            this.ctx.fillStyle = "white"
+            this.ctx.fillRect(this.width/2 - eyeWidth, Math.floor(this.height/2) - eyeHeight, 1, 1) 
+            this.ctx.fillRect(this.width/2 + eyeWidth, Math.floor(this.height/2) - eyeHeight, 1, 1) 
+            this.ctx.beginPath();
+            this.ctx.arc(this.width/2,
+                           this.height/2 - frownHeight,
+                           4.0,
+                           (-Math.PI/2) - 1,
+                           (-Math.PI/2) + 1
+                        )
+            this.ctx.stroke()
+            this.ctx.font = "10px ibmvga"
+            this.ctx.fillText("couldn't load sample", this.width/2 - 45, 50)
+        }
 
-        //this.ctx.lineTo(this.width, this.height/2)
-        this.ctx.stroke()
     }
 }
 

@@ -17,6 +17,16 @@ let editor
 const evaluateAfter_ms = 300 //stops thrashing of the evaluator and keeps good scheduling
 let reloadEvent
 
+function scheduleCompilation(after, onCodeChange){
+	reloadEvent && clearTimeout(reloadEvent)
+    if(after === 0){
+        onCodeChange()
+    }
+    else{
+        reloadEvent = setTimeout(onCodeChange, evaluateAfter_ms)
+    }
+}
+
 const defaultCode = `# Hello
 # Trane is a music playground 
 # It's written in Janet, a lisp-like language
@@ -73,8 +83,7 @@ async function initCodeEditor(el, onCodeChange, onCodeReload){
         janet(),
         EditorView.updateListener.of(function(viewUpdate: ViewUpdate) {
             if (viewUpdate.docChanged) {
-                reloadEvent && clearTimeout(reloadEvent)
-                reloadEvent = setTimeout(onCodeChange, evaluateAfter_ms)
+                scheduleCompilation(evaluateAfter_ms, onCodeChange)
             }
         }),
 
@@ -169,4 +178,4 @@ function dragover(e) {
     e.preventDefault();
 }
 
-export {initCodeEditor, editor, saveCurrentScript}
+export {initCodeEditor, editor, saveCurrentScript, scheduleCompilation}

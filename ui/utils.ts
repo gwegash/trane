@@ -31,9 +31,11 @@ const loadSample = async (sampleURLRaw) => {
   }
 
   const response = await fetch(sampleURL)
-  const buffer = await response.arrayBuffer()
+  if(response.ok){
+	  const buffer = await response.arrayBuffer()
 
-  return buffer
+	  return buffer
+  }
 }
 
 export {lerp, loadSample, note_to_frequency, resolvePath}
