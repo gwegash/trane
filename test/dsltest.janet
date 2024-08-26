@@ -2,6 +2,9 @@
 
 (use ../src/globals)
 (use ../src/dsl)
+(use ../src/instruments)
+(use ../src/dsl_helpers)
+(use ../src/harmony)
 
 (setdyn *instruments* @{})
 
