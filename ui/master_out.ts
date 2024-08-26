@@ -12,6 +12,7 @@ class Output extends Effect { //TODO this isn't really an effect.
         super(context, parentEl, name)
 	this.webAudioNodes.gainNode = this.audioContext.createGain()
 	this.webAudioNodes.gainNode.connect(context.destination)
+	this.webAudioNodes.gainNode.gain.setValueAtTime(0.75, context.currentTime)
 
         this.inputNode = this.webAudioNodes.gainNode
         this.outputNode = undefined //should error if someone tries to wire this to something :)
