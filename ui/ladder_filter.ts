@@ -32,7 +32,9 @@ class LadderFilter extends Effect {
         this.setupKnobs()
     }
 
-    async setup({}){
+    async setup({cutoff, Q}){
+        this.updateParamIfChanged(0, cutoff)
+        this.updateParamIfChanged(1, Q)
         return this
     }
 }

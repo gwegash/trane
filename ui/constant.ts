@@ -13,7 +13,7 @@ class Constant extends Effect {
     constructor(context: AudioContext, parentEl : Element, name : string){
         super(context, parentEl, name)
         this.webAudioNodes.constantSource = context.createConstantSource()
-        //this.webAudioNodes.constantSource.connect(nullGain)
+        this.webAudioNodes.constantSource.connect(nullGain)
         this.webAudioNodes.constantSource.start()
 
         this.knobsEl = document.createElement("div")

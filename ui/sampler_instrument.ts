@@ -1,14 +1,20 @@
 import {Instrument} from "./instruments"
 import {loadSample} from "./utils"
 
-interface SampleBuffer {
+interface SampleBuffer { // Represents an individual hit
     sampleURL : string
     buffer: AudioBuffer 
+    opacity : number
+    lastHitTime: number
 }
 
 class Sampler extends Instrument {
 
     static friendlyName = "drums"
+    height = 65
+    width = 65
+    ctx
+    canvas
 
     settings = {
         detune: 0,

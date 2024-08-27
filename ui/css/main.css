@@ -137,6 +137,9 @@ table {
 .output-channel {
     background: black;
     color: white;
+    max-height: 20vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .main-area{

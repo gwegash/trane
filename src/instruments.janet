@@ -116,8 +116,8 @@
   ~(inst ,:scope ,name)
 )
 
-(defmacro ladder [name]
-  ~(inst ,:ladder_filter ,name)
+(defmacro ladder [name &named cutoff Q]
+  ~(inst ,:ladder_filter ,name :cutoff ,cutoff :Q ,Q)
 )
 
 (defmacro constant [name &named constant]

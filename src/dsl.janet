@@ -62,7 +62,7 @@
 
             (let [,$paramIdx (get ,$instMap ,param)]
               (assert ,$paramIdx (string "paramater " ,param " does not exist in instrument " (get ,$inst 1)))
-              (array/push (get self :notes) (change_ (encodeParam ,$instChannel ,$paramIdx) ,to ,;rest))
+              (array/push (get (dyn *self*) :notes) (change_ (encodeParam ,$instChannel ,$paramIdx) ,to ,;rest))
             )
           )
         )
@@ -195,8 +195,8 @@
   )
 )
 
-(defmacro chain [& forms]
-  ````Chaining macro, chains together modules. Wires the output of the first into the input of the second,
+(defn chain [& forms]
+  ````Chaining function, chains together modules. Wires the output of the first into the input of the second,
   and the output of the second into the output of the third etc.
 
   **Example**
@@ -209,14 +209,13 @@
   )
   ```
   ````
-  (def firstInst (eval (first forms))) #both keywords now
-  (def nextInst (eval (get forms 1))) #both keywords now
-  (if (and firstInst nextInst) 
-    ~[
-      (wire ,firstInst ,nextInst)
-      ,;(chain nextInst ;(tuple/slice forms 2))
-    ]
-    []
+  (def firstInst (first forms))
+  (def nextInst (get forms 1))
+  (if (and firstInst nextInst)
+    (do 
+        (wire firstInst nextInst)
+        (chain ;(tuple/slice forms 1))
+    )
   )
 )
 
@@ -252,10 +251,10 @@
   ````
   [note instName & rest]
   (if note
-    (do  
+    (do
       (def instChannel (first (get (dyn *instruments*) instName)))
       (assert instChannel (string "instrument not found: " instName))
-      ~(array/push (get self :notes) ;(play_ ,note ,instChannel ,;rest))
+      ~(array/push (get (dyn *self*) :notes) ;(play_ ,note ,instChannel ,;rest))
     )
   )
 )
@@ -270,7 +269,7 @@
   ```
   ````
   [& picks]
-  ~(get [,;picks] (math/rng-int (get self :rng) (length [,;picks])))
+  ~(get [,;picks] (math/rng-int (get (dyn *self*) :rng) (length [,;picks])))
 )
 
 (defmacro rand 
@@ -282,7 +281,7 @@
   ```
   ````
   [lo hi]
-  ~(+ ,lo (* (- ,hi ,lo) (math/rng-uniform (get self :rng))))
+  ~(+ ,lo (* (- ,hi ,lo) (math/rng-uniform (get (dyn *self*) :rng))))
 )
 
 (defmacro timesel
@@ -308,7 +307,7 @@
   ```
   ````
   [seed]
-  ~(set (self :rng) (math/rng ,seed))
+  ~(set ((dyn *self*) :rng) (math/rng ,seed))
 )
 
 (defmacro live_loop
@@ -324,13 +323,13 @@
   ````
   [name & instructions]
   ~(put (dyn ,*lloops*) ,name (fiber/new (fn []
-       (let [self @{:notes @[] :rng (math/rng)}]
+       (with-dyns [*self* @{:notes @[] :rng (math/rng)}]
          (forever 
-           (set (self :start-time) (dyn :current-time))
+           (set ((dyn *self*) :start-time) (dyn :current-time))
            ,;instructions
-           (yield [(- (dyn :current-time) (get self :start-time)) (get self :notes)])
-           (set (self :notes) @[])
-       )
+           (yield [(- (dyn :current-time) (get (dyn *self*) :start-time)) (get (dyn *self*) :notes)])
+           (set ((dyn *self*) :notes) @[])
+         )
        )
      ) :yei)))
 
