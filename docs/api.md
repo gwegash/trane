@@ -20,7 +20,7 @@ Returns a list of `[note, duration]` pairs that can be scheduled.
 (P [0 [1 1] 0 0] 4) # -> @[(0 1) (1 0.5) (1 0.5) (0 1) (0 1)]
 ```
 
-  [1]: ../src/dsl.janet#L224
+  [1]: ../src/dsl.janet#L223
 
   ### bpm
 
@@ -43,7 +43,7 @@ To change BPM, reload the page
 
   ### chain
 
-  **macro**  | [source][3]
+  **function**  | [source][3]
 
   ```janet
   (chain & forms)
@@ -141,7 +141,7 @@ Approaches `to` from its last value linearly
 )
 ```
 
-  [8]: ../src/dsl.janet#L314
+  [8]: ../src/dsl.janet#L313
 
   ### pick
 
@@ -159,7 +159,7 @@ Approaches `to` from its last value linearly
 (pick 1 2 3) # -> 3
 ```
 
-  [9]: ../src/dsl.janet#L263
+  [9]: ../src/dsl.janet#L262
 
   ### play
 
@@ -178,7 +178,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (play 0 :my-drum :dur 2) # plays a note 0 on :my-drum for 2 beats
 ```
 
-  [10]: ../src/dsl.janet#L243
+  [10]: ../src/dsl.janet#L242
 
   ### rand
 
@@ -195,7 +195,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (rand 0 1) # -> 0.566847
 ```
 
-  [11]: ../src/dsl.janet#L276
+  [11]: ../src/dsl.janet#L275
 
   ### rep
 
@@ -229,7 +229,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (seed 5)
 ```
 
-  [13]: ../src/dsl.janet#L302
+  [13]: ../src/dsl.janet#L301
 
   ### sleep
 
@@ -312,7 +312,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (timesel [1 2 3 4] 2) # -> 3
 ```
 
-  [18]: ../src/dsl.janet#L288
+  [18]: ../src/dsl.janet#L287
 
   ### uclid
 
@@ -347,7 +347,7 @@ Accepts an optional `toParam` which specifies a named parameter, or knob, of `to
 
   ## harmony
 
-  [chord](#chord), [note](#note), [notes](#notes)
+  [chord](#chord), [note](#note), [notes](#notes), [scale](#scale)
 
   ### chord
 
@@ -357,16 +357,17 @@ Accepts an optional `toParam` which specifies a named parameter, or knob, of `to
   (chord root quality)
   ```
 
-  Returns a MIDI chord of a given root and quality
+  Returns a MIDI chord generator of a given root and quality
 
 For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/src/harmony.janet#L3)
 
 **Example**
 ```
-(chord :C3 :min) # -> @[36 39 43]
+((chord :C3 :min) [0 1 2]) # -> @[36 39 43]
+((chord :C3 :min) 0) # -> 36
 ```
 
-  [21]: ../src/harmony.janet#L534
+  [21]: ../src/harmony.janet#L594
 
   ### note
 
@@ -383,7 +384,7 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (note :c4) # -> 48
 ```
 
-  [22]: ../src/harmony.janet#L518
+  [22]: ../src/harmony.janet#L537
 
   ### notes
 
@@ -400,7 +401,27 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (notes :c3 :e3 :g3) # -> @[36 40 43]
 ```
 
-  [23]: ../src/harmony.janet#L549
+  [23]: ../src/harmony.janet#L614
+
+  ### scale
+
+  **function**  | [source][24]
+
+  ```janet
+  (scale root quality)
+  ```
+
+  Returns a MIDI scale generator of a given root and quality
+
+For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/src/harmony.janet#L518)
+
+**Example**
+```
+((scale :C3 :minor) [0 1 2 3 4 5 6]) # -> @[36 38 39 41 43 44 46]
+((scale :C3 :minor) 0) # -> 36
+```
+
+  [24]: ../src/harmony.janet#L574
 
   ## instruments
 
@@ -408,7 +429,7 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   ### Dlay
 
-  **macro**  | [source][24]
+  **macro**  | [source][25]
 
   ```janet
   (Dlay name &named delay_time feedback)
@@ -424,11 +445,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (Dlay :hello-delay :delay_time 0.75 :feedback 0.5)
 ```
 
-  [24]: ../src/instruments.janet#L16
+  [25]: ../src/instruments.janet#L16
 
   ### biquad
 
-  **macro**  | [source][25]
+  **macro**  | [source][26]
 
   ```janet
   (biquad name &named filter_type frequency detune Q gain)
@@ -436,11 +457,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [25]: ../src/instruments.janet#L103
+  [26]: ../src/instruments.janet#L103
 
   ### breakbeat
 
-  **macro**  | [source][26]
+  **macro**  | [source][27]
 
   ```janet
   (breakbeat name &named url length_beats slices)
@@ -448,11 +469,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [26]: ../src/instruments.janet#L85
+  [27]: ../src/instruments.janet#L85
 
   ### chorus
 
-  **macro**  | [source][27]
+  **macro**  | [source][28]
 
   ```janet
   (chorus name)
@@ -460,11 +481,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [27]: ../src/instruments.janet#L77
+  [28]: ../src/instruments.janet#L77
 
   ### compressor
 
-  **macro**  | [source][28]
+  **macro**  | [source][29]
 
   ```janet
   (compressor name &named threshold knee ratio attack release)
@@ -472,11 +493,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [28]: ../src/instruments.janet#L49
+  [29]: ../src/instruments.janet#L49
 
   ### constant
 
-  **macro**  | [source][29]
+  **macro**  | [source][30]
 
   ```janet
   (constant name &named constant)
@@ -484,11 +505,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [29]: ../src/instruments.janet#L123
+  [30]: ../src/instruments.janet#L123
 
   ### distortion
 
-  **macro**  | [source][30]
+  **macro**  | [source][31]
 
   ```janet
   (distortion name &named amount)
@@ -496,11 +517,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [30]: ../src/instruments.janet#L45
+  [31]: ../src/instruments.janet#L45
 
   ### drums
 
-  **macro**  | [source][31]
+  **macro**  | [source][32]
 
   ```janet
   (drums name &named hits)
@@ -508,11 +529,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [31]: ../src/instruments.janet#L65
+  [32]: ../src/instruments.janet#L65
 
   ### gain
 
-  **macro**  | [source][32]
+  **macro**  | [source][33]
 
   ```janet
   (gain name &named gain)
@@ -520,11 +541,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [32]: ../src/instruments.janet#L69
+  [33]: ../src/instruments.janet#L69
 
   ### keyboard
 
-  **macro**  | [source][33]
+  **macro**  | [source][34]
 
   ```janet
   (keyboard name)
@@ -532,23 +553,23 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [33]: ../src/instruments.janet#L73
+  [34]: ../src/instruments.janet#L73
 
   ### ladder
 
-  **macro**  | [source][34]
+  **macro**  | [source][35]
 
   ```janet
-  (ladder name)
+  (ladder name &named cutoff Q)
   ```
 
   
 
-  [34]: ../src/instruments.janet#L119
+  [35]: ../src/instruments.janet#L119
 
   ### lfo
 
-  **macro**  | [source][35]
+  **macro**  | [source][36]
 
   ```janet
   (lfo name &named wave frequency magnitude)
@@ -556,11 +577,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [35]: ../src/instruments.janet#L111
+  [36]: ../src/instruments.janet#L111
 
   ### line_in
 
-  **macro**  | [source][36]
+  **macro**  | [source][37]
 
   ```janet
   (line_in name)
@@ -568,11 +589,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [36]: ../src/instruments.janet#L53
+  [37]: ../src/instruments.janet#L53
 
   ### looper
 
-  **macro**  | [source][37]
+  **macro**  | [source][38]
 
   ```janet
   (looper name &named loop_time)
@@ -587,11 +608,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (looper :hello-looper :loop_time 4)
 ```
 
-  [37]: ../src/instruments.janet#L31
+  [38]: ../src/instruments.janet#L31
 
   ### oscillator
 
-  **macro**  | [source][38]
+  **macro**  | [source][39]
 
   ```janet
   (oscillator name &named wave frequency)
@@ -599,11 +620,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [38]: ../src/instruments.janet#L107
+  [39]: ../src/instruments.janet#L107
 
   ### panner
 
-  **macro**  | [source][39]
+  **macro**  | [source][40]
 
   ```janet
   (panner name &named pan)
@@ -611,11 +632,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [39]: ../src/instruments.janet#L81
+  [40]: ../src/instruments.janet#L81
 
   ### reverb
 
-  **macro**  | [source][40]
+  **macro**  | [source][41]
 
   ```janet
   (reverb name &named impulse)
@@ -629,11 +650,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 (reverb :hello-verb :impulse "http://impulses.com/big_impulse.wav")
 ```
 
-  [40]: ../src/instruments.janet#L3
+  [41]: ../src/instruments.janet#L3
 
   ### sample
 
-  **macro**  | [source][41]
+  **macro**  | [source][42]
 
   ```janet
   (sample name &named url pitch gain attack release)
@@ -641,11 +662,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [41]: ../src/instruments.janet#L57
+  [42]: ../src/instruments.janet#L57
 
   ### scope
 
-  **macro**  | [source][42]
+  **macro**  | [source][43]
 
   ```janet
   (scope name)
@@ -653,11 +674,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [42]: ../src/instruments.janet#L115
+  [43]: ../src/instruments.janet#L115
 
   ### synth
 
-  **macro**  | [source][43]
+  **macro**  | [source][44]
 
   ```janet
   (synth name &named wave gain attack release)
@@ -665,5 +686,5 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [43]: ../src/instruments.janet#L99
+  [44]: ../src/instruments.janet#L99
 

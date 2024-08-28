@@ -8,6 +8,7 @@
     :chorus @{
       :rate 0
       :amount 1
+      :wet-dry 2
     }
     :compressor @{
       :threshold 0
@@ -36,6 +37,9 @@
     :looper @{
       :latency 0
     }
+    :out @{
+      :gain 0
+    }
     :oscillator @{
       :frequency 0
     }
@@ -46,6 +50,9 @@
       :gain 0
       :attack 1
       :release 2
+    }
+    :reverb @{
+      :wet-dry 0
     }
     :synth @{
       :gain 0
