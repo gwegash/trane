@@ -9,12 +9,16 @@ class BreakbeatSampler extends Sampler {
   slices = [this.sampleStart]
   slicesWithEnd = [this.sampleStart, this.sampleEnd] //for visualisation
 
+  params = [
+    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true },
+  ]
+
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
     this.setupUI()
   }
 
-  async setup({ url, length_beats, slices }) {
+  async setup({ url, length_beats, slices, gain }) {
     //TODO make bpm dynamic
     this.length_bars = parseFloat(length_beats)
     const parsedSlices = slices
@@ -25,6 +29,7 @@ class BreakbeatSampler extends Sampler {
     this.sampleEnd = parsedSlices[parsedSlices.length - 1]
     this.slices = parsedSlices.slice(0, -1) //ignore last slice, it's the end marker, not an onset
     this.slicesWithEnd = [...this.slices, this.sampleEnd]
+    this.updateParamIfChanged(0, gain) //TODO move this to the parent element
     super.setup(url)
     return this
   }

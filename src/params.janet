@@ -23,6 +23,9 @@
     :Dlay @{
       :feedback 0
     }
+    :breakbeat_sampler @{
+      :gain 0
+    }
     :gain @{
       :gain 0
     }

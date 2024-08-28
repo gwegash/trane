@@ -17,6 +17,7 @@ JUNGLE_TRACK = "?t=tracks/jungle.janet"
 CRYSTAL_TRACK = "?t=tracks/gypsy_woman.janet"
 ETUDE_TRACK = "?t=tracks/etude.janet"
 KEYBOARD_TRACK = "?t=tracks/keyboards.janet"
+TUTOR = "?tutor"
 
 def get_wait(driver):
     errors = [NoSuchElementException, ElementNotInteractableException]
@@ -76,3 +77,8 @@ def test_keyboards(setup_driver):
     setup_driver.get(LOCAL_SERVER + KEYBOARD_TRACK)
     execute_code(setup_driver)
     time.sleep(15)
+
+def test_keyboards(setup_driver):
+    setup_driver.get(LOCAL_SERVER + TUTOR)
+    execute_code(setup_driver)
+    time.sleep(60)

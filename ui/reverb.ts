@@ -28,8 +28,10 @@ class ConvolutionReverb extends Effect {
     this.setupKnobs()
   }
 
-  async setup({ impulse }) {
+  async setup({impulse, ...rest}) {
     //Ty Greg Hopkins CC Attribution-any: https://oramics.github.io/sampled/IR/EMT140-Plate/
+	  //
+    this.updateParamIfChanged(0, rest["wet-dry"])
     const impulseURL =
       impulse === "nil" ? "impulses/emt_140_medium_3.wav" : impulse
 

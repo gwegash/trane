@@ -9,8 +9,8 @@
   (reverb :hello-verb :impulse "http://impulses.com/big_impulse.wav")
   ```
   ````
-  [name &named impulse]
-  ~(inst ,:reverb ,name :impulse ,impulse)
+  [name &named impulse wet-dry]
+  ~(inst ,:reverb ,name :impulse ,impulse :wet-dry ,wet-dry)
 )
 
 (defmacro Dlay 
@@ -82,7 +82,7 @@
   ~(inst ,:panner ,name :pan ,pan)
 )
 
-(defmacro breakbeat [name &named url length_beats slices]
+(defmacro breakbeat [name &named url length_beats slices gain]
   (with-syms [$slices]
     ~(let [,$slices 
            (cond 
@@ -91,7 +91,7 @@
              (error "slices not a number of slices or tuple of slice times")
            )
            ]
-       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices)
+       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain)
      )
   )
 )
