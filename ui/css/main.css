@@ -3,65 +3,145 @@
    License: none (public domain)
 */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
 }
 body {
-	line-height: 1;
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: grayscale;
-    font-smooth: never;
+  line-height: 1;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
 }
-ol, ul {
-	list-style: none;
+ol,
+ul {
+  list-style: none;
 }
-blockquote, q {
-	quotes: none;
+blockquote,
+q {
+  quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
-
 .instruments {
-    height: 100vh;
-    max-width: round(40vw, 2px);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: flex-start;
+  height: 100vh;
+  max-width: round(40vw, 2px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
 }
 
 .instrument-name {
-    padding-top: 1px;
+  padding-top: 1px;
 }
 
 .instrument {
@@ -73,7 +153,7 @@ table {
   border: solid 1px gray;
   padding: 1px;
   margin: 1px;
-  font-family: 'ibmvga';
+  font-family: "ibmvga";
   align-items: center;
 }
 
@@ -82,7 +162,7 @@ table {
   align-items: top;
   flex-direction: row;
   justify-content: space-around;
-  font-family: 'ibmvga';
+  font-family: "ibmvga";
   width: max-content;
   border: solid 1px gray;
   padding: 2px;
@@ -94,23 +174,23 @@ table {
   align-items: top;
   flex-direction: column;
   justify-content: space-around;
-  font-family: 'ibmvga';
+  font-family: "ibmvga";
   width: max-content;
   border: solid 1px gray;
   padding: 2px;
   margin: 1px;
 }
 
-.info{
+.info {
   border: solid 1px gray;
   position: absolute;
-  font-family: 'ibmvga';
+  font-family: "ibmvga";
   right: 0;
   bottom: 0;
   padding: 2px;
 }
 
-.select{
+.select {
   appearance: none;
 }
 
@@ -121,51 +201,50 @@ table {
 }
 
 .code {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
 }
 
 .janet-err {
-  font-family: 'ibmvga';
+  font-family: "ibmvga";
   color: red;
   font-size: larger;
 }
 
 .output-channel {
-    background: black;
-    color: white;
-    max-height: 20vh;
-    overflow-x: hidden;
-    overflow-y: scroll;
+  background: black;
+  color: white;
+  max-height: 20vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
-.main-area{
-    display: flex;
-    flex-direction: row;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+.main-area {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.intro{
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    background: black;
-    cursor: pointer;
+.intro {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  background: black;
+  cursor: pointer;
 }
 
-.intro-title{
-
+.intro-title {
 }
 .about-area {
   height: 100vh;
@@ -176,8 +255,8 @@ table {
   align-items: center;
   color: white;
   background: black;
-  font-family: 'ibmvga';
-  font-size: 'large';
+  font-family: "ibmvga";
+  font-size: "large";
 }
 
 .about-area > p {
@@ -198,6 +277,6 @@ a:visited {
   width: 22rem;
 }
 
-.intro-clicked{
-    display: none;
+.intro-clicked {
+  display: none;
 }

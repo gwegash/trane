@@ -1,9 +1,9 @@
-.heading{
+.heading {
   width: max-content;
   margin: 0;
 }
 
-.knob-container{
+.knob-container {
   display: flex;
   align-items: center;
   flex-direction: column;
