@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild ui/index.ts filter_worker=ui/worklets/filter_worker.js loop_worker=ui/worklets/loop_worker.js --define:DEBUG=false --external:module --alias:wasm-runtime=./build/wasm.js --bundle --minify --outdir=dist --allow-overwrite --loader:.woff2=dataurl --define:DEV=false && cp -rvf dist/* ../music-site-dist/",
+    "build": "esbuild ui/index.ts filter_worklet=ui/worklets/filter_worklet.js loop_worker=ui/worklets/loop_worker.js --define:DEBUG=false --external:module --loader:.wasm=binary --alias:wasm-runtime=./build/wasm.js --bundle --minify --outdir=dist --allow-overwrite --loader:.woff2=dataurl --define:DEV=false && cp -rvf dist/* ../music-site-dist/",
     "dev": "esbuild ui/index.ts filter_worklet=ui/worklets/filter_worklet.js loop_worker=ui/worklets/loop_worker.js --define:DEBUG=true --external:module --loader:.wasm=binary --sourcemap --alias:wasm-runtime=./build/wasm.js --bundle --outdir=dist --allow-overwrite --watch --loader:.woff2=dataurl --servedir=dist --define:DEV=true",
     "create-parameters": "esbuild scripts/create-parameters.ts --platform=node --external:module --alias:wasm-runtime=./build/wasm.js --bundle --outdir=scripts --allow-overwrite --loader:.woff2=dataurl --tree-shaking=true --define:DEV=false && node scripts/create-parameters.js",
     "format": "npx prettier ui --write --no-semi"

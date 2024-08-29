@@ -17,6 +17,10 @@ JUNGLE_TRACK = "?t=tracks/jungle.janet"
 CRYSTAL_TRACK = "?t=tracks/gypsy_woman.janet"
 ETUDE_TRACK = "?t=tracks/etude.janet"
 KEYBOARD_TRACK = "?t=tracks/keyboards.janet"
+ACID_TRACK = "?t=tracks/acid.janet"
+PARAMETERS_TRACK = "?t=tracks/parameter_changing.janet"
+WIRING_TRACK = "?t=tracks/wiring.janet"
+SCALES_CHORDS = "?t=tracks/scales_chords.janet"
 TUTOR = "?tutor"
 
 def get_wait(driver):
@@ -82,3 +86,23 @@ def test_keyboards(setup_driver):
     setup_driver.get(LOCAL_SERVER + TUTOR)
     execute_code(setup_driver)
     time.sleep(60)
+
+def test_acid(setup_driver):
+    setup_driver.get(LOCAL_SERVER + ACID_TRACK)
+    execute_code(setup_driver)
+    time.sleep(15)
+
+def test_parameters(setup_driver):
+    setup_driver.get(LOCAL_SERVER + PARAMETERS_TRACK)
+    execute_code(setup_driver)
+    time.sleep(15)
+
+def test_wiring(setup_driver):
+    setup_driver.get(LOCAL_SERVER + WIRING_TRACK)
+    execute_code(setup_driver)
+    time.sleep(15)
+
+def test_scales_chords(setup_driver):
+    setup_driver.get(LOCAL_SERVER + SCALES_CHORDS)
+    execute_code(setup_driver)
+    time.sleep(15)

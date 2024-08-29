@@ -1,7 +1,7 @@
 import { context, play } from "./audio"
 import { bpm, janetRuntime } from "./index"
 
-const LEAD_TIME_MILLIS = 250
+const LEAD_TIME_MILLIS = 500 //hack, let's see if this helps
 let current_time_beats = 0
 let start_time_seconds
 
