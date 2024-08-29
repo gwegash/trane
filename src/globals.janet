@@ -2,3 +2,4 @@
 (def *instruments* :instruments)
 (def *instrument_counter* :instruments_counter)
 (def *bpm* :bpm)
+(def *self* :self)

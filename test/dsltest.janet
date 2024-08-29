@@ -2,6 +2,9 @@
 
 (use ../src/globals)
 (use ../src/dsl)
+(use ../src/instruments)
+(use ../src/dsl_helpers)
+(use ../src/harmony)
 
 (setdyn *instruments* @{})
 
@@ -40,6 +43,7 @@
 (deftest: loop_body "test_several_instruments" [context]
   (breakbeat :breaks :url "local://thing.wav" :length_beats 4 :slices [0.1 0.2 0.3])
   (breakbeat :breaksa :url "local://thing.wav" :length_beats 4 :slices [0.1 0.2 0.3])
+  
   (chain :breaks :breaksa :out)
   (test (dyn *instruments*)
     @{"breaks->wire->breaksa" @[4
@@ -76,6 +80,17 @@
                  "(0.1 0.2 0.3)"]
       :midi @[1 :midi]
       :out @[0 :out]})
+)
+
+(deftest: loop_body "test_procedural_graph" [context]
+  #(for i 0 10
+  (chain 
+    (synth :hiiiii :wave "triangle")
+    (gain :geaan)
+    :out
+  )
+  #)
+  #(test (dyn *instruments*))
 )
 
 (deftest: loop_body "test_several_instruments" [context]
@@ -140,5 +155,27 @@
               "(\"1\" \"2\" \"3\" \"4\")"]
       :midi @[1 :midi]
       :out @[0 :out]})
+)
+
+(deftest: loop_body "test_til" [context]
+  (setdyn :current-time 0)
+  (test (dyn :current-time) 0)
+  (sleep 1)
+  (test (dyn :current-time) 1)
+  (test (time) 1)
+  (test (til 8) 7)
+  (sleep 7)
+  (test (til 8) 0)
+  (sleep 7.999999)
+  (sleep (til 8))
+  (test (til 8) 0)
+  (sleep 8)
+  (test (til 8) 0)
+)
+
+(deftest: loop_body "test_play" [context]
+  (gain :my-gaine)
+  (test-macro (play 0 :my-gaine)
+    (array/push (get (dyn *self*) :notes) (splice (play_ 0 2))))
 )
 

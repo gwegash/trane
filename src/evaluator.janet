@@ -3,7 +3,7 @@
 (use ./globals)
 
 (def- template-env (make-env root-env))
-(each module ["./helpers" "./dsl" "./euclid"]
+(each module ["./helpers" "./globals" "./dsl" "./instruments" "./euclid" "./dsl_helpers" "./harmony"]
   (merge-module template-env (require module)))
 
 (defn- chunk-string [str]
@@ -20,6 +20,7 @@
 
   (put env *lloops* lloops)
   (put env *instruments* instruments)
+
 
   (def errors @[])
   (var error-fiber nil)

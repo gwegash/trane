@@ -12,3 +12,4 @@ scripts/create-parameters.js
 jpm_tree
 
 *.tested
+*.wasm

@@ -1,0 +1,34 @@
+  # {{project-name}} API
+
+  {{#project-doc}}
+  {{&project-doc}}
+
+  {{/project-doc}}
+  {{#modules}}
+  ## {{ns}}
+
+  {{#items}}{{^first}}, {{/first}}[{{name}}](#{{in-link}}){{/items}}
+
+  {{#doc}}
+  {{&doc}}
+
+  {{/doc}}
+  {{#items}}
+  ### {{name}}
+
+  **{{kind}}** {{#private?}}| **private**{{/private?}} {{#link}}| [source][{{num}}]{{/link}}
+
+  {{#sig}}
+  ```janet
+  {{&sig}}
+  ```
+  {{/sig}}
+
+  {{&docstring}}
+
+  {{#link}}
+  [{{num}}]: {{link}}
+  {{/link}}
+
+  {{/items}}
+  {{/modules}}

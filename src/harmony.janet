@@ -1,12 +1,15 @@
 #gratefully taken from https://github.com/yuma-m/pychord/blob/44d3db5c075efdda4e7b4ecdb9cdef074b2aab0d/pychord/constants/qualities.py
 
-(def chord_qualities @{
+(def- chord_qualities @{
   :5 [0 7]
   :maj [0 4 7]
+  :major [0 4 7]
   :m [0 3 7]
   :min [0 3 7]
+  :minor [0 3 7]
   :- [0 3 7]
   :dim [0 3 6]
+  :diminished [0 3 6]
   :b5 [0 4 6]
   :aug [0 4 8]
   :sus2 [0 2 7]
@@ -94,7 +97,7 @@
   }
 )
 
-(def midi_notes @{
+(def- midi_notes @{
     :c 0 
     :db 1 
     :cs 1 
@@ -513,4 +516,109 @@
     :B9 119
     :Cb9 119
   }
+)
+
+(def- scales @{
+    :bebop [0 2 4 5 7 9 10 11]
+    :blues [0 3 5 6 7 10]
+    :flamenco [0 1 4 5 7 8 11]
+    :harmonic_minor [0 2 3 5 7 8 11]
+    :hirajoshi [0 4 6 7 11]
+    :melodic_minor [0 2 3 5 7 9 11]
+    :minor_pentatonic [0 3 5 7 10]
+    :major_pentatonic [0 2 4 7 9]
+    :minor [0 2 3 5 7 8 10]
+    :major [0 2 4 5 7 9 11]
+  }
+)
+
+
+
+(defn note 
+  ````Returns a MIDI note that corresponds to the given `quality`
+
+  **Example**
+  ```
+  (note :c4) # -> 48
+  ```
+  ````
+  [quality]
+  (cond
+   (number? quality) quality
+   (keyword? quality) (get midi_notes quality)
+   (errorf "not a note %q" quality)
+  )
+)
+
+(defn- single_note_chord_scale_generator [tones rootNum]
+  (fn [n]
+    (let [idx (% n (length tones))]
+      (+ 
+        rootNum
+        (* 12 (math/floor (/ n (length tones)))) 
+        (get tones (if (>= idx 0) idx (+ (length tones) idx)))
+      )
+    )
+  )
+)
+
+(defn- chord_scale_generator [tones rootNum]
+  (fn [notes_or_note]
+    (if (or (array? notes_or_note) (tuple? notes_or_note))
+      (map (single_note_chord_scale_generator tones rootNum) notes_or_note)
+      ((single_note_chord_scale_generator tones rootNum) notes_or_note)
+    )
+  )
+)
+
+(defn scale
+  ````Returns a MIDI scale generator of a given root and quality
+  
+  For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/src/harmony.janet#L518)
+
+  **Example**
+  ```
+  ((scale :C3 :minor) [0 1 2 3 4 5 6]) # -> @[36 38 39 41 43 44 46]
+  ((scale :C3 :minor) 0) # -> 36
+  ```
+  ````
+  [root quality]
+  (def rootNum (note root))
+  (def tones (get scales quality))
+  (if tones
+    (chord_scale_generator tones rootNum)
+    (errorf "not a scale %q" quality)
+  )
+)
+
+(defn chord
+  ````Returns a MIDI chord generator of a given root and quality
+  
+  For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/src/harmony.janet#L3)
+
+  **Example**
+  ```
+  ((chord :C3 :min) [0 1 2]) # -> @[36 39 43]
+  ((chord :C3 :min) 0) # -> 36
+  ```
+  ````
+  [root quality]
+  (def rootNum (note root))
+  (def tones (get chord_qualities quality))
+  (if tones
+    (chord_scale_generator tones rootNum)
+    (errorf "not a chord %q" quality)
+  )
+)
+
+(defn notes
+  ````A mapped version of note
+  
+  **Example**
+  ```
+  (notes :c3 :e3 :g3) # -> @[36 40 43]
+  ```
+  ````
+  [& qualities]
+  (map note qualities)
 )
