@@ -10,7 +10,7 @@ You define instruments by declaring an audio graph at the top-level.
 
 For example, to create simple sine oscillator synth, you can write this:
 ```
-(synth :hello-world "sine")
+(synth :hello-world :wave "sine")
 ```
 Instruments have to have a name, like `:hello-synth` so that we can send events to them later on.
 This synth isn't very useful on it's own. It's just a synth sitting there, not connected to anything. 
@@ -48,13 +48,13 @@ Let's create an effects chain. First let's delete any code we already have, star
 
 First we'll create a sampler instrument, and wire it up to the output
 ```
-(sample :hello-sample "tracks/choir%20g%20maj.wav" :G3)  # load a sample from the web with a pitch of :G3
+(sample :hello-sample :url "tracks/choir%20g%20maj.wav" :pitch :G3)  # load a sample from the web with a pitch of :G3
 ```
 Next let's create a lowpass [biquad filter](https://en.wikipedia.org/wiki/Digital_biquad_filter)
 
 
 ```
-(biquad :hello-biquad "lowpass")
+(biquad :hello-biquad :type "lowpass")
 ```
 
 And let's wire them together like this `:hello-sample` -> `:hello-filter` -> `:out`
@@ -82,8 +82,8 @@ This method of wiring instruments and effects together works, but it's quite har
 To create the same audio graph as above, we can instead write the following: 
 ```
 (chain 
-  (sample :hello-sample "tracks/choir%20g%20maj.wav" :G3)
-  (biquad :hello-biquad "lowpass")
+  (sample :hello-sample :url "tracks/choir%20g%20maj.wav" :pitch :G3)
+  (biquad :hello-biquad :type "lowpass")
   :out
 )
 ```

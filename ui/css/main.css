@@ -220,6 +220,8 @@ table {
   max-height: 20vh;
   overflow-x: hidden;
   overflow-y: scroll;
+  display: flex;
+	flex-direction: column-reverse;
 }
 
 .main-area {
