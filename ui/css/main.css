@@ -206,6 +206,7 @@ table {
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
+  max-width: 75vw;
 }
 
 .janet-err {
