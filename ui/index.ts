@@ -53,7 +53,6 @@ async function main(runtime: Module) {
   codeElement.appendChild(outputChannelElement)
   outputChannel.target = outputChannelElement
 
-  onCodeReload()
 }
 
 function onChange() {
