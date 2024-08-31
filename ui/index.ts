@@ -6,7 +6,7 @@ import {
   saveCurrentScript,
   scheduleCompilation,
 } from "./editor"
-import { init as initLoopManager, codeReload } from "./loop_manager"
+import { codeReload } from "./loop_manager"
 import { OutputChannel } from "./errors"
 import { editor } from "./editor"
 import { background } from "./dark_theme"
@@ -80,7 +80,6 @@ async function onCodeReload() {
     }
 
     await initAudio() //no-op if already initialised
-    initLoopManager() //also no-op if already initialised
     await newInstrumentMappings(instrument_mappings)
     codeReload(environment, lloop_names)
     continueTutorial()

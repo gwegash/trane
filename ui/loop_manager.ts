@@ -16,7 +16,7 @@ interface LoopState {
 
 function init() {
   //requires the audioContext and runtime to be initialised
-  if (start_time_seconds) {
+  if (start_time_seconds !== undefined) {
     //don't bother if we've already started
     return
   }

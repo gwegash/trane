@@ -3,6 +3,7 @@ dist/impulses
 dist/*.js
 dist/*.css
 dist/tracks
+dist/*.map
 build/*.jimage
 build/*.js
 node_modules

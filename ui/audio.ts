@@ -25,6 +25,7 @@ import type { Effect } from "./effect"
 import { Wire } from "./wire"
 import "./css/fonts.css"
 import { bpm, instrumentElement as instrumentEl } from "./index"
+import { init as initLoopManager } from "./loop_manager"
 
 let instruments
 const instrumentsByName: Record<string, GraphNode> = {} //a mapping from instrumentName to
@@ -85,6 +86,7 @@ async function initAudio() {
 
   console.log(Output.friendlyName)
   context = new AudioContext({ sampleRate: 48000, latencyHint: 0 })
+  initLoopManager() //no-op if already initialised
   nullGain = context.createGain()
   nullGain.gain.value = 0.0
   nullGain.connect(context.destination)
