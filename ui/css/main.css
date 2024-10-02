@@ -209,7 +209,10 @@ table {
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
+  scrollbar-color: white black;
+  scrollbar-width: thin;
   max-width: calc(100vw - 520px);
+  order: 0;
 }
 
 .janet-err {
