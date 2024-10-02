@@ -71,11 +71,8 @@ class FilterProcessor extends AudioWorkletProcessor {
       this.inputBuffer.set(inputList[0][0]);
       this.filter(parameters.cutoff[0], parameters.Q[0]);
       outputList[0][0].set(this.outputBuffer);
-
-      return true;
-    } else {
-      return false;
     }
+    return true;
   }
 }
 registerProcessor("filter-processor", FilterProcessor);
