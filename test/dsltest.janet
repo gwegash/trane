@@ -11,7 +11,7 @@
 (def a 4)
 (test-macro (breakbeat :break "local://thing" 4 4)
   (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil (error "slices not a number of slices or tuple of slice times"))]
-    (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1>))) 
+    (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1> :gain nil))) 
 
 (test-macro (synth :synth "sawtooth")
   (inst :synth :synth :wave nil :gain nil :attack nil :release nil))
@@ -35,7 +35,9 @@
                ":length_beats"
                "4"
                ":slices"
-               "(0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1)"]
+               "(0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1)"
+               ":gain"
+               "nil"]
       :midi @[1 :midi]
       :out @[0 :out]})
 )
@@ -69,7 +71,9 @@
                 ":length_beats"
                 "4"
                 ":slices"
-                "(0.1 0.2 0.3)"]
+                "(0.1 0.2 0.3)"
+                ":gain"
+                "nil"]
       :breaksa @[3
                  :breakbeat_sampler
                  ":url"
@@ -77,7 +81,9 @@
                  ":length_beats"
                  "4"
                  ":slices"
-                 "(0.1 0.2 0.3)"]
+                 "(0.1 0.2 0.3)"
+                 ":gain"
+                 "nil"]
       :midi @[1 :midi]
       :out @[0 :out]})
 )
@@ -121,7 +127,9 @@
                 ":length_beats"
                 "4"
                 ":slices"
-                "(0.1 0.2 0.3)"]
+                "(0.1 0.2 0.3)"
+                ":gain"
+                "nil"]
       :chorus @[3 :chorus]
       :midi @[1 :midi]
       :out @[0 :out]})
