@@ -145,7 +145,7 @@ class GraphNode {
     Object.values(this.webAudioNodes).forEach((node) => {
       node.disconnect()
     })
-    this.el.remove()
+    this.el?.remove()
   }
 
   _generate_params() {
@@ -222,8 +222,8 @@ class Instrument extends GraphNode {
         node.disconnect()
       }
     })
-    this.el.remove()
+    this.el?.remove()
   }
 }
 
-export { GraphNode, Instrument, WebAudioNodes, Param, getTabIndex }
+export { GraphNode, Instrument, WebAudioNodes, Param, getTabIndex}

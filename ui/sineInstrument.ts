@@ -2,6 +2,7 @@ import { Instrument } from "./instruments"
 import { Knob } from "./knob"
 import { note_to_frequency } from "./utils"
 import { nullGain } from "./audio"
+import { EnvelopeNode } from "./envelope"
 //import "./css/synth.css"
 
 // oscillators[i] -> envelopeGain -> gain -> output
@@ -29,19 +30,19 @@ class SawSynth extends Instrument {
 
   /*
    * Adds an oscillatorEnvelope to the WebAudioNodes
+   *
    */
 
   addVoice() {
     const voice = {
       signal: this.audioContext.createOscillator(),
-      envelopeGain: this.audioContext.createGain(),
+      envelope: new EnvelopeNode(this.audioContext),
     }
 
     voice.signal.type = this.oscillatorType
-    voice.signal.connect(voice.envelopeGain)
+    voice.signal.connect(voice.envelope.gain)
     voice.signal.start()
-    voice.envelopeGain.gain.setValueAtTime(0, this.audioContext.currentTime)
-    voice.envelopeGain.connect(this.webAudioNodes.gainNode)
+    voice.envelope.connect(this.webAudioNodes.gainNode)
 
     return voice
   }
@@ -49,7 +50,7 @@ class SawSynth extends Instrument {
   removeVoice(voice) {
     voice.signal.stop()
     voice.signal.disconnect()
-    voice.envelopeGain.disconnect()
+    voice.envelope.disconnect()
   }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
@@ -73,6 +74,8 @@ class SawSynth extends Instrument {
     this.webAudioNodes.voices = {}
 
     this.setupUI()
+
+    this.voice = this.addVoice()
   }
 
   setup({ wave, gain, attack, release }) {
@@ -104,15 +107,14 @@ class SawSynth extends Instrument {
     voice.signal.frequency.setTargetAtTime(frequency, startTime, 0.001)
 
     if (dur > 0) {
-      voice.envelopeGain.gain.setValueAtTime(0, startTime)
-      voice.envelopeGain.gain.linearRampToValueAtTime(
-        1,
-        startTime + Math.min(this.webAudioNodes.attackNode.offset.value, dur),
-      )
-      voice.envelopeGain.gain.setValueAtTime(1, startTime + dur)
-      voice.envelopeGain.gain.linearRampToValueAtTime(
-        0,
-        startTime + dur + this.webAudioNodes.releaseNode.offset.value,
+      voice.envelope.play(
+        startTime,
+        dur,
+        1.0,
+        this.webAudioNodes.attackNode.offset.value,
+        0.1,
+        0.9,
+        this.webAudioNodes.releaseNode.offset.value,
       )
 
       setTimeout(
