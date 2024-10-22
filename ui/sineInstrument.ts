@@ -1,4 +1,4 @@
-import { Instrument } from "./instruments"
+import { LOG_SCALE_MIN, Instrument } from "./instruments"
 import { Knob } from "./knob"
 import { note_to_frequency } from "./utils"
 import { nullGain } from "./audio"
@@ -11,13 +11,14 @@ class SawSynth extends Instrument {
   oscillatorType = "sawtooth"
 
   params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0 },
+    { name: "gain", path: "gainNode.gain", min: 0, max: 1, lastValue: 1.0, logScale: true},
     {
       name: "attack",
       path: "attackNode.offset",
       min: 0,
       max: 1,
       lastValue: 0.01,
+      logScale: true,
     },
     {
       name: "release",

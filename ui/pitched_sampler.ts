@@ -6,7 +6,7 @@ class PitchedSampler extends Sampler {
   static friendlyName = "pitched_sampler"
   samplePitch: number
   params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0 },
+    { name: "gain", path: "gainNode.gain", min: 0, max: 1, logScale: true },
     {
       name: "attack",
       path: "attackNode.offset",

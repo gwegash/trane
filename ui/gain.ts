@@ -1,3 +1,4 @@
+import {  } from "./effect"
 import { Effect } from "./effect"
 import { Knob } from "./knob"
 
@@ -8,7 +9,7 @@ class Gain extends Effect {
     {
       name: "gain",
       path: "gainNode.gain",
-      min: 0.001,
+      min: 0,
       max: 10.0,
       logScale: true,
     },

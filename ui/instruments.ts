@@ -127,17 +127,22 @@ class GraphNode {
     startTime: number,
     dur: number,
   ) {
+	
+    const resolvedParam = this.resolvedParams[paramIndex]
+    if(this.params && this.params[paramIndex].logScale){
+      to = Math.max(LOG_SCALE_MIN, to)
+    }
     if (type < 0) {
-      this.resolvedParams[paramIndex].setTargetAtTime(to, startTime, -type)
+      resolvedParam.setTargetAtTime(to, startTime, -type)
     } else if (type === 0) {
-      this.resolvedParams[paramIndex].linearRampToValueAtTime(to, startTime)
+      resolvedParam.linearRampToValueAtTime(to, startTime)
     } else if (type === 1) {
-      this.resolvedParams[paramIndex].exponentialRampToValueAtTime(
+      resolvedParam.exponentialRampToValueAtTime(
         to,
         startTime,
       )
     } else if (type === 2) {
-      this.resolvedParams[paramIndex].setValueAtTime(to, startTime)
+      resolvedParam.setValueAtTime(to, startTime)
     }
   }
 

@@ -1,5 +1,6 @@
 import { Sampler } from "./sampler_generic"
 import { bpm } from "./index"
+import { LOG_SCALE_MIN } from "./instruments"
 
 class BreakbeatSampler extends Sampler {
   static friendlyName = "breakbeat_sampler"
@@ -10,7 +11,7 @@ class BreakbeatSampler extends Sampler {
   slicesWithEnd = [this.sampleStart, this.sampleEnd] //for visualisation
 
   params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true },
+    { name: "gain", path: "gainNode.gain", min: 0, max: 1, logScale: true },
   ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {

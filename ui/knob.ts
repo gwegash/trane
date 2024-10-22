@@ -9,6 +9,18 @@ const KNOB_TIME_CONSTANT = 1 / 10000
 const KNOB_KNOTCH_LENGTH = 0.5 //How much of the circle the indicator shows
 const CC_PRINT_TIMEOUT = 1 //Stop showing the message 1s after midi
 
+const eps = 1e-16
+const LOG_SCALE_MIN = 1e-32
+
+const logToLin = (x) => {
+  return Math.exp(x/200000.0)*(2<<16)
+}
+
+const linToLog = (x) => {
+  const restrictedX = Math.max(x, LOG_SCALE_MIN)
+  return 200000.0*Math.log(restrictedX/(2<<16))
+}
+
 class Knob {
   parameter
   min
@@ -34,7 +46,7 @@ class Knob {
 
   getRotation() {
     const normalised = this.logScale
-      ? (Math.log2(this.parameter.value) - this.logMin) /
+      ? (linToLog(this.parameter.value) - this.logMin) /
         (this.logMax - this.logMin)
       : (this.parameter.value - this.min) / (this.max - this.min)
     return lerp(
@@ -56,7 +68,7 @@ class Knob {
     const normalised = byteVal / 127.0
 
     const target = this.logScale
-      ? Math.pow(2, this.logMin + (this.logMax - this.logMin) * normalised)
+      ? logToLin(2, this.logMin + (this.logMax - this.logMin) * normalised)
       : this.min + (this.max - this.min) * normalised
 
     this.lastCCChange = this.audioContext.currentTime
@@ -82,8 +94,8 @@ class Knob {
     this.min = min !== undefined ? min : parameter.minValue
     this.max = max !== undefined ? max : parameter.maxValue
 
-    this.logMin = Math.log2(min)
-    this.logMax = Math.log2(max)
+    this.logMin = linToLog(min)
+    this.logMax = linToLog(max)
     this.logScale = logScale
 
     this.headingEl = document.createElement("p")
@@ -117,16 +129,14 @@ class Knob {
         this.clicked = true
 
         const startVal = this.logScale
-          ? Math.log2(this.parameter.value)
+          ? linToLog(this.parameter.value)
           : this.parameter.value
 
         const onMouseMove = (e) => {
           const normalised = (this.mouseStart - e.pageY) * KNOB_SENSITIVITY
 
           const target = this.logScale
-            ? Math.pow(
-                2,
-                Math.min(
+            ? logToLin(Math.min(
                   Math.max(
                     startVal + normalised * (this.logMax - this.logMin),
                     this.logMin,
@@ -209,7 +219,7 @@ class Knob {
     }
 
     this.ctx.font = "10px ibmvga"
-    this.ctx.fillText(`${this.min}`, 1, SIZE_PX)
+    this.ctx.fillText(`${this.min < eps ? 0 : this.min}`, 1, SIZE_PX)
 
     const maxTextWidth = this.ctx.measureText(`${this.max}`).width
     this.ctx.fillText(`${this.max}`, SIZE_PX - maxTextWidth, SIZE_PX)

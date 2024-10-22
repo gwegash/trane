@@ -53,7 +53,6 @@
       (let [,$instChannel (first ,$inst)]
         (if ,$instChannel
           (assert ,$instChannel (string "instrument not found: " ,instName ))
-          (pp (dyn ,*instruments*))
         )
 
         (let [,$instChannel (first ,$inst)]
@@ -309,6 +308,23 @@
   [seed]
   ~(set ((dyn *self*) :rng) (math/rng ,seed))
 )
+
+(defmacro do_timed
+  ````
+  **Example**
+  ```
+  (rep [1 2 3] 3) # -> @[(1 2 3) (1 2 3) (1 2 3)]
+  ```
+  ````
+  [& body]
+  (with-syms [$startTime]
+    ~(let [,$startTime (dyn :current-time)]
+       ,;body
+       (setdyn :current-time ,$startTime)
+     )
+  )
+)
+
 
 (defmacro live_loop
   ````Creates a live-loop of a given name to schedule notes or parameter changes from

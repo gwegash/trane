@@ -1,4 +1,5 @@
 import { Effect } from "./effect"
+import { LOG_SCALE_MIN } from "./instruments"
 
 class Output extends Effect {
   //TODO this isn't really an effect.
@@ -6,13 +7,7 @@ class Output extends Effect {
   static friendlyName = "out"
 
   params = [
-    {
-      name: "gain",
-      path: "gainNode.gain",
-      min: 0.001,
-      max: 1.0,
-      logScale: true,
-    },
+    { name: "gain", path: "gainNode.gain", min: 0, max: 1},
   ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
