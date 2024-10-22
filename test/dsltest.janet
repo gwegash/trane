@@ -6,6 +6,15 @@
 (use ../src/dsl_helpers)
 (use ../src/harmony)
 
+
+(test (+ 2 :c3) 38)
+(test (+ [2 3] :c3) [38 39])
+(test (+ [:c3 :d4] :c3) [72 86])
+(test (+ [:c3 :d4] [:c3 1]) [72 51])
+(test (+ :d3 :c1) 50)
+(test (* :d3 :c1) 456)
+(test (- :d3 :c1) 26)
+
 (setdyn *instruments* @{})
 
 (def a 4)
@@ -19,6 +28,7 @@
 (deftest-type loop_body
   :setup (fn [] (do 
                   (setdyn *instruments* @{:out @[0 :out] :midi @[1 :midi]})
+                  (setdyn *self* @{:notes @[] :rng (math/rng)})
                   ))
   :reset (fn [context] (do 
                   (setdyn *instruments* @{:out @[0 :out] :midi @[1 :midi]})
@@ -187,3 +197,11 @@
     (array/push (get (dyn *self*) :notes) (splice (play_ 0 2))))
 )
 
+(deftest: loop_body "test_change" [context]
+  (gain :my-gaine)
+  (change :my-gaine :gain 8)
+  (lin :my-gaine :gain 9)
+  (exp :my-gaine :gain 10)
+  (itarget :my-gaine :gain 11)
+  (test (get (dyn *self*) :notes) 0)
+)

@@ -64,3 +64,55 @@
      modTime
    ) 
 )
+
+# Following Gratefully borrowed from alect https://alectroemel.com/posts/2023-09-26-physics-vectors.html
+(defmacro vectorize [fn]
+  (let [original-fn (symbol :original/ fn)]
+	~(upscope
+	# save the original function under a new name
+	(def ,original-fn ,fn)
+
+	# now redefine the function
+	(defn ,(symbol fn) [& args]
+     # Use reduce to accumulate all the arguments with the function.
+     # There are 4 possible situations to consider.
+     # The comments below will use + as a standing for the provided function.
+
+    # special case - can be unary
+    (if (= (length args) 1)
+     (,original-fn (first args))
+     (reduce2
+      |(cond
+         # [x1 y1] + [x2 y2] => [(x1 + x2) (y1 + y2)]
+         (and (indexed? $0) (indexed? $1))
+         (tuple ;(map ,original-fn $0 $1))
+
+         # [x y] + n => [(x + n) (y + n)]
+         (and (indexed? $0) (number? $1))
+         (tuple ;(map (fn [v] (,original-fn v $1)) $0))
+
+         # n + [x y]  => [(x + n) (y + n)]
+         (and (number? $0) (indexed? $1))
+         (tuple ;(map (fn [v] (,original-fn v $0)) $1))
+
+         # n1 + n2  => n1 + n2
+         (and (number? $0) (number? $1))
+         (,original-fn $0 $1)
+       )
+	args))))
+  )
+)
+
+(defmacro notify_args [fn]
+  (let [original-fn (symbol :original/ fn)]
+    ~(upscope
+      # save the original function under a new name
+      (def ,original-fn ,fn)
+
+      # now redefine the function
+      (defn ,(symbol fn) [& args]
+        (,original-fn ;(map ,note args))
+      )
+    )
+  )
+)

@@ -9,3 +9,4 @@
 (test ((scale :C3 :minor) [0 1 2 3 4 5 6]) @[36 38 39 41 43 44 46])
 (test ((scale :C3 :minor) 0) 36)
 
+(test (note 1) 1)

@@ -1,5 +1,4 @@
 #gratefully taken from https://github.com/yuma-m/pychord/blob/44d3db5c075efdda4e7b4ecdb9cdef074b2aab0d/pychord/constants/qualities.py
-
 (def- chord_qualities @{
   :5 [0 7]
   :maj [0 4 7]
@@ -532,21 +531,46 @@
   }
 )
 
+(defn note? [n]
+  (or 
+    (number? n)
+    (not (nil? (get midi_notes n)))
+  )
+)
 
+(defn notes? [n]
+  (if (indexed? n)
+    (all note? n)
+    (note? n)
+  )
+)
+
+(defn- note_single [quality]
+ (if (number? quality) 
+   quality
+   (get midi_notes quality)
+ )
+)
+
+(defn- notes
+  [qualities]
+  (map note_single qualities)
+)
 
 (defn note 
-  ````Returns a MIDI note that corresponds to the given `quality`
+  ````Returns a MIDI note or notes that corresponds to the given `quality(s)`
 
   **Example**
   ```
   (note :c4) # -> 48
+  (note [:c4 :d4]) # -> [48 50]
   ```
   ````
   [quality]
   (cond
-   (number? quality) quality
-   (keyword? quality) (get midi_notes quality)
-   (errorf "not a note %q" quality)
+   (note? quality) (note_single quality)
+   (notes? quality) (notes quality)
+   (errorf "not a note or notes %q" quality)
   )
 )
 
@@ -609,16 +633,4 @@
     (chord_scale_generator tones rootNum)
     (errorf "not a chord %q" quality)
   )
-)
-
-(defn notes
-  ````A mapped version of note
-  
-  **Example**
-  ```
-  (notes :c3 :e3 :g3) # -> @[36 40 43]
-  ```
-  ````
-  [& qualities]
-  (map note qualities)
 )

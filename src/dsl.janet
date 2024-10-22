@@ -333,3 +333,12 @@
        )
      ) :yei)))
 
+
+(vectorize +)
+(notify_args +)
+(vectorize -)
+(notify_args -)
+(vectorize /)
+(notify_args /)
+(vectorize *)
+(notify_args *)
