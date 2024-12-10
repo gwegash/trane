@@ -8,7 +8,7 @@ class Chorus extends Effect {
   params = [
     { name: "rate", path: "lfo.frequency", min: 0.1, max: 10 },
     { name: "amount", path: "lfoGain.gain", min: 0.001, max: 0.01 },
-    { name: "wet-dry", path: "wetDryPanner.pan", min: -1, max: 1 },
+    { name: "wet-dry", path: "crossfaderNode.panner.pan", min: -1, max: 1 },
   ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {

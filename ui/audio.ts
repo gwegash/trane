@@ -108,17 +108,18 @@ async function newInstrumentMappings(new_instrument_mappings) {
       inst = instrumentsByName[instrument_mapping.name]
     } else {
       //we need to instantiate it
-      inst = await friendlyNameToInstrument(
+      inst = friendlyNameToInstrument(
         instrument_mapping.args.get(0).slice(1),
-        instrument_mapping.name,
+        instrument_mapping.name
       )
       instrumentsByName[instrument_mapping.name] = inst
     }
 
     const argsMap = {} //call setup on already-instantiated instruments. TODO notice if an instrument has changed type
     for (let j = 1; j < instrument_mapping.args.size(); j += 2) {
-      argsMap[instrument_mapping.args.get(j).slice(1)] =
-        instrument_mapping.args.get(j + 1)
+      const val = instrument_mapping.args.get(j + 1)
+      //Nils to undefined
+      argsMap[instrument_mapping.args.get(j).slice(1)] = val === "nil" ? undefined : val
     }
 
     inst.setup(argsMap)

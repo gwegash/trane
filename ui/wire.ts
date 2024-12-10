@@ -31,7 +31,7 @@ class Wire {
     }
     this.from = from
     this.to = to
-    this.toParam = toParam === "nil" ? undefined : toParam.slice(1) //TODO fix this, we shouldn't be getting these here
+    this.toParam = toParam?.slice(1) //TODO fix this, we shouldn't be getting these here
 
     const toInst = instrumentsByName[to]
     const fromInst = instrumentsByName[from]
@@ -60,7 +60,7 @@ class Wire {
     } else if (fromInst instanceof Keyboard) {
       fromInst.deregisterEvents(toInst)
     }
-    if (toInst) {
+    else if (toInst) {
       const destination = this.getDestination()
       console.debug("disconnecting", this.from, this.to)
       fromInst?.outputNode.disconnect(destination)

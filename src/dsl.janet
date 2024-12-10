@@ -272,7 +272,7 @@
   ~(get [,;picks] (math/rng-int (get (dyn *self*) :rng) (length [,;picks])))
 )
 
-(defmacro rand 
+(defn rand 
   ````Picks a number uniformly between `lo` and `hi`
 
   **Example**
@@ -281,7 +281,7 @@
   ```
   ````
   [lo hi]
-  ~(+ ,lo (* (- ,hi ,lo) (math/rng-uniform (get (dyn *self*) :rng))))
+  (+ lo (* (- hi lo) (math/rng-uniform (get (dyn *self*) :rng))))
 )
 
 (defmacro timesel

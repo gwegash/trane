@@ -9,8 +9,8 @@
   (reverb :hello-verb :impulse "http://impulses.com/big_impulse.wav")
   ```
   ````
-  [name &named impulse wet-dry]
-  ~(inst ,:reverb ,name :impulse ,impulse :wet-dry ,wet-dry)
+  [name &named impulse wet-dry decay-time predelay]
+  ~(inst ,:reverb ,name :impulse ,impulse :wet-dry ,wet-dry :decay-time ,decay-time :predelay ,predelay)
 )
 
 (defmacro Dlay 
