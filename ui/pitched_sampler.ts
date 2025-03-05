@@ -5,23 +5,43 @@ import { nullGain } from "./audio"
 class PitchedSampler extends Sampler {
   static friendlyName = "pitched_sampler"
   samplePitch: number
-  params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0 },
-    {
-      name: "attack",
-      path: "attackNode.offset",
-      min: 0,
-      max: 1,
-      lastValue: 0.01,
-    },
-    {
-      name: "release",
-      path: "releaseNode.offset",
-      min: 0,
-      max: 1,
-      lastValue: 0.01,
-    },
-  ]
+	params = [ // TODO why do we override the defaults??
+		{
+			name: "gain",
+			path: "gainNode.gain",
+			min: 0.001,
+			max: 1,
+			lastValue: 1.0,
+		},
+		{
+			name: "attack",
+			path: "attackNode.offset",
+			min: 0,
+			max: 1,
+			lastValue: 0.01,
+		},
+		{
+			name: "release",
+			path: "releaseNode.offset",
+			min: 0,
+			max: 1,
+			lastValue: 0.01,
+		},
+		{
+			name: "loop_start",
+			path: "loopStart.offset",
+			min: 0,
+			max: 1,
+			lastValue: Number.POSITIVE_INFINITY,
+		},
+		{
+			name: "loop_end",
+			path: "loopEnd.offset",
+			min: 0,
+			max: 1,
+			lastValue: Number.NEGATIVE_INFINITY,
+		},
+	]
 
   //TODO this is shared almost verbatim between the synth and this. Maybe refactor into instrument?
   addVoice() {
@@ -42,29 +62,6 @@ class PitchedSampler extends Sampler {
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
-    this.params = [
-      {
-        name: "gain",
-        path: "gainNode.gain",
-        min: 0.001,
-        max: 1,
-        lastValue: 1.0,
-      },
-      {
-        name: "attack",
-        path: "attackNode.offset",
-        min: 0,
-        max: 1,
-        lastValue: 0.01,
-      },
-      {
-        name: "release",
-        path: "releaseNode.offset",
-        min: 0,
-        max: 1,
-        lastValue: 0.01,
-      },
-    ]
 
     this.webAudioNodes.attackNode = context.createConstantSource()
     this.webAudioNodes.attackNode.start()
@@ -72,6 +69,14 @@ class PitchedSampler extends Sampler {
     this.webAudioNodes.releaseNode = context.createConstantSource()
     this.webAudioNodes.releaseNode.start()
     this.webAudioNodes.releaseNode.connect(nullGain)
+
+    this.webAudioNodes.loopStart = context.createConstantSource()
+    this.webAudioNodes.loopStart.start()
+    this.webAudioNodes.loopStart.connect(nullGain)
+
+    this.webAudioNodes.loopEnd = context.createConstantSource()
+    this.webAudioNodes.loopEnd.start()
+    this.webAudioNodes.loopEnd.connect(nullGain)
 
     this.webAudioNodes.attackNode.offset.value =
       this.webAudioNodes.releaseNode.offset.value = 0.01
@@ -81,7 +86,7 @@ class PitchedSampler extends Sampler {
     this.setupUI()
   }
 
-  async setup({ url, pitch, gain, attack, release }) {
+  async setup({ url, pitch, gain, attack, release, loop_start, loop_end }) {
     if (pitch) {
       this.samplePitch = parseFloat(pitch)
     } else {
@@ -91,6 +96,8 @@ class PitchedSampler extends Sampler {
     this.updateParamIfChanged(0, gain)
     this.updateParamIfChanged(1, attack)
     this.updateParamIfChanged(2, release)
+    this.updateParamIfChanged(3, loop_start)
+    this.updateParamIfChanged(4, loop_end)
 
     super.setup(url)
 
@@ -134,6 +141,8 @@ class PitchedSampler extends Sampler {
         0,
         playbackRate,
         voice.envelopeGain,
+				this.webAudioNodes.loopStart.offset.value*this.buffer.duration,
+				this.webAudioNodes.loopEnd.offset.value*this.buffer.duration,
       )
       setTimeout(
         () => this.removeVoice(voice),

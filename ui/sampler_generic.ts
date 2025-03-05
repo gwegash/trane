@@ -18,13 +18,8 @@ class Sampler extends Instrument {
   height = 65
   width = 350
   sampleURL: string
-  loop = false
 
   playheads: Set<Playhead>
-
-  params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true },
-  ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -71,13 +66,19 @@ class Sampler extends Instrument {
     timeInAudio,
     rate,
     envelopeNode: AudioNode | undefined = undefined,
+		loop_start,
+		loop_end,
   ) {
     if (this.buffer) {
       const player = this.audioContext.createBufferSource()
       player.playbackRate.value = rate
       player.connect(envelopeNode ? envelopeNode : this.webAudioNodes.gainNode)
       player.buffer = this.buffer
-      player.loop = this.loop
+			player.loop = loop_start >= 0 && loop_start < this.buffer.duration && loop_end > 0 && loop_end <= this.buffer.duration
+			if(player.loop){
+				player.loopStart = loop_start
+				player.loopEnd = loop_end
+			}
       player.start(startTime, timeInAudio)
       if (dur >= 0) {
         player.stop(startTime + dur)

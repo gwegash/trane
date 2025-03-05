@@ -5,6 +5,9 @@
       :Q 2
       :gain 3
     }
+    :breakbeat_sampler @{
+      :gain 0
+    }
     :chorus @{
       :rate 0
       :amount 1
@@ -23,9 +26,6 @@
     :Dlay @{
       :feedback 0
     }
-    :breakbeat_sampler @{
-      :gain 0
-    }
     :gain @{
       :gain 0
     }
@@ -43,6 +43,9 @@
     :out @{
       :gain 0
     }
+    :octaver @{
+      :wet-dry 0
+    }
     :oscillator @{
       :frequency 0
     }
@@ -53,6 +56,8 @@
       :gain 0
       :attack 1
       :release 2
+      :loop_start 3
+      :loop_end 4
     }
     :reverb @{
       :wet-dry 0

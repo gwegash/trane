@@ -54,10 +54,10 @@
   ~(inst ,:line_in ,name)
 )
 
-(defmacro sample [name &named url pitch gain attack release]
+(defmacro sample [name &named url pitch gain attack release loop-start loop-end]
   (with-syms [$note]
    ~(let [,$note (note ,pitch)]
-      (inst :pitched_sampler ,name :url ,url :pitch ,$note :gain ,gain :attack ,attack :release ,release)
+      (inst :pitched_sampler ,name :url ,url :pitch ,$note :gain ,gain :attack ,attack :release ,release :loop_start ,loop-start :loop_end ,loop-end)
     )
   )
 )
