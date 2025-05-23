@@ -132,39 +132,39 @@ async function dropFile(e) {
   e.preventDefault()
 
   const dt = e.dataTransfer
-  const files = dt.files
+  const fileList = dt.files
+	const files = Array.from(fileList)
 
-  if (files.length == 1) {
-    try {
-      const value = await localforage.setItem(
-        files[0].name,
-        files[0].arrayBuffer(),
-      )
+	try {
+		
+		files.forEach(async (file) => {
+			const value = await localforage.setItem(
+				file.name,
+				file.arrayBuffer(),
+			)
+		})
 
-      const cursor = editor.state.selection.main.head
-      const transaction = editor.state.update({
-        changes: {
-          from: cursor,
-          insert: `"local://${files[0].name}"`,
-        },
-        // the next 2 lines will set the appropriate cursor position after inserting the new text.
-        selection: { anchor: cursor + 1 },
-        scrollIntoView: true,
-      })
+		const cursor = editor.state.selection.main.head
+		const transaction = editor.state.update({
+			changes: {
+				from: cursor,
+				insert: files.map(file => `"local://${file.name}"`).join("\n"),
+			},
+			// the next 2 lines will set the appropriate cursor position after inserting the new text.
+			selection: { anchor: cursor + 1 },
+			scrollIntoView: true,
+		})
 
-      if (transaction) {
-        editor.dispatch(transaction)
-      }
+		if (transaction) {
+			editor.dispatch(transaction)
+		}
 
-      // This code runs once the value has been loaded
-      // from the offline store.
-    } catch (err) {
-      // This code runs if there were any errors.
-      console.log(err)
-    }
-  } else {
-    console.error("more than one file dropped into the sample bay")
-  }
+		// This code runs once the value has been loaded
+		// from the offline store.
+	} catch (err) {
+		// This code runs if there were any errors.
+		console.log(err)
+	}
 }
 
 function dragenter(e) {
