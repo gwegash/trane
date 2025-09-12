@@ -1,13 +1,16 @@
 import { Sampler } from "./sampler_generic"
 import { bpm } from "./index"
+import { findClosest } from "./utils"
 
 class BreakbeatSampler extends Sampler {
   static friendlyName = "breakbeat_sampler"
   length_bars = 8 //default to two bars
   sampleStart = 0
   sampleEnd = 1
-  slices = [this.sampleStart]
-  slicesWithEnd = [this.sampleStart, this.sampleEnd] //for visualisation
+  slices = [this.sampleStart, this.sampleEnd]
+  movingSliceIdx: number | undefined = undefined
+
+  //TODO the slices field is so redundant. I am dumb. Let's get rid of it. WHY do i program these things so late
 
   params = [
     { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true },
@@ -16,22 +19,56 @@ class BreakbeatSampler extends Sampler {
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
     this.setupUI()
+    this.canvas.addEventListener("mousedown", this.onMousedown.bind(this))
+    this.canvas.addEventListener("mouseup", this.onMouseup.bind(this))
+    this.canvas.addEventListener("mousemove", this.onMousemove.bind(this))
   }
 
   async setup({ url, length_beats, slices, gain }) {
     //TODO make bpm dynamic
     this.length_bars = parseFloat(length_beats)
-    const parsedSlices = slices
-      .slice(1, -1)
-      .split(" ")
-      .map((slice) => parseFloat(slice))
-    this.sampleStart = parsedSlices[0]
-    this.sampleEnd = parsedSlices[parsedSlices.length - 1]
-    this.slices = parsedSlices.slice(0, -1) //ignore last slice, it's the end marker, not an onset
-    this.slicesWithEnd = [...this.slices, this.sampleEnd]
+    if(slices){
+      const parsedSlices = slices
+        .slice(1, -1)
+        .split(" ")
+        .map((slice) => parseFloat(slice))
+      this.slices = parsedSlices
+    }
+    else{
+      this.slices = [this.sampleStart]
+      this.sampleEnd = 1
+    }
+    this.sampleStart = this.slices[0]
+    this.sampleEnd = this.slices[this.slices.length - 1]
     this.updateParamIfChanged(0, gain) //TODO move this to the parent element
     super.setup(url)
     return this
+  }
+
+  onMouseup(event: MouseEvent){
+    this.movingSliceIdx = undefined
+    this.slices.sort() //TODO this is potentially inefficient. We just need an insertion beforehand. Oh well.
+  }
+
+  onMousemove(event: MouseEvent){
+    if(this.movingSliceIdx){
+      this.slices[this.movingSliceIdx] = this.getNTimeForX(event.offsetX)
+    }
+  }
+
+  onMousedown(event: MouseEvent){
+    const mouseTime = this.getNTimeForX(event.offsetX)
+    const firstVisibleSliceIdx = this.slices.findIndex(slice => slice >= this.viewBounds[0]) //find finds the first, helpfully
+    let lastVisibleSliceIdx = this.slices.findIndex(slice => slice >= this.viewBounds[1])
+    const closestSliceIdx = findClosest(this.slices, mouseTime, firstVisibleSliceIdx, lastVisibleSliceIdx)
+
+    if(Math.abs(this.getXForNTime(this.slices[closestSliceIdx]) - event.offsetX) < 4){
+      console.log(`Hit! slice ${closestSliceIdx}`)
+      this.movingSliceIdx = closestSliceIdx
+    }
+    else {
+      console.log(`Miss! closest ${closestSliceIdx}`)
+    }
   }
 
   play(note, startTime, dur) {
@@ -43,16 +80,16 @@ class BreakbeatSampler extends Sampler {
         wantSampleLength_s
       //Don't include the end (last slice point) in this
       const sliceTime =
-        this.slices[note % this.slices.length] * this.buffer.duration
+        this.slices[note % (this.slices.length - 1)] * this.buffer.duration
 
       //we get a noteOn, we just want to play the slice that they refer to, nothing else
       let playDur = dur
       if (dur < 0) {
         //      seconds?        multiplier
         const sliceTime =
-          this.slices[note % this.slices.length] * this.buffer.duration
+          this.slices[note % (this.slices.length - 1)] * this.buffer.duration
         const nextSliceTime =
-          this.slicesWithEnd[(note % this.slices.length) + 1] *
+          this.slices[(note % this.slices.length - 1) + 1] *
           this.buffer.duration
         playDur = (nextSliceTime - sliceTime) / playbackRate
       }
@@ -61,33 +98,24 @@ class BreakbeatSampler extends Sampler {
     }
   }
 
-  /*
-   * Gets the x position at a normalised time within a sample
-   */
-  getXForNTime(nTime: number) {
-    return nTime * this.width
-  }
-
   drawSlices() {
-    const start = this.getXForNTime(this.sampleStart)
-    const end = this.getXForNTime(this.sampleEnd)
-    this.ctx.beginPath()
-    this.ctx.setLineDash([])
-    this.ctx.moveTo(start, 0)
-    this.ctx.lineTo(start, this.height)
-    this.ctx.moveTo(end, 0)
-    this.ctx.lineTo(end, this.height)
-    this.ctx.stroke()
+    this.slices.forEach((slice, i) => {
+      this.ctx.beginPath()
+      const canvasX = this.getXForNTime(slice)
 
-    this.ctx.beginPath()
-    this.ctx.setLineDash([5, 5])
-    this.slices.slice(1).forEach((slice) => {
-      const x = this.getXForNTime(slice)
-      this.ctx.moveTo(x, 0)
-      this.ctx.lineTo(x, this.height)
+      if(i == 0 || i == (this.slices.length - 1)){
+        this.ctx.setLineDash([])
+        this.ctx.moveTo(canvasX, 0)
+        this.ctx.lineTo(canvasX, this.height)
+      }
+      else{
+
+        this.ctx.setLineDash([5, 5])
+        this.ctx.moveTo(canvasX, 0)
+        this.ctx.lineTo(canvasX, this.height)
+      }
+      this.ctx.stroke()
     })
-
-    this.ctx.stroke()
   }
 
   draw() {

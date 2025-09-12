@@ -88,7 +88,6 @@
            (cond 
              (int? ,slices) (tuple ;(map (fn [x] (/ x ,slices)) (range 0 (+ ,slices 1))))
              (tuple? ,slices) ,slices
-             (error "slices not a number of slices or tuple of slice times")
            )
            ]
        (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain)

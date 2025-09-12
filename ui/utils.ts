@@ -17,6 +17,31 @@ const resolvePath = (obj, pathArr: Array<string>) => {
   }
 }
 
+const clamp = (x, min, max) => {
+  return Math.max(min, Math.min(max, x))
+}
+
+const findClosest = (sortedArray: number[], x: number, left = 0, right = sortedArray.length - 1): number | undefined => {
+  if (left > right) { if (right < 0) return 0
+    if (left >= sortedArray.length) return sortedArray.length - 1
+
+    const leftDiff = Math.abs(sortedArray[right] - x);
+    const rightDiff = Math.abs(sortedArray[left] - x);
+
+    return leftDiff <= rightDiff ? right : left;
+  }
+
+  const mid = Math.floor((left + right) / 2);
+
+  if (sortedArray[mid] === x) return mid
+
+  if (sortedArray[mid] < x) {
+    return findClosest(sortedArray, x, mid + 1, right);
+  } else {
+    return findClosest(sortedArray, x, left, mid - 1);
+  }
+}
+
 const loadSample = async (sampleURLRaw) => {
   let sampleURL
   const localFileSplit = sampleURLRaw.split("local://") //todo cache things already given a URL
@@ -36,4 +61,4 @@ const loadSample = async (sampleURLRaw) => {
   }
 }
 
-export { lerp, loadSample, note_to_frequency, resolvePath }
+export { findClosest, clamp, lerp, loadSample, note_to_frequency, resolvePath }

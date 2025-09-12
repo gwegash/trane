@@ -1,6 +1,7 @@
 import { Instrument } from "./instruments"
 import { Knob } from "./knob"
-import { loadSample } from "./utils"
+import { loadSample, clamp } from "./utils"
+import { AudioMipmap } from "./audio_mipmap"
 
 interface Playhead {
   startTime: number
@@ -9,16 +10,41 @@ interface Playhead {
   playbackRate: number
 }
 
+function findClosest(sortedArray: number[], x: number, left = 0, right = sortedArray.length - 1): number | undefined {
+  if (left > right) {
+    if (right < 0) return sortedArray[0];
+    if (left >= sortedArray.length) return sortedArray[sortedArray.length - 1];
+
+    const leftDiff = Math.abs(sortedArray[right] - x);
+    const rightDiff = Math.abs(sortedArray[left] - x);
+
+    return leftDiff <= rightDiff ? sortedArray[right] : sortedArray[left];
+  }
+
+  const mid = Math.floor((left + right) / 2);
+
+  if (sortedArray[mid] === x) return sortedArray[mid];
+
+  if (sortedArray[mid] < x) {
+    return findClosest(sortedArray, x, mid + 1, right);
+  } else {
+    return findClosest(sortedArray, x, left, mid - 1);
+  }
+}
+
 // All sample times/quantities are normalised to the length of the sample
 // samplers -> hpf -> lpf -> gain -> output
 class Sampler extends Instrument {
   buffer: AudioBuffer
-  canvas: Element
+  canvas: HTMLCanvasElement
   ctx //TODO this is overloaded with audiocontext, rename!
   height = 65
   width = 350
   sampleURL: string
+  mipmap: AudioMipmap
 
+  viewBounds = [0.0, 1.0] //viewport bounds in normalized sample length.
+                          //A viewLight/viewRight of [0, 0.5] would display the first half of the sample
   playheads: Set<Playhead>
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
@@ -44,6 +70,7 @@ class Sampler extends Instrument {
       const decoded = await this.audioContext.decodeAudioData(buffer)
       this.buffer = decoded
       this.sampleURL = sampleURLRaw
+      this.mipmap = new AudioMipmap(this.buffer.getChannelData(0))
     } else {
       this.buffer = undefined
       this.sampleURL = undefined
@@ -58,6 +85,28 @@ class Sampler extends Instrument {
         1000 +
         50,
     )
+  }
+
+  /*
+   * Gets the x position at a normalised time within a sample
+   */
+  getXForNTime(nTime: number) {
+    return (nTime - this.viewBounds[0])/(this.viewBounds[1] - this.viewBounds[0])*this.width
+  }
+
+  /*
+   * Gets the normalisedTime within a sample given a canvas position
+   */
+  getNTimeForX(canvasX: number) {
+    return this.viewBounds[0] + (canvasX / this.width)*(this.viewBounds[1] - this.viewBounds[0])
+  }
+
+  onWheel(event: WheelEvent) {
+    const zoomCenter = this.getNTimeForX(event.offsetX)
+    const zoomAmount = event.deltaY * 1e-3
+    
+    this.viewBounds[0] = clamp(this.viewBounds[0] + (zoomCenter - this.viewBounds[0])*zoomAmount, 0, this.viewBounds[1])
+    this.viewBounds[1] = clamp(this.viewBounds[1] + (zoomCenter - this.viewBounds[1])*zoomAmount, this.viewBounds[0], 1)
   }
 
   playSample(
@@ -106,6 +155,7 @@ class Sampler extends Instrument {
     this.canvas.style.width = this.width
     this.canvas.style.height = this.height
     this.knobsEl.appendChild(this.canvas)
+    this.canvas.addEventListener("wheel", this.onWheel.bind(this))
 
     this.ctx = this.canvas.getContext("2d")
     this.ctx.strokeStyle = "white"
@@ -124,27 +174,20 @@ class Sampler extends Instrument {
     this.ctx.setLineDash([])
     this.ctx.moveTo(0, this.height / 2)
 
-    //draw our waveform
-    let x = 0
-
     //TODO should we allow this? I think so, or should we enforce that the sample is loaded before we get here? I think this is OK, if a bit messy. It still allows messages to be routed around fine
     if (this.buffer) {
-      const PCMBuffer = this.buffer.getChannelData(0)
-      //pcm data is in [-1.0,1.0]
-      const sampleStride = Math.ceil(PCMBuffer.length / this.width)
+      const samples = this.mipmap.sampleRange(this.viewBounds[0], this.viewBounds[1], this.width)
 
-      //TODO zooming, split the range of channel data before iterating, faster!
-      for (let sample = 0; sample < PCMBuffer.length; sample += sampleStride) {
+      samples.forEach((sample, x) => 
         this.ctx.lineTo(
           x,
           this.height / 2 +
             (this.webAudioNodes.gainNode.gain.value *
-              PCMBuffer[sample] *
+              sample *
               this.height) /
               2,
         )
-        x++
-      }
+      )
 
       this.playheads.forEach((playhead) => {
         if (
