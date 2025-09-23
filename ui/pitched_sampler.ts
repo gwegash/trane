@@ -99,7 +99,7 @@ class PitchedSampler extends Sampler {
     this.updateParamIfChanged(3, loop_start)
     this.updateParamIfChanged(4, loop_end)
 
-    super.setup(url)
+    super.setup({url})
 
     return this
   }

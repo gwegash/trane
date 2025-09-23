@@ -10,28 +10,6 @@ interface Playhead {
   playbackRate: number
 }
 
-function findClosest(sortedArray: number[], x: number, left = 0, right = sortedArray.length - 1): number | undefined {
-  if (left > right) {
-    if (right < 0) return sortedArray[0];
-    if (left >= sortedArray.length) return sortedArray[sortedArray.length - 1];
-
-    const leftDiff = Math.abs(sortedArray[right] - x);
-    const rightDiff = Math.abs(sortedArray[left] - x);
-
-    return leftDiff <= rightDiff ? sortedArray[right] : sortedArray[left];
-  }
-
-  const mid = Math.floor((left + right) / 2);
-
-  if (sortedArray[mid] === x) return sortedArray[mid];
-
-  if (sortedArray[mid] < x) {
-    return findClosest(sortedArray, x, mid + 1, right);
-  } else {
-    return findClosest(sortedArray, x, left, mid - 1);
-  }
-}
-
 // All sample times/quantities are normalised to the length of the sample
 // samplers -> hpf -> lpf -> gain -> output
 class Sampler extends Instrument {
@@ -42,6 +20,9 @@ class Sampler extends Instrument {
   width = 350
   sampleURL: string
   mipmap: AudioMipmap
+  recording: false
+  mediaRecorder: MediaRecorder
+  recorderChunks = []
 
   viewBounds = [0.0, 1.0] //viewport bounds in normalized sample length.
                           //A viewLight/viewRight of [0, 0.5] would display the first half of the sample
@@ -56,20 +37,20 @@ class Sampler extends Instrument {
     this.outputNode = this.webAudioNodes.gainNode
   }
 
-  async setup(sampleURL) {
-    if (this.sampleURL !== sampleURL) {
-      await this.loadSample(sampleURL)
+  async setup({url}) {
+    if (this.sampleURL !== url) {
+      await this.loadSample(url)
     }
 
     return this
   }
 
   async loadSample(sampleURLRaw) {
+    this.sampleURL = sampleURLRaw
     const buffer = await loadSample(sampleURLRaw)
     if (buffer) {
       const decoded = await this.audioContext.decodeAudioData(buffer)
       this.buffer = decoded
-      this.sampleURL = sampleURLRaw
       this.mipmap = new AudioMipmap(this.buffer.getChannelData(0))
     } else {
       this.buffer = undefined
@@ -143,6 +124,10 @@ class Sampler extends Instrument {
     }
   }
 
+  canRecord(): boolean {
+    return !this.buffer && !this.sampleURL
+  }
+
   setupUI() {
     this.knobsEl = document.createElement("div")
     this.knobsEl.className = "knobs"
@@ -156,6 +141,7 @@ class Sampler extends Instrument {
     this.canvas.style.height = this.height
     this.knobsEl.appendChild(this.canvas)
     this.canvas.addEventListener("wheel", this.onWheel.bind(this))
+    this.canvas.addEventListener("click", this.onClick.bind(this))
 
     this.ctx = this.canvas.getContext("2d")
     this.ctx.strokeStyle = "white"
@@ -163,6 +149,42 @@ class Sampler extends Instrument {
 
     this.resolveParams()
     this.setupKnobs()
+  }
+
+  async onClick(event: MouseEvent){
+    if(this.canRecord()){
+      if(this.recording){
+        this.mediaRecorder.stop()
+        this.recording = false
+      }
+      else{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            autoGainControl: false,
+            echoCancellation: false,
+            noiseSuppression: false,
+            latency: 0.0,
+          },
+          video: false,
+        })
+        this.mediaRecorder = new MediaRecorder(stream)
+
+        this.mediaRecorder.ondataavailable = (evt) => {
+          // Push each chunk (blobs) in an array
+          this.recorderChunks.push(evt.data)
+        }
+
+        this.mediaRecorder.onstop = (evt) => {
+          // Make blob out of our blobs, and open it.
+          const blob = new Blob(this.recorderChunks, { type: "audio/flac" })
+          this.loadSample(URL.createObjectURL(blob))
+        }
+
+        this.mediaRecorder.start()
+        this.recording = true
+      }
+    }
   }
 
   draw() {
@@ -196,17 +218,17 @@ class Sampler extends Instrument {
         ) {
           //we're at a time where this should be playing!
           const playheadX =
-            (this.width *
+            this.getXForNTime(
               (playhead.startTimeInAudio +
                 (this.audioContext.currentTime - playhead.startTime) *
-                  playhead.playbackRate)) /
-            this.buffer.duration
+                  playhead.playbackRate) /
+            this.buffer.duration)
           this.ctx.moveTo(playheadX, 0)
           this.ctx.lineTo(playheadX, this.height)
         }
       })
       this.ctx.stroke()
-    } else {
+    } else if(!this.canRecord()) {
       const eyeWidth = 10
       const eyeHeight = 20
       const frownHeight = 10
@@ -233,7 +255,41 @@ class Sampler extends Instrument {
       )
       this.ctx.stroke()
       this.ctx.font = "10px ibmvga"
-      this.ctx.fillText("couldn't load sample", this.width / 2 - 45, 50)
+      this.ctx.fillText("couldn't load sample", this.width / 2 - 45, 50) //TODO expand this with loading/couldn't load
+    }
+    else{
+      if(this.recording){
+        const circleHeight = 10
+        this.ctx.strokeStyle = this.audioContext.currentTime % 1 < 0.5 ? "white" : "red"
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.width / 2,
+          this.height / 2 - circleHeight,
+          4.0,
+          0,
+          2.0*Math.PI,
+        )
+        this.ctx.stroke()
+        this.ctx.font = "10px ibmvga"
+        this.ctx.fillStyle = "white"
+        this.ctx.fillText("Recording", this.width / 2 - 17, 50)
+      }
+      else{
+        const circleHeight = 10
+        this.ctx.strokeStyle = "white"
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.width / 2,
+          this.height / 2 - circleHeight,
+          4.0,
+          0,
+          2.0*Math.PI,
+        )
+        this.ctx.stroke()
+        this.ctx.font = "10px ibmvga"
+        this.ctx.fillStyle = "white"
+        this.ctx.fillText("Record?", this.width / 2 - 15, 50)
+      }
     }
   }
 }
