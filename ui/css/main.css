@@ -134,13 +134,78 @@ table {
   border-spacing: 0;
 }
 
+.code {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 0.3;
+  scrollbar-color: white black;
+  scrollbar-width: thin;
+  order: 0;
+}
+
 .instruments {
-  height: 100vh;
-  min-width: 520px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-content: flex-start;
+  overflow-y: auto;
+  flex-grow: 0.2;
+}
+
+.main-area {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (min-aspect-ratio: 6/4) {
+  .code{
+    height: 100vh;
+  }
+  .instruments {
+    height: 100vh;
+  }
+}
+
+@media (max-aspect-ratio: 6/4) {
+  .code{
+    height: 50vh;
+    width: 100vw;
+  }
+  .instruments {
+    height: 50vh;
+    width: 100vw;
+  }
+
+  .main-area {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 400px) {
+  .code {
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .instruments {
+    height: 100vh;
+    width: 0vw;
+  }
+
+  .hiding {
+    width: 0vw;
+  }
+
+  .showing {
+    width: 100vw;
+  }
 }
 
 .instrument-name {
@@ -203,18 +268,6 @@ table {
   font-family: "ibmvga";
 }
 
-.code {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1;
-  scrollbar-color: white black;
-  scrollbar-width: thin;
-  max-width: calc(100vw - 520px);
-  order: 0;
-}
-
 .janet-err {
   font-family: "ibmvga";
   color: red;
@@ -229,17 +282,6 @@ table {
   overflow-y: scroll;
   display: flex;
 	flex-direction: column-reverse;
-}
-
-.main-area {
-  display: flex;
-  flex-direction: row;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
 }
 
 .intro {
