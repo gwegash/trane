@@ -119,6 +119,10 @@
   ~(inst ,:ladder_filter ,name :cutoff ,cutoff :Q ,Q)
 )
 
+(defmacro tb303 [name &named wave gain cutoff resonance envMod decay attack slide]
+  ~(inst ,:tb303 ,name :wave ,wave :gain ,gain :cutoff ,cutoff :resonance ,resonance :envMod ,envMod :decay ,decay :attack ,attack :slide ,slide)
+)
+
 (defmacro constant [name &named constant]
   ~(inst ,:constant ,name :constant ,constant)
 )

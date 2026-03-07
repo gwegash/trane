@@ -67,4 +67,13 @@
       :attack 1
       :release 2
     }
+    :tb303 @{
+      :gain 0
+      :cutoff 1
+      :resonance 2
+      :envMod 3
+      :decay 4
+      :attack 5
+      :slide 6
+    }
 })

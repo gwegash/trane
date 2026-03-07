@@ -19,6 +19,7 @@ import { Chorus } from "./chorus"
 import { LineIn } from "./line_in_inst"
 import { Panner } from "./panner"
 import { LadderFilter } from "./ladder_filter"
+import { TB303 } from "./tb303"
 import { Keyboard } from "./keyboard"
 import type { GraphNode, Instrument } from "./instruments"
 import type { Effect } from "./effect"
@@ -56,6 +57,7 @@ const instMap = Object.fromEntries(
     Chorus,
     LineIn,
     LadderFilter,
+    TB303,
   ].map((instDef) => [instDef.friendlyName, instDef]),
 )
 
@@ -73,6 +75,7 @@ async function initWorklets() {
     [
       "loop_worker.js", //TODO rename to worklet
       "filter_worklet.js",
+      "envelope_worklet.js",
     ].map(
       async (worker_url) => await context.audioWorklet.addModule(worker_url),
     ),
