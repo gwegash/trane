@@ -85,7 +85,7 @@ async function initAudio() {
   }
 
   console.log(Output.friendlyName)
-  context = new AudioContext({ sampleRate: 48000, latencyHint: 0 })
+  context = new AudioContext({ sampleRate: 48000, latencyHint: 0.00001 })
   initLoopManager() //no-op if already initialised
   nullGain = context.createGain()
   nullGain.gain.value = 0.0
@@ -93,6 +93,7 @@ async function initAudio() {
 
   // init worklet modules
   await initWorklets()
+  setInterval(() => console.log("latency", context.baseLatency), 1000)
 }
 
 async function newInstrumentMappings(new_instrument_mappings) {

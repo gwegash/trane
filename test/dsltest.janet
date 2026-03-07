@@ -19,7 +19,7 @@
 
 (def a 4)
 (test-macro (breakbeat :break "local://thing" 4 4)
-  (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil (error "slices not a number of slices or tuple of slice times"))]
+  (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil)]
     (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1> :gain nil))) 
 
 (test-macro (synth :synth "sawtooth")
@@ -161,6 +161,10 @@
                  ":attack"
                  "nil"
                  ":release"
+                 "nil"
+                 ":loop_start"
+                 "nil"
+                 ":loop_end"
                  "nil"]})
 )
 
@@ -189,6 +193,11 @@
   (test (til 8) 0)
   (sleep 8)
   (test (til 8) 0)
+)
+
+(deftest: loop_body "test_pattern" [context]
+  (seed 5)
+  (test (P [(rep (rand 0 100)) 2] 4))
 )
 
 (deftest: loop_body "test_play" [context]

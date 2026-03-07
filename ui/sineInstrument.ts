@@ -5,6 +5,11 @@ import { nullGain } from "./audio"
 import { EnvelopeNode } from "./envelope"
 //import "./css/synth.css"
 
+interface Voice {
+  signal: OscillatorNode
+  envelope: EnvelopeNode
+}
+
 // oscillators[i] -> envelopeGain -> gain -> output
 class SawSynth extends Instrument {
   static friendlyName = "synth"
@@ -33,7 +38,7 @@ class SawSynth extends Instrument {
    *
    */
 
-  addVoice() {
+  addVoice(): Voice {
     const voice = {
       signal: this.audioContext.createOscillator(),
       envelope: new EnvelopeNode(this.audioContext),
@@ -79,7 +84,7 @@ class SawSynth extends Instrument {
   }
 
   setup({ wave, gain, attack, release }) {
-    this.oscillatorType = wave
+    if (wave) this.oscillatorType = wave
     for (const osc of Object.values(this.webAudioNodes.voices)) {
       osc.signal.type = wave
     }
@@ -91,7 +96,7 @@ class SawSynth extends Instrument {
   //TODO oscillator cleanup
   play(note, startTime, dur) {
     //seconds dur === 0 means noteOff, dur<0 means noteOn. Else play for duration
-    let voice
+    let voice: Voice
     if (dur > 0) {
       voice = this.addVoice()
     } else if (dur < 0) {
@@ -127,20 +132,14 @@ class SawSynth extends Instrument {
           3000,
       ) //3 second just to be sure
     } else if (dur < 0) {
-      voice.envelopeGain.gain.setValueAtTime(0, startTime)
-      voice.envelopeGain.gain.linearRampToValueAtTime(
-        1,
-        startTime + this.webAudioNodes.attackNode.offset.value,
-      )
+      voice.envelope.noteOn(startTime, 
+        1.0,
+        this.webAudioNodes.attackNode.offset.value,
+        0.1,
+        0.9)
     } else if (dur === 0) {
-      voice.envelopeGain.gain.cancelScheduledValues(startTime)
-      voice.envelopeGain.gain.setValueAtTime(
-        voice.envelopeGain.gain.value,
-        startTime,
-      )
-      voice.envelopeGain.gain.linearRampToValueAtTime(
-        0,
-        startTime + this.webAudioNodes.releaseNode.offset.value,
+      voice.envelope.noteOff(startTime, 
+        this.webAudioNodes.releaseNode.offset.value
       )
     }
   }

@@ -46,6 +46,13 @@ class Keyboard extends Effect {
 
   baseKey = 60 //middle C
 
+  modifierKeys = {
+    "ArrowUp": () => this.baseKey++,
+    "ArrowDown": () => this.baseKey--,
+    "ArrowLeft": () => this.baseKey-=12,
+    "ArrowRight": () => this.baseKey+=12,
+  }
+
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
     this.noteRegistrations = new Set()
@@ -87,6 +94,7 @@ class Keyboard extends Effect {
 
     this.pressedKeys = new Set()
     this.el.addEventListener("keydown", (event: KeyboardEvent) => {
+      console.log(event.key)
       if (
         keyToSemitone[event.key] !== undefined &&
         !this.pressedKeys.has(event.key)
@@ -101,6 +109,7 @@ class Keyboard extends Effect {
           ) // negative time is forever
         })
       }
+      if(this.modifierKeys[event.key]) this.modifierKeys[event.key]()
     })
     window.addEventListener("keyup", (event: KeyboardEvent) => {
       if (this.pressedKeys.has(event.key)) {
