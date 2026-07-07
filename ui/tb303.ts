@@ -26,6 +26,7 @@ class TB303 extends Instrument {
   filterEnvScaler: GainNode      // scales 0–1 envelope to 0–(envMod×8000) Hz
   envModNode: ConstantSourceNode
   slideNode: ConstantSourceNode
+  _sliding = false
 
   params = [
     { name: "gain",      path: "gainNode.gain",       min: 0.001, max: 1,    logScale: false, lastValue: 0.5   },
@@ -123,18 +124,25 @@ class TB303 extends Instrument {
   }
 
   play(note: number, startTime: number, dur: number) {
-    const slideTime = this.slideNode.offset.value
-    const gate = this.envNode.parameters.get("gate")
+    const gate = this.envNode.parameters.get("gate")!
+    const freq = note_to_frequency(note)
 
-    this.osc.frequency.setTargetAtTime(note_to_frequency(note), startTime, slideTime)
+    if (this._sliding) {
+      this.osc.frequency.setTargetAtTime(freq, startTime, this.slideNode.offset.value)
+    } else {
+      this.osc.frequency.setValueAtTime(freq, startTime)
+    }
 
     if (dur > 0) {
       gate.setValueAtTime(1, startTime)
       gate.setValueAtTime(0, startTime + dur)
+      this._sliding = false
     } else if (dur < 0) {
       gate.setValueAtTime(1, startTime)
+      this._sliding = true
     } else {
       gate.setValueAtTime(0, startTime)
+      this._sliding = false
     }
   }
 
