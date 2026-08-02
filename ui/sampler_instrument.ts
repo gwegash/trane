@@ -24,11 +24,11 @@ function insertSorted(arr, val){
   arr.splice(sortedIndex(arr, val)+ 1, 0, val)
 }
 
-class Sampler extends Instrument {
+class DrumSampler extends Instrument {
   static friendlyName = "drums"
   height = 65
   width = 65
-  ctx
+  canvasCtx
   canvas
 
   settings = {
@@ -60,12 +60,12 @@ class Sampler extends Instrument {
     this.canvas.style.height = this.height
     this.el.appendChild(this.canvas)
 
-    this.ctx = this.canvas.getContext("2d")
+    this.canvasCtx = this.canvas.getContext("2d")
     this.draw()
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.width, this.height)
+    this.canvasCtx.clearRect(0, 0, this.width, this.height)
 
     this.buffers.forEach((buffer, i) => {
       const lastHitTimeIdx = buffer.lastHitTimes.findLastIndex(time => time < this.audioContext.currentTime)
@@ -77,8 +77,8 @@ class Sampler extends Instrument {
         const y = Math.floor(i / 8)
 
         const opacity = 255*Math.max(1 -(this.audioContext.currentTime - lastHitTime), 0)
-        this.ctx.fillStyle = `rgb(${opacity} ${opacity} ${opacity})`
-        this.ctx.fillRect(x * 8 + 1, y * 8 + 1, 7, 7)
+        this.canvasCtx.fillStyle = `rgb(${opacity} ${opacity} ${opacity})`
+        this.canvasCtx.fillRect(x * 8 + 1, y * 8 + 1, 7, 7)
       }
     })
 
@@ -127,4 +127,4 @@ class Sampler extends Instrument {
   }
 }
 
-export { Sampler }
+export { DrumSampler }

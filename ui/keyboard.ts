@@ -37,7 +37,7 @@ const keyToSemitone = {
 
 class Keyboard extends Effect {
   static friendlyName = "keyboard"
-  canvasCtx //TODO this is overloaded with audiocontext, rename!
+  canvasCtx
   height = 65
   width = 120
   canvas

@@ -69,8 +69,9 @@
 (defmacro vectorize [fn]
   (let [original-fn (symbol :original/ fn)]
 	~(upscope
-	# save the original function under a new name
-	(def ,original-fn ,fn)
+	# save the original function under a new name (private: an implementation
+	# detail of this macro, not part of the DSL surface or the generated docs)
+	(def ,original-fn :private ,fn)
 
 	# now redefine the function
 	(defn ,(symbol fn) [& args]
@@ -106,8 +107,8 @@
 (defmacro notify_args [fn]
   (let [original-fn (symbol :original/ fn)]
     ~(upscope
-      # save the original function under a new name
-      (def ,original-fn ,fn)
+      # save the original function under a new name (private, as above)
+      (def ,original-fn :private ,fn)
 
       # now redefine the function
       (defn ,(symbol fn) [& args]

@@ -5,7 +5,7 @@
       :Q 2
       :gain 3
     }
-    :breakbeat_sampler @{
+    :breakbeat @{
       :gain 0
     }
     :chorus @{
@@ -23,13 +23,13 @@
     :constant @{
       :constant 0
     }
-    :Dlay @{
+    :delay @{
       :feedback 0
     }
     :gain @{
       :gain 0
     }
-    :ladder_filter @{
+    :ladder @{
       :cutoff 0
       :Q 1
     }
@@ -52,7 +52,7 @@
     :panner @{
       :pan 0
     }
-    :pitched_sampler @{
+    :sample @{
       :gain 0
       :attack 1
       :release 2

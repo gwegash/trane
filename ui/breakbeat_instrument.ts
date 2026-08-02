@@ -1,9 +1,9 @@
-import { Sampler } from "./sampler_generic"
+import { SamplerBase } from "./sampler_generic"
 import { bpm } from "./index"
 import { findClosest, clamp} from "./utils"
 
-class BreakbeatSampler extends Sampler {
-  static friendlyName = "breakbeat_sampler"
+class BreakbeatSampler extends SamplerBase {
+  static friendlyName = "breakbeat"
   length_beats = 8 //default to two bars
   sampleStart = 0
   sampleEnd = 1
@@ -135,21 +135,21 @@ class BreakbeatSampler extends Sampler {
 
   drawSlices() {
     this.slices.forEach((slice, i) => {
-      this.ctx.beginPath()
+      this.canvasCtx.beginPath()
       const canvasX = this.getXForNTime(slice)
 
       if(i == 0 || i == (this.slices.length - 1)){
-        this.ctx.setLineDash([])
-        this.ctx.moveTo(canvasX, 0)
-        this.ctx.lineTo(canvasX, this.height)
+        this.canvasCtx.setLineDash([])
+        this.canvasCtx.moveTo(canvasX, 0)
+        this.canvasCtx.lineTo(canvasX, this.height)
       }
       else{
 
-        this.ctx.setLineDash([5, 5])
-        this.ctx.moveTo(canvasX, 0)
-        this.ctx.lineTo(canvasX, this.height)
+        this.canvasCtx.setLineDash([5, 5])
+        this.canvasCtx.moveTo(canvasX, 0)
+        this.canvasCtx.lineTo(canvasX, this.height)
       }
-      this.ctx.stroke()
+      this.canvasCtx.stroke()
     })
   }
 

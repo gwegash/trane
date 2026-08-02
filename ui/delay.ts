@@ -3,7 +3,7 @@ import { bpm } from "./index"
 
 class Delay extends Effect {
   //TODO we need to unify these names with the DSL, will allow for easier feature development
-  static friendlyName = "Dlay"
+  static friendlyName = "delay"
 
   params = [
     { name: "feedback", path: "gainNode.gain", min: 0, max: 1, lastValue: 0.5 },

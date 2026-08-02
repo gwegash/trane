@@ -20,7 +20,7 @@
 (def a 4)
 (test-macro (breakbeat :break "local://thing" 4 4)
   (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil)]
-    (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1> :gain nil :transpose nil :timestretch nil))) 
+    (inst :breakbeat :break :url nil :length_beats nil :slices <1> :gain nil :transpose nil :timestretch nil))) 
 
 (test-macro (synth :synth "sawtooth")
   (inst :synth :synth :wave nil :gain nil :attack nil :release nil))
@@ -39,7 +39,7 @@
   (breakbeat :break :url "local://thing" :length_beats 4 :slices 8)
   (test (dyn *instruments*)
     @{:break @[2
-               :breakbeat_sampler
+               :breakbeat
                ":url"
                "local://thing"
                ":length_beats"
@@ -79,7 +79,7 @@
                              ":toParam"
                              "nil"]
       :breaks @[2
-                :breakbeat_sampler
+                :breakbeat
                 ":url"
                 "local://thing.wav"
                 ":length_beats"
@@ -93,7 +93,7 @@
                 ":timestretch"
                 "nil"]
       :breaksa @[3
-                 :breakbeat_sampler
+                 :breakbeat
                  ":url"
                  "local://thing.wav"
                  ":length_beats"
@@ -143,7 +143,7 @@
                             ":toParam"
                             "nil"]
       :breaks @[2
-                :breakbeat_sampler
+                :breakbeat
                 ":url"
                 "local://thing.wav"
                 ":length_beats"
@@ -167,7 +167,7 @@
     @{:midi @[1 :midi]
       :out @[0 :out]
       :samples @[2
-                 :pitched_sampler
+                 :sample
                  ":url"
                  "thing.wav"
                  ":pitch"

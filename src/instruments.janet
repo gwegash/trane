@@ -13,7 +13,8 @@
   ~(inst ,:reverb ,name :impulse ,impulse :wet-dry ,wet-dry :decay-time ,decay-time :predelay ,predelay)
 )
 
-(defmacro Dlay 
+# shadows the Janet `delay` because I don't really use it. But hey, if you want it, then you can change that here.
+(defmacro delay
   ````Creates a delay module with a given `name`
   * `delay_time` is given in beats
   * `feedback` is a number
@@ -21,11 +22,11 @@
   **Example**
   ```
   # Creates a delay module with a delay line length of 0.75 beats and a feedback of 50%
-  (Dlay :hello-delay :delay_time 0.75 :feedback 0.5)
+  (delay :hello-delay :delay_time 0.75 :feedback 0.5)
   ```
   ````
   [name &named delay_time feedback]
-  ~(inst ,:Dlay ,name :delay_time ,delay_time :feedback ,feedback)
+  ~(inst ,:delay ,name :delay_time ,delay_time :feedback ,feedback)
 )
 
 (defmacro looper 
@@ -57,7 +58,7 @@
 (defmacro sample [name &named url pitch gain attack release loop-start loop-end]
   (with-syms [$note]
    ~(let [,$note (note ,pitch)]
-      (inst :pitched_sampler ,name :url ,url :pitch ,$note :gain ,gain :attack ,attack :release ,release :loop_start ,loop-start :loop_end ,loop-end)
+      (inst :sample ,name :url ,url :pitch ,$note :gain ,gain :attack ,attack :release ,release :loop_start ,loop-start :loop_end ,loop-end)
     )
   )
 )
@@ -90,7 +91,7 @@
              (tuple? ,slices) ,slices
            )
            ]
-       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain :transpose ,transpose :timestretch ,timestretch)
+       (inst ,:breakbeat ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain :transpose ,transpose :timestretch ,timestretch)
      )
   )
 )
@@ -116,7 +117,7 @@
 )
 
 (defmacro ladder [name &named cutoff Q]
-  ~(inst ,:ladder_filter ,name :cutoff ,cutoff :Q ,Q)
+  ~(inst ,:ladder ,name :cutoff ,cutoff :Q ,Q)
 )
 
 (defmacro tb303 [name &named wave gain cutoff resonance envMod decay attack slide]

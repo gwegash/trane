@@ -1,9 +1,9 @@
-import { Sampler } from "./sampler_generic"
+import { SamplerBase } from "./sampler_generic"
 import { note_to_frequency } from "./utils"
 import { nullGain } from "./audio"
 
-class PitchedSampler extends Sampler {
-  static friendlyName = "pitched_sampler"
+class PitchedSampler extends SamplerBase {
+  static friendlyName = "sample"
   samplePitch: number
 	params = [ // TODO why do we override the defaults??
 		{

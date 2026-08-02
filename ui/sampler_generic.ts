@@ -12,10 +12,10 @@ interface Playhead {
 
 // All sample times/quantities are normalised to the length of the sample
 // samplers -> hpf -> lpf -> gain -> output
-class Sampler extends Instrument {
+class SamplerBase extends Instrument {
   buffer: AudioBuffer
   canvas: HTMLCanvasElement
-  ctx //TODO this is overloaded with audiocontext, rename!
+  canvasCtx
   height = 65
   width = 350
   sampleURL: string
@@ -160,8 +160,8 @@ class Sampler extends Instrument {
     this.canvas.addEventListener("wheel", this.onWheel.bind(this))
     this.canvas.addEventListener("click", this.onClick.bind(this))
 
-    this.ctx = this.canvas.getContext("2d")
-    this.ctx.strokeStyle = "white"
+    this.canvasCtx = this.canvas.getContext("2d")
+    this.canvasCtx.strokeStyle = "white"
     this.draw()
 
     this.resolveParams()
@@ -205,20 +205,20 @@ class Sampler extends Instrument {
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.width, this.height)
+    this.canvasCtx.clearRect(0, 0, this.width, this.height)
 
-    this.ctx.font = "5px pixeled"
+    this.canvasCtx.font = "5px pixeled"
 
-    this.ctx.beginPath()
-    this.ctx.setLineDash([])
-    this.ctx.moveTo(0, this.height / 2)
+    this.canvasCtx.beginPath()
+    this.canvasCtx.setLineDash([])
+    this.canvasCtx.moveTo(0, this.height / 2)
 
     //TODO should we allow this? I think so, or should we enforce that the sample is loaded before we get here? I think this is OK, if a bit messy. It still allows messages to be routed around fine
     if (this.buffer) {
       const samples = this.mipmap.sampleRange(this.viewBounds[0], this.viewBounds[1], this.width)
 
       samples.forEach((sample, x) => 
-        this.ctx.lineTo(
+        this.canvasCtx.lineTo(
           x,
           this.height / 2 +
             (this.webAudioNodes.gainNode.gain.value *
@@ -240,75 +240,75 @@ class Sampler extends Instrument {
                 (this.audioContext.currentTime - playhead.startTime) *
                   playhead.playbackRate) /
             this.buffer.duration)
-          this.ctx.moveTo(playheadX, 0)
-          this.ctx.lineTo(playheadX, this.height)
+          this.canvasCtx.moveTo(playheadX, 0)
+          this.canvasCtx.lineTo(playheadX, this.height)
         }
       })
-      this.ctx.stroke()
+      this.canvasCtx.stroke()
     } else if(!this.canRecord()) {
       const eyeWidth = 10
       const eyeHeight = 20
       const frownHeight = 10
-      this.ctx.fillStyle = "white"
-      this.ctx.fillRect(
+      this.canvasCtx.fillStyle = "white"
+      this.canvasCtx.fillRect(
         this.width / 2 - eyeWidth,
         Math.floor(this.height / 2) - eyeHeight,
         1,
         1,
       )
-      this.ctx.fillRect(
+      this.canvasCtx.fillRect(
         this.width / 2 + eyeWidth,
         Math.floor(this.height / 2) - eyeHeight,
         1,
         1,
       )
-      this.ctx.beginPath()
-      this.ctx.arc(
+      this.canvasCtx.beginPath()
+      this.canvasCtx.arc(
         this.width / 2,
         this.height / 2 - frownHeight,
         4.0,
         -Math.PI / 2 - 1,
         -Math.PI / 2 + 1,
       )
-      this.ctx.stroke()
-      this.ctx.font = "10px ibmvga"
-      this.ctx.fillText("couldn't load sample", this.width / 2 - 45, 50) //TODO expand this with loading/couldn't load
+      this.canvasCtx.stroke()
+      this.canvasCtx.font = "10px ibmvga"
+      this.canvasCtx.fillText("couldn't load sample", this.width / 2 - 45, 50) //TODO expand this with loading/couldn't load
     }
     else{
       if(this.recording){
         const circleHeight = 10
-        this.ctx.strokeStyle = this.audioContext.currentTime % 1 < 0.5 ? "white" : "red"
-        this.ctx.beginPath()
-        this.ctx.arc(
+        this.canvasCtx.strokeStyle = this.audioContext.currentTime % 1 < 0.5 ? "white" : "red"
+        this.canvasCtx.beginPath()
+        this.canvasCtx.arc(
           this.width / 2,
           this.height / 2 - circleHeight,
           4.0,
           0,
           2.0*Math.PI,
         )
-        this.ctx.stroke()
-        this.ctx.font = "10px ibmvga"
-        this.ctx.fillStyle = "white"
-        this.ctx.fillText("Recording", this.width / 2 - 17, 50)
+        this.canvasCtx.stroke()
+        this.canvasCtx.font = "10px ibmvga"
+        this.canvasCtx.fillStyle = "white"
+        this.canvasCtx.fillText("Recording", this.width / 2 - 17, 50)
       }
       else{
         const circleHeight = 10
-        this.ctx.strokeStyle = "white"
-        this.ctx.beginPath()
-        this.ctx.arc(
+        this.canvasCtx.strokeStyle = "white"
+        this.canvasCtx.beginPath()
+        this.canvasCtx.arc(
           this.width / 2,
           this.height / 2 - circleHeight,
           4.0,
           0,
           2.0*Math.PI,
         )
-        this.ctx.stroke()
-        this.ctx.font = "10px ibmvga"
-        this.ctx.fillStyle = "white"
-        this.ctx.fillText("Record?", this.width / 2 - 15, 50)
+        this.canvasCtx.stroke()
+        this.canvasCtx.font = "10px ibmvga"
+        this.canvasCtx.fillStyle = "white"
+        this.canvasCtx.fillText("Record?", this.width / 2 - 15, 50)
       }
     }
   }
 }
 
-export { Sampler }
+export { SamplerBase }

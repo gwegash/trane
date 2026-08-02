@@ -5,7 +5,7 @@ class Scope extends Effect {
 
   buffer: AudioBuffer
   canvas: Element
-  ctx //TODO this is overloaded with audiocontext, rename!
+  canvasCtx
   height = 65
   width = 150
   fftSize = 2048
@@ -42,18 +42,18 @@ class Scope extends Effect {
     this.canvas.style.height = this.height
     this.knobsEl.appendChild(this.canvas)
 
-    this.ctx = this.canvas.getContext("2d")
-    this.ctx.strokeStyle = "white"
+    this.canvasCtx = this.canvas.getContext("2d")
+    this.canvasCtx.strokeStyle = "white"
     this.draw()
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.width, this.height)
+    this.canvasCtx.clearRect(0, 0, this.width, this.height)
 
-    this.ctx.font = "5px pixeled"
+    this.canvasCtx.font = "5px pixeled"
 
-    this.ctx.beginPath()
-    this.ctx.moveTo(0, this.height / 2)
+    this.canvasCtx.beginPath()
+    this.canvasCtx.moveTo(0, this.height / 2)
 
     //draw our waveform
     let x = 0
@@ -64,12 +64,12 @@ class Scope extends Effect {
 
     //TODO zooming, split the range of channel data before iterating, faster!
     for (let sample = 0; sample < this.buffer.length; sample += sampleStride) {
-      this.ctx.lineTo(x, (this.buffer[sample] * this.height) / 256)
+      this.canvasCtx.lineTo(x, (this.buffer[sample] * this.height) / 256)
       x++
     }
 
-    //this.ctx.lineTo(this.width, this.height/2)
-    this.ctx.stroke()
+    //this.canvasCtx.lineTo(this.width, this.height/2)
+    this.canvasCtx.stroke()
     window.requestAnimationFrame(this.draw.bind(this))
   }
 }

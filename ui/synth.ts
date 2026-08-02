@@ -10,7 +10,7 @@ interface Voice {
 }
 
 // oscillators[i] -> envelopeGain -> gain -> output
-class SawSynth extends Instrument {
+class Synth extends Instrument {
   static friendlyName = "synth"
   oscillatorType = "sawtooth"
 
@@ -152,4 +152,4 @@ class SawSynth extends Instrument {
   }
 }
 
-export { SawSynth }
+export { Synth }

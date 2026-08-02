@@ -23,7 +23,7 @@ class Knob {
   containerEl
   canvas
   audioContext
-  ctx
+  canvasCtx
 
   mouseStart
   mouseMoveEvent
@@ -102,9 +102,9 @@ class Knob {
     this.containerEl.style.userSelect = "none"
     parentEl.appendChild(this.containerEl)
 
-    this.ctx = this.canvas.getContext("2d")
-    this.ctx.fillStyle = "white"
-    this.ctx.strokeStyle = "white"
+    this.canvasCtx = this.canvas.getContext("2d")
+    this.canvasCtx.fillStyle = "white"
+    this.canvasCtx.strokeStyle = "white"
     this.draw()
 
     this.canvas.addEventListener("mousedown", (e) => {
@@ -181,38 +181,38 @@ class Knob {
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, SIZE_PX, SIZE_PX)
+    this.canvasCtx.clearRect(0, 0, SIZE_PX, SIZE_PX)
 
-    this.ctx.beginPath()
+    this.canvasCtx.beginPath()
     const radius = SIZE_PX / 2 - 6
-    this.ctx.arc(SIZE_PX / 2, SIZE_PX / 2, radius, 0, 2 * Math.PI)
+    this.canvasCtx.arc(SIZE_PX / 2, SIZE_PX / 2, radius, 0, 2 * Math.PI)
 
     const knotchLength = this.shouldDrawParamValue() ? KNOB_KNOTCH_LENGTH : 0
-    this.ctx.moveTo(
+    this.canvasCtx.moveTo(
       SIZE_PX / 2 + Math.sin(this.getRotation()) * radius * knotchLength,
       SIZE_PX / 2 + Math.cos(this.getRotation()) * radius * knotchLength,
     )
-    this.ctx.lineTo(
+    this.canvasCtx.lineTo(
       SIZE_PX / 2 + Math.sin(this.getRotation()) * radius,
       SIZE_PX / 2 + Math.cos(this.getRotation()) * radius,
     )
-    this.ctx.stroke()
+    this.canvasCtx.stroke()
 
     if (this.shouldDrawParamValue()) {
       const valueString = `${this.parameter.value.toFixed(2)}`
-      const maxTextWidth = this.ctx.measureText(valueString).width
-      this.ctx.fillText(
+      const maxTextWidth = this.canvasCtx.measureText(valueString).width
+      this.canvasCtx.fillText(
         valueString,
         SIZE_PX / 2 - maxTextWidth / 2,
         SIZE_PX / 2 + 5,
       )
     }
 
-    this.ctx.font = "10px ibmvga"
-    this.ctx.fillText(`${this.min}`, 1, SIZE_PX)
+    this.canvasCtx.font = "10px ibmvga"
+    this.canvasCtx.fillText(`${this.min}`, 1, SIZE_PX)
 
-    const maxTextWidth = this.ctx.measureText(`${this.max}`).width
-    this.ctx.fillText(`${this.max}`, SIZE_PX - maxTextWidth, SIZE_PX)
+    const maxTextWidth = this.canvasCtx.measureText(`${this.max}`).width
+    this.canvasCtx.fillText(`${this.max}`, SIZE_PX - maxTextWidth, SIZE_PX)
     window.requestAnimationFrame(this.draw.bind(this))
   }
 }

@@ -2,7 +2,7 @@ import { Effect } from "./effect" //  Gets WeAssembly bytcode from file
 import filterWasm from "../src/cpp/ladder_filter.wasm"
 
 class LadderFilter extends Effect {
-  static friendlyName = "ladder_filter"
+  static friendlyName = "ladder"
 
   params = [
     {

@@ -1,5 +1,5 @@
-import { SawSynth } from "./sineInstrument"
-import { Sampler } from "./sampler_instrument"
+import { Synth } from "./synth"
+import { DrumSampler } from "./sampler_instrument"
 import { BreakbeatSampler } from "./breakbeat_instrument"
 import { PitchedSampler } from "./pitched_sampler"
 import { ConvolutionReverb } from "./reverb"
@@ -36,9 +36,9 @@ let nullGain //for chrome based implementation details on constant sources
 const instMap = Object.fromEntries(
   [
     Output,
-    SawSynth,
+    Synth,
     Gain,
-    Sampler,
+    DrumSampler,
     BreakbeatSampler,
     PitchedSampler,
     ConvolutionReverb,
