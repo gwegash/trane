@@ -2,6 +2,7 @@ import { Instrument } from "./instruments"
 import { Knob } from "./knob"
 import { loadSample, clamp } from "./utils"
 import { AudioMipmap } from "./audio_mipmap"
+import { Timestretcher } from "timestretcher"
 
 interface Playhead {
   startTime: number
@@ -22,6 +23,8 @@ class Sampler extends Instrument {
   mipmap: AudioMipmap
   recording: false
   mediaRecorder: MediaRecorder
+  timestretch : 1.0
+  transpose : 0
   recorderChunks = []
 
   viewBounds = [0.0, 1.0] //viewport bounds in normalized sample length.
@@ -37,20 +40,35 @@ class Sampler extends Instrument {
     this.outputNode = this.webAudioNodes.gainNode
   }
 
-  async setup({url}) {
-    if (this.sampleURL !== url) {
-      await this.loadSample(url)
+  async setup({url, timestretch, transpose}) {
+    const timeRatio : number = timestretch ? parseFloat(timestretch) : 1.0 
+    const semitones : number = transpose ? parseFloat(transpose) : 0
+    if (this.sampleURL !== url || this.timestretch !== timeRatio || this.transpose !== semitones) {
+      await this.loadSampleTimestretch(url, timeRatio, semitones)
     }
-
     return this
   }
 
   async loadSample(sampleURLRaw) {
+    return await this.loadSampleTimestretch(sampleURLRaw, 1.0, 0)
+  }
+
+  async loadSampleTimestretch(sampleURLRaw, timeRatio : number, semitones : number) {
     this.sampleURL = sampleURLRaw
     const buffer = await loadSample(sampleURLRaw)
     if (buffer) {
       const decoded = await this.audioContext.decodeAudioData(buffer)
-      this.buffer = decoded
+
+      if(timeRatio !== 1 || semitones !== 0){ //just avoid the work if we can
+        console.log("requesting timestretch")
+        this.buffer = await Timestretcher.timestretch(decoded, {timeRatio, semitones }).catch(err => console.log(err))
+        console.log("got timestretch result")
+      }
+      else {
+        this.buffer = decoded
+      }
+      this.timestretch = timeRatio
+      this.transpose = semitones
       this.mipmap = new AudioMipmap(this.buffer.getChannelData(0))
     } else {
       this.buffer = undefined

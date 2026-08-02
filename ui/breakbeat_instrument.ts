@@ -26,7 +26,7 @@ class BreakbeatSampler extends Sampler {
     this.canvas.addEventListener("contextmenu", (e) => { e.preventDefault() })
   }
 
-  async setup({ url, length_beats, slices, gain }) {
+  async setup({length_beats, slices, gain, ...rest }) {
     //TODO make bpm dynamic
     this.length_beats = parseFloat(length_beats)
     if(slices){
@@ -43,7 +43,10 @@ class BreakbeatSampler extends Sampler {
     this.sampleStart = this.slices[0]
     this.sampleEnd = this.slices[this.slices.length - 1]
     this.updateParamIfChanged(0, gain) //TODO move this to the parent element
-    super.setup({url})
+    //
+    //this.buffer is set after super is loaded.
+    await super.setup(rest)
+
     return this
   }
 

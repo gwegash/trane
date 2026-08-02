@@ -26,6 +26,7 @@ import type { Effect } from "./effect"
 import { Wire } from "./wire"
 import "./css/fonts.css"
 import { bpm, instrumentElement as instrumentEl } from "./index"
+import { Timestretcher } from "timestretcher"
 import { init as initLoopManager } from "./loop_manager"
 
 let instruments
@@ -95,6 +96,8 @@ async function initAudio() {
   nullGain.connect(context.destination)
 
   // init worklet modules
+  //
+  await Timestretcher.init()
   await initWorklets()
   setInterval(() => console.log("latency", context.baseLatency), 1000)
 }

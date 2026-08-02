@@ -82,7 +82,7 @@
   ~(inst ,:panner ,name :pan ,pan)
 )
 
-(defmacro breakbeat [name &named url length_beats slices gain]
+(defmacro breakbeat [name &named url length_beats slices gain timestretch transpose]
   (with-syms [$slices]
     ~(let [,$slices 
            (cond 
@@ -90,7 +90,7 @@
              (tuple? ,slices) ,slices
            )
            ]
-       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain)
+       (inst ,:breakbeat_sampler ,name :url ,url :length_beats ,length_beats :slices ,$slices :gain ,gain :transpose ,transpose :timestretch ,timestretch)
      )
   )
 )

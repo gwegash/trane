@@ -17,6 +17,7 @@
     "codemirror": "^6.0.1",
     "codemirror-lang-janet": "^0.7.2",
     "localforage": "^1.10.0",
+    "timestretcher": "file:../sampler_node_pitch",
     "tsx": "^4.16.2",
     "typescript-parser": "^2.6.1"
   },
