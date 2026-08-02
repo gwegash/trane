@@ -22,10 +22,9 @@ import { LadderFilter } from "./ladder_filter"
 import { TB303 } from "./tb303"
 import { Keyboard } from "./keyboard"
 import type { GraphNode, Instrument } from "./instruments"
-import type { Effect } from "./effect"
 import { Wire } from "./wire"
 import "./css/fonts.css"
-import { bpm, instrumentElement as instrumentEl } from "./index"
+import { instrumentElement as instrumentEl } from "./index"
 import { Timestretcher } from "timestretcher"
 import { init as initLoopManager } from "./loop_manager"
 
@@ -189,6 +188,5 @@ export {
   newInstrumentMappings,
   instrumentsByName,
   instMap,
-  getTabIndex,
   nullGain,
 }

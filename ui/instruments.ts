@@ -180,4 +180,4 @@ class Instrument extends GraphNode {
   }
 }
 
-export { GraphNode, Instrument, WebAudioNodes, Param, getTabIndex, isNil}
+export { GraphNode, Instrument, WebAudioNodes, Param, getTabIndex }

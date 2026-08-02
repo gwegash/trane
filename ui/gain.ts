@@ -1,5 +1,4 @@
 import { Effect } from "./effect"
-import { Knob } from "./knob"
 
 class Gain extends Effect {
   static friendlyName = "gain"

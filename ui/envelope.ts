@@ -1,8 +1,3 @@
-import { Instrument } from "./instruments"
-import { Knob } from "./knob"
-import { note_to_frequency } from "./utils"
-import { nullGain } from "./audio"
-
 class EnvelopeNode {
   gain
   attackEnd
@@ -53,11 +48,6 @@ class EnvelopeNode {
   disconnect(){
     this.gain.disconnect()
   }
-}
-
-class Envelope extends Instrument {
-  static friendlyName = "synth"
-
 }
 
 export {EnvelopeNode}

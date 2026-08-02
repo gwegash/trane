@@ -10,7 +10,7 @@ import { codeReload } from "./loop_manager"
 import { OutputChannel } from "./errors"
 import { editor } from "./editor"
 import { background } from "./dark_theme"
-import { tutor, continueTutorial } from "./tutor"
+import { continueTutorial } from "./tutor"
 import "./css/main.css"
 
 let bpm
@@ -18,8 +18,6 @@ let janetRuntime
 let compiledImage //the image that is compiling, but not yet ready been pushed to the running loops, TODO MAYBE set this to null/undefined if the compilation hasn't succeeded?
 let outputChannel: OutputChannel
 let instrumentElement: HTMLElement
-
-function addAboutSection() {}
 
 async function main(runtime: Module) {
   janetRuntime = runtime
@@ -60,7 +58,7 @@ async function main(runtime: Module) {
 
 function onChange() {
   outputChannel.clearErrors()
-  const result = runtime.trane_compile(editor.state.doc.toString())
+  const result = janetRuntime.trane_compile(editor.state.doc.toString())
   if (!result.isError) {
     compiledImage = result.image
   } else {

@@ -23,7 +23,7 @@
   (all note? xs))
 
 (defn- rest_length? [x]
-  (number? x) and (< 0 x))
+  (and (number? x) (< 0 x)))
 
 (defn- fiber_return? [x]
   (tuple-of? x [rest_length? notes?])) #rest length, array of notes

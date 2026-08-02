@@ -20,7 +20,7 @@
 (def a 4)
 (test-macro (breakbeat :break "local://thing" 4 4)
   (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil)]
-    (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1> :gain nil))) 
+    (inst :breakbeat_sampler :break :url nil :length_beats nil :slices <1> :gain nil :transpose nil :timestretch nil))) 
 
 (test-macro (synth :synth "sawtooth")
   (inst :synth :synth :wave nil :gain nil :attack nil :release nil))
@@ -47,6 +47,10 @@
                ":slices"
                "(0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1)"
                ":gain"
+               "nil"
+               ":transpose"
+               "nil"
+               ":timestretch"
                "nil"]
       :midi @[1 :midi]
       :out @[0 :out]})
@@ -83,6 +87,10 @@
                 ":slices"
                 "(0.1 0.2 0.3)"
                 ":gain"
+                "nil"
+                ":transpose"
+                "nil"
+                ":timestretch"
                 "nil"]
       :breaksa @[3
                  :breakbeat_sampler
@@ -93,6 +101,10 @@
                  ":slices"
                  "(0.1 0.2 0.3)"
                  ":gain"
+                 "nil"
+                 ":transpose"
+                 "nil"
+                 ":timestretch"
                  "nil"]
       :midi @[1 :midi]
       :out @[0 :out]})
@@ -139,6 +151,10 @@
                 ":slices"
                 "(0.1 0.2 0.3)"
                 ":gain"
+                "nil"
+                ":transpose"
+                "nil"
+                ":timestretch"
                 "nil"]
       :chorus @[3 :chorus]
       :midi @[1 :midi]
@@ -197,7 +213,10 @@
 
 (deftest: loop_body "test_pattern" [context]
   (seed 5)
-  (test (P [(rep (rand 0 100)) 2] 4))
+  (test (P [(rep (rand 0 100) 2) 2] 4)
+    @[[38.215540643257519 1]
+      [38.215540643257519 1]
+      [2 2]])
 )
 
 (deftest: loop_body "test_play" [context]
@@ -212,5 +231,9 @@
   (lin :my-gaine :gain 9)
   (exp :my-gaine :gain 10)
   (itarget :my-gaine :gain 11)
-  (test (get (dyn *self*) :notes) 0)
+  (test (get (dyn *self*) :notes)
+    @[[-65 8 -0.01 24 -1]
+      [-65 9 0 24 -1]
+      [-65 10 1 24 -1]
+      [-65 11 2 24 -1]])
 )

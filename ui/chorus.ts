@@ -1,5 +1,4 @@
 import { Effect } from "./effect"
-import { bpm } from "./index"
 
 class Chorus extends Effect {
   //TODO we need to unify these names with the DSL, will allow for easier feature development

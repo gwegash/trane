@@ -1,5 +1,4 @@
 import { Instrument } from "./instruments"
-import { Knob } from "./knob"
 import { note_to_frequency } from "./utils"
 import { nullGain } from "./audio"
 import { EnvelopeNode } from "./envelope"

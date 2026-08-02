@@ -1,5 +1,4 @@
 import { Instrument } from "./instruments"
-import { Knob } from "./knob"
 import { loadSample, clamp } from "./utils"
 import { AudioMipmap } from "./audio_mipmap"
 import { Timestretcher } from "timestretcher"

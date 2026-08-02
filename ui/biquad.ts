@@ -1,6 +1,4 @@
 import { Effect } from "./effect"
-import { Knob } from "./knob"
-import { resolvePath } from "./utils"
 
 class Biquad extends Effect {
   static friendlyName = "biquad"

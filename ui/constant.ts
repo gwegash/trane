@@ -1,5 +1,4 @@
 import { Effect } from "./effect"
-import { Knob } from "./knob"
 import { nullGain } from "./audio"
 
 class Constant extends Effect {

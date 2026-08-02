@@ -109,10 +109,7 @@ async function saveCurrentScript() {
   if(window.location.origin !== window.location.href.slice(0, -1)){
     window.history.pushState({}, "", window.location.origin) //TODO get rid of this once we have a server
   }
-  const value = await localforage.setItem(
-    "saved_script",
-    editor.state.doc.toString(),
-  )
+  await localforage.setItem("saved_script", editor.state.doc.toString())
 }
 
 async function loadSavedScript(): Promise<string | null> {
@@ -138,7 +135,7 @@ async function dropFile(e) {
 	try {
 		
 		files.forEach(async (file) => {
-			const value = await localforage.setItem(
+			await localforage.setItem(
 				file.name,
 				file.arrayBuffer(),
 			)

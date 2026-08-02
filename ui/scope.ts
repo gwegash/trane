@@ -1,6 +1,4 @@
 import { Effect } from "./effect"
-import { Knob } from "./knob"
-import { loadSample } from "./utils"
 
 class Scope extends Effect {
   static friendlyName = "scope"
