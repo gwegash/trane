@@ -2,19 +2,19 @@ import { Effect } from "./effect" //  Gets WeAssembly bytcode from file
 import filterWasm from "../src/cpp/ladder_filter.wasm"
 
 class LadderFilter extends Effect {
-  static friendlyName = "ladder"
-
-  params = [
-    {
-      name: "cutoff",
-      path: "filterNode.cutoff",
-      isWorklet: true,
-      min: 40,
-      max: 12000,
-      logScale: true,
+  static def = {
+    name: "ladder",
+    params: {
+      cutoff: {
+        at: (n) => n.filterNode.parameters.get("cutoff"),
+        min: 40,
+        max: 12000,
+        log: true,
+      },
+      // min/max come from the processor's own parameterDescriptors
+      Q: { at: (n) => n.filterNode.parameters.get("Q") },
     },
-    { name: "Q", path: "filterNode.Q", isWorklet: true },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -37,12 +37,6 @@ class LadderFilter extends Effect {
 
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
-  }
-
-  async setup({ cutoff, Q }) {
-    this.updateParamIfChanged(0, cutoff)
-    this.updateParamIfChanged(1, Q)
-    return this
   }
 }
 

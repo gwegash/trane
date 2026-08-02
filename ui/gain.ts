@@ -1,17 +1,12 @@
 import { Effect } from "./effect"
 
 class Gain extends Effect {
-  static friendlyName = "gain"
-
-  params = [
-    {
-      name: "gain",
-      path: "gainNode.gain",
-      min: 0.001,
-      max: 10.0,
-      logScale: true,
+  static def = {
+    name: "gain",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 10.0, log: true },
     },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -26,11 +21,6 @@ class Gain extends Effect {
 
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
-  }
-
-  async setup({ gain }) {
-    this.updateParamIfChanged(0, gain)
-    return this
   }
 }
 

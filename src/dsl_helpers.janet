@@ -1,20 +1,87 @@
 (use ./harmony)
 (use ./globals)
+(use ./params)
 
-(defmacro nicedescribe [x]
-  ~(if 
-     (string? ,x) ,x
-     (string/format "%n" ,x)
-  )
-)
+# Every instrument argument crosses into JS as a string; nil becomes the literal
+# "nil", which audio.ts maps back to undefined.
+(defn nicedescribe [x]
+  (if (string? x) x (string/format "%n" x)))
 
-(defmacro inst [instType name & args]
-  ~(do
-    (assert (not (get (dyn ,*instruments*) ,name)) (string "instrument already declared: " ,name))
-    (put (dyn ,*instruments*) ,name @[(length (dyn ,*instruments*)) ,instType ,;(map nicedescribe args)])
-    ,name
-  )
-)
+(defn inst
+  ````Registers an instrument in the graph and returns its `name`.
+
+  Runs while the script is being evaluated -- that is, during trane_compile -- so the
+  whole audio graph exists, and any error in building it has already been reported,
+  before a single live_loop runs.
+  ````
+  [inst-type name & args]
+  (def instruments (dyn *instruments*))
+  (assert (not (get instruments name)) (string "instrument already declared: " name))
+  (put instruments name @[(length instruments) inst-type ;(map nicedescribe args)])
+  name)
+
+# Which argument of each DSL form names an instrument, and which name a parameter
+# too. (play note :inst ...) puts the instrument second; (change :inst :param ...)
+# puts it first and the parameter second.
+(def- instrument-arg
+  {'play 2 'change 1 'lin 1 'exp 1 'itarget 1 'target 1})
+
+(def- names-a-param
+  {'change true 'lin true 'exp true 'itarget true 'target true})
+
+(defn record-references
+  ````Walks a live_loop body while it is being compiled, noting the instruments and
+  parameters it mentions so that validate-references can check them once the whole
+  graph exists.
+
+  Only literal keywords are recorded. `(play n (pick :a :b))` is skipped rather than
+  wrongly rejected -- this reports what it is sure about and stays quiet otherwise.
+  ````
+  [form]
+  (def checks (dyn *checks*))
+  (when (and checks (indexed? form))
+    (def idx (get instrument-arg (first form)))
+    (when idx
+      (def inst-name (get form idx))
+      (def param (get form 2))
+      (when (keyword? inst-name)
+        (array/push checks
+                    (if (and (get names-a-param (first form)) (keyword? param))
+                      [:param inst-name param]
+                      [:instrument inst-name]))))
+    (each sub form
+      (record-references sub))))
+
+(defn validate-references
+  ````Checks everything record-references collected against the finished instrument
+  table. Returns a list of error strings, empty when the script is sound.
+
+  This runs after the whole script has been evaluated, so an instrument may be
+  declared below the live_loop that plays it.
+  ````
+  [env]
+  (def instruments (get env *instruments*))
+  (def errors @[])
+  (each check (or (get env *checks*) @[])
+    (def [kind inst-name] check)
+    (def inst (get instruments inst-name))
+    (cond
+      (nil? inst)
+      (array/push errors (string "instrument not found: " inst-name))
+
+      (= kind :param)
+      (let [inst-type (get inst 1)
+            params (get *inst_params* inst-type)
+            param (get check 2)]
+        (cond
+          (nil? params)
+          (array/push errors (string "instrument type not found: " inst-type))
+
+          (nil? (get params param))
+          (array/push errors
+                      (string "parameter " param " does not exist on " inst-name
+                              " (" inst-type ")"))))))
+  (distinct errors))
 
 (defn play_ [pitch channel &named vel dur]
   (cond
@@ -29,13 +96,9 @@
   )
 )
 
-(defmacro change_ [channel to &named cType dur]
-  (with-syms [$cType $dur]
-    ~(let [,$cType (if ,cType ,cType -0.01) ,$dur (if ,dur ,dur -1.0)]
-      (tuple ,channel ,to ,$cType (dyn :current-time) ,$dur)
-    )
-  )
-)
+(defn change_ [channel to &named cType dur]
+  # 0 is a meaningful cType (linear ramp) and Janet counts it as true, so `if` is safe
+  [channel to (if cType cType -0.01) (dyn :current-time) (if dur dur -1.0)])
 
 (defn squish-rest-reducer [accum el]
   (def [currentNote currentLen] el)
@@ -53,9 +116,11 @@
   (reduce squish-rest-reducer @[(get pattern 0)] (array/slice pattern 1))
 )
 
-(defmacro encodeParam [inst instParam]
-  ~(- (inc (+ (blshift ,inst 5) ,instParam)))
-)
+# Packs an instrument channel and a param index into a single negative number, which
+# is how audio.ts tells a param change from a note. 5 bits for the param index caps a
+# node at 32 params -- see the NodeDef comment in ui/instruments.ts.
+(defn encodeParam [inst instParam]
+  (- (inc (+ (blshift inst 5) instParam))))
 
 (defn quantiseModulo [modTime measure] ## This could be a terrible idea.
   # float64 eps?? probably a bit generous

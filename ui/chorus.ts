@@ -2,13 +2,18 @@ import { Effect } from "./effect"
 
 class Chorus extends Effect {
   //TODO we need to unify these names with the DSL, will allow for easier feature development
-  static friendlyName = "chorus"
-
-  params = [
-    { name: "rate", path: "lfo.frequency", min: 0.1, max: 10 },
-    { name: "amount", path: "lfoGain.gain", min: 0.001, max: 0.01 },
-    { name: "wet-dry", path: "crossfaderNode.panner.pan", min: -1, max: 1 },
-  ]
+  static def = {
+    name: "chorus",
+    params: {
+      rate: { at: (n) => n.lfo.frequency, min: 0.1, max: 10 },
+      amount: { at: (n) => n.lfoGain.gain, min: 0.001, max: 0.01 },
+      "wet-dry": {
+        at: (n) => n.crossfaderNode.panner.pan,
+        min: -1,
+        max: 1,
+      },
+    },
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -44,8 +49,6 @@ class Chorus extends Effect {
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
   }
-
-  async setup() {}
 }
 
 export { Chorus }

@@ -5,6 +5,11 @@
 (use ../src/instruments)
 (use ../src/dsl_helpers)
 (use ../src/harmony)
+(use ../src/params)
+
+# In the browser this table arrives from the UI at startup (paramsAsJanet in
+# ui/audio.ts). Tests supply the subset they exercise, through the same entry point.
+(set-params `@{:gain @{:gain 0}}`)
 
 
 (test (+ 2 :c3) 38)
@@ -18,20 +23,47 @@
 (setdyn *instruments* @{})
 
 (def a 4)
-(test-macro (breakbeat :break "local://thing" 4 4)
-  (let [<1> (cond (int? nil) (tuple (splice (map (fn [x] (/ x nil)) (range 0 (+ nil 1))))) (tuple? nil) nil)]
-    (inst :breakbeat :break :url nil :length_beats nil :slices <1> :gain nil :transpose nil :timestretch nil))) 
+# These used to assert macro expansions. The instrument constructors are plain
+# functions now, so assert what they actually register instead.
+(test (breakbeat :break :url "local://thing" :length_beats 4 :slices 4) :break)
+(test (get (dyn *instruments*) :break)
+  @[0
+    :breakbeat
+    ":url"
+    "local://thing"
+    ":length_beats"
+    "4"
+    ":slices"
+    "(0 0.25 0.5 0.75 1)"
+    ":gain"
+    "nil"
+    ":transpose"
+    "nil"
+    ":timestretch"
+    "nil"])
 
-(test-macro (synth :synth "sawtooth")
-  (inst :synth :synth :wave nil :gain nil :attack nil :release nil))
+(test (synth :synth :wave "sawtooth") :synth)
+(test (get (dyn *instruments*) :synth)
+  @[1
+    :synth
+    ":wave"
+    "sawtooth"
+    ":gain"
+    "nil"
+    ":attack"
+    "nil"
+    ":release"
+    "nil"])
 
 (deftest-type loop_body
   :setup (fn [] (do 
                   (setdyn *instruments* @{:out @[0 :out] :midi @[1 :midi]})
                   (setdyn *self* @{:notes @[] :rng (math/rng)})
                   ))
-  :reset (fn [context] (do 
+  # reset scheduled notes too, so each test sees only what it itself pushed
+  :reset (fn [context] (do
                   (setdyn *instruments* @{:out @[0 :out] :midi @[1 :midi]})
+                  (put (dyn *self*) :notes @[])
                   ))
 )
 
@@ -221,8 +253,8 @@
 
 (deftest: loop_body "test_play" [context]
   (gain :my-gaine)
-  (test-macro (play 0 :my-gaine)
-    (array/push (get (dyn *self*) :notes) (splice (play_ 0 2))))
+  (play 0 :my-gaine :dur 2)
+  (test (get (dyn *self*) :notes) @[[2 0 1 24 2]])
 )
 
 (deftest: loop_body "test_change" [context]

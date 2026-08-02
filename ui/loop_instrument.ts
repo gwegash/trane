@@ -2,11 +2,11 @@ import { Effect } from "./effect"
 import { bpm } from "./index"
 
 class LoopInstrument extends Effect {
-  static friendlyName = "looper"
-
-  params = [
-    { name: "latency", path: "loopNode.latency", isWorklet: true }, //min max are correct on the processor
-  ]
+  static def = {
+    name: "looper",
+    //min/max are declared by the processor itself
+    params: { latency: { at: (n) => n.loopNode.parameters.get("latency") } },
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)

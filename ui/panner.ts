@@ -1,9 +1,10 @@
 import { Effect } from "./effect"
 
 class Panner extends Effect {
-  static friendlyName = "panner"
-
-  params = [{ name: "pan", path: "pannerNode.pan", min: -1, max: 1 }]
+  static def = {
+    name: "panner",
+    params: { pan: { at: (n) => n.pannerNode.pan, min: -1, max: 1 } },
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -17,11 +18,6 @@ class Panner extends Effect {
 
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
-  }
-
-  async setup({ pan }) {
-    this.updateParamIfChanged(0, pan)
-    return this
   }
 }
 

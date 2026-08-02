@@ -11,26 +11,21 @@ interface Voice {
 
 // oscillators[i] -> envelopeGain -> gain -> output
 class Synth extends Instrument {
-  static friendlyName = "synth"
-  oscillatorType = "sawtooth"
+  static def = {
+    name: "synth",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 1, default: 1.0 },
+      attack: { at: (n) => n.attackNode.offset, min: 0, max: 1, default: 0.01 },
+      release: {
+        at: (n) => n.releaseNode.offset,
+        min: 0,
+        max: 1,
+        default: 0.01,
+      },
+    },
+  }
 
-  params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, lastValue: 1.0 },
-    {
-      name: "attack",
-      path: "attackNode.offset",
-      min: 0,
-      max: 1,
-      lastValue: 0.01,
-    },
-    {
-      name: "release",
-      path: "releaseNode.offset",
-      min: 0,
-      max: 1,
-      lastValue: 0.01,
-    },
-  ]
+  oscillatorType = "sawtooth"
 
   /*
    * Adds an oscillatorEnvelope to the WebAudioNodes
@@ -82,14 +77,12 @@ class Synth extends Instrument {
     this.voice = this.addVoice()
   }
 
-  setup({ wave, gain, attack, release }) {
+  async setup({ wave }) {
     if (wave) this.oscillatorType = wave
     for (const osc of Object.values(this.webAudioNodes.voices)) {
       osc.signal.type = wave
     }
-    this.updateParamIfChanged(0, gain)
-    this.updateParamIfChanged(1, attack)
-    this.updateParamIfChanged(2, release)
+    return this
   }
 
   //TODO oscillator cleanup

@@ -25,7 +25,7 @@ function insertSorted(arr, val){
 }
 
 class DrumSampler extends Instrument {
-  static friendlyName = "drums"
+  static def = { name: "drums" }
   height = 65
   width = 65
   canvasCtx

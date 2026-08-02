@@ -11,6 +11,7 @@ static JanetFunction *janetfn_evaluate = NULL;
 static JanetFunction *janetfn_run = NULL;
 static JanetFunction *janetfn_print_instruments = NULL;
 static JanetFunction *janetfn_print_loops = NULL;
+static JanetFunction *janetfn_set_params = NULL;
 
 Janet env_lookup(JanetTable *env, const char *name) {
     Janet out;
@@ -110,6 +111,20 @@ void retain_image(uintptr_t image_ptr) {
 }
 void release_image(uintptr_t image_ptr) {
     janet_gcunroot(janet_wrap_buffer(reinterpret_cast<JanetBuffer *>(image_ptr)));
+}
+
+// Hands the UI's param table (instrument type -> param name -> index) to Janet.
+// `source` is Janet source text for a table, as produced by paramsAsJanet in
+// ui/audio.ts. Must be called before the first trane_compile: `change` and `wire`
+// resolve param names against this table while the user's script is compiling.
+bool trane_set_params(string source) {
+    if (janetfn_set_params == NULL) {
+        fprintf(stderr, "unable to initialize params\n");
+        return false;
+    }
+    Janet out;
+    const Janet args[1] = { janet_cstringv(source.c_str()) };
+    return call_fn(janetfn_set_params, 1, args, &out);
 }
 
 CompileResult trane_compile(string source) {
@@ -331,6 +346,8 @@ int main() {
     janet_gcroot(janet_wrap_function(janetfn_print_instruments));
     janetfn_print_loops = env_lookup_function(janet_unwrap_table(environment), "runner/print_loops");
     janet_gcroot(janet_wrap_function(janetfn_print_loops));
+    janetfn_set_params = env_lookup_function(janet_unwrap_table(environment), "params/set-params");
+    janet_gcroot(janet_wrap_function(janetfn_set_params));
 }
 
 EMSCRIPTEN_BINDINGS(module) {
@@ -374,6 +391,7 @@ EMSCRIPTEN_BINDINGS(module) {
         .field("rest_length", &ContinueResult::rest_length)
         ;
 
+    function("trane_set_params", &trane_set_params);
     function("trane_compile", &trane_compile);
     function("trane_start", &trane_start);
     function("trane_continue", &trane_continue);

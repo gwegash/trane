@@ -3,21 +3,17 @@ import { Effect } from "./effect"
 class Output extends Effect {
   //TODO this isn't really an effect.
 
-  static friendlyName = "out"
+  static def = {
+    name: "out",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 1.0, log: true },
+    },
+  }
+
 	recordElement
 	recording = false
 	recorderChunks = []
 	mediaRecorder
-
-  params = [
-    {
-      name: "gain",
-      path: "gainNode.gain",
-      min: 0.001,
-      max: 1.0,
-      logScale: true,
-    },
-  ]
 
 	clickRecord = () => {
 		if(!this.recording){

@@ -1,6 +1,7 @@
 # Lots here is taken from https://github.com/ianthehenry/toodle.studio
 
 (use ./globals)
+(use ./dsl_helpers) # validate-references
 
 (def- template-env (make-env root-env))
 (each module ["./globals" "./dsl" "./instruments" "./euclid" "./dsl_helpers" "./harmony"]
@@ -20,6 +21,8 @@
 
   (put env *lloops* lloops)
   (put env *instruments* instruments)
+  # filled in by live_loop as the script compiles, checked once it has finished
+  (put env *checks* @[])
 
 
   (def errors @[])
@@ -51,8 +54,17 @@
         (set error-fiber fiber)))
     })
 
-  (if (empty? errors)
-    env
+  (unless (empty? errors)
     (if error-fiber
       (propagate (first errors) error-fiber)
-      (error (first errors)))))
+      (error (first errors))))
+
+  # The whole script has now been evaluated, so the audio graph is complete and every
+  # instrument exists regardless of the order they were declared in. Only now can the
+  # references collected from live_loop bodies be judged. Failing here means nothing
+  # is handed to the running loops, so a typo cannot reach the audio thread.
+  (def reference-errors (validate-references env))
+  (unless (empty? reference-errors)
+    (error (string/join reference-errors "\n")))
+
+  env)

@@ -1,14 +1,16 @@
 import { Effect } from "./effect"
 
 class Compressor extends Effect {
-  static friendlyName = "compressor"
-  params = [
-    { name: "threshold", path: "compressor.threshold", min: -100, max: 0 },
-    { name: "knee", path: "compressor.knee", min: 0, max: 40 },
-    { name: "ratio", path: "compressor.ratio", min: 1, max: 20 },
-    { name: "attack", path: "compressor.attack", min: 0, max: 1 },
-    { name: "release", path: "compressor.release", min: 0, max: 1 },
-  ]
+  static def = {
+    name: "compressor",
+    params: {
+      threshold: { at: (n) => n.compressor.threshold, min: -100, max: 0 },
+      knee: { at: (n) => n.compressor.knee, min: 0, max: 40 },
+      ratio: { at: (n) => n.compressor.ratio, min: 1, max: 20 },
+      attack: { at: (n) => n.compressor.attack, min: 0, max: 1 },
+      release: { at: (n) => n.compressor.release, min: 0, max: 1 },
+    },
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -22,15 +24,6 @@ class Compressor extends Effect {
 
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
-  }
-
-  async setup({ threshold, knee, ratio, attack, release }) {
-    this.updateParamIfChanged(0, threshold)
-    this.updateParamIfChanged(1, knee)
-    this.updateParamIfChanged(2, ratio)
-    this.updateParamIfChanged(3, attack)
-    this.updateParamIfChanged(4, release)
-    return this
   }
 }
 

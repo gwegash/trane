@@ -3,7 +3,7 @@ import { Keyboard } from "./keyboard"
 import { registerMidiNoteInput, deregisterMidiNoteInput } from "./midi_manager"
 
 class Wire {
-  static friendlyName = "wire"
+  static def = { name: "wire" }
 
   name: string
   from: string
@@ -17,9 +17,7 @@ class Wire {
   getDestination() {
     const toInst = instrumentsByName[this.to]
     const destination: AudioNode | AudioParam = this.toParam
-      ? toInst.resolvedParams[
-          toInst.params.findIndex((param) => param.name === this.toParam)
-        ]
+      ? toInst.resolvedParams[toInst.paramIndex(this.toParam)]
       : toInst.inputNode
     return destination
   }

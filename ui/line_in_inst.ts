@@ -3,7 +3,7 @@ import { Effect } from "./effect"
 class LineIn extends Effect {
   //TODO this isn't really an effect.
 
-  static friendlyName = "line_in"
+  static def = { name: "line_in" }
   stereo: boolean = false
 
   constructor(context: AudioContext, parentEl: Element, name: string) {

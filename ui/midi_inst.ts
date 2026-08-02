@@ -3,7 +3,7 @@ import { Effect } from "./effect"
 class MIDIInst extends Effect {
   //TODO this isn't really an effect.
 
-  static friendlyName = "midi"
+  static def = { name: "midi" }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)

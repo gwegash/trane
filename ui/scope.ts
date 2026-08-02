@@ -1,7 +1,7 @@
 import { Effect } from "./effect"
 
 class Scope extends Effect {
-  static friendlyName = "scope"
+  static def = { name: "scope" }
 
   buffer: AudioBuffer
   canvas: Element

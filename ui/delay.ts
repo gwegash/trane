@@ -2,12 +2,12 @@ import { Effect } from "./effect"
 import { bpm } from "./index"
 
 class Delay extends Effect {
-  //TODO we need to unify these names with the DSL, will allow for easier feature development
-  static friendlyName = "delay"
-
-  params = [
-    { name: "feedback", path: "gainNode.gain", min: 0, max: 1, lastValue: 0.5 },
-  ]
+  static def = {
+    name: "delay",
+    params: {
+      feedback: { at: (n) => n.gainNode.gain, min: 0, max: 1, default: 0.5 },
+    },
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -29,7 +29,7 @@ class Delay extends Effect {
     this.setupKnobs()
   }
 
-  async setup({ delay_time, feedback }) {
+  async setup({ delay_time }) {
     let delayTime_beats = parseFloat(delay_time)
     if (!delayTime_beats) {
       delayTime_beats = 0.75
@@ -39,8 +39,7 @@ class Delay extends Effect {
       this.audioContext.currentTime + 0.01,
       0.1,
     )
-
-    this.updateParamIfChanged(0, feedback)
+    return this
   }
 }
 

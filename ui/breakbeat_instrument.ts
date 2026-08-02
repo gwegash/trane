@@ -3,7 +3,12 @@ import { bpm } from "./index"
 import { findClosest, clamp} from "./utils"
 
 class BreakbeatSampler extends SamplerBase {
-  static friendlyName = "breakbeat"
+  static def = {
+    name: "breakbeat",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 1, log: true },
+    },
+  }
   length_beats = 8 //default to two bars
   sampleStart = 0
   sampleEnd = 1
@@ -12,10 +17,6 @@ class BreakbeatSampler extends SamplerBase {
   scrolling = false
 
   //TODO the slices field is so redundant. I am dumb. Let's get rid of it. WHY do i program these things so late
-
-  params = [
-    { name: "gain", path: "gainNode.gain", min: 0.001, max: 1, logScale: true },
-  ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -26,7 +27,7 @@ class BreakbeatSampler extends SamplerBase {
     this.canvas.addEventListener("contextmenu", (e) => { e.preventDefault() })
   }
 
-  async setup({length_beats, slices, gain, ...rest }) {
+  async setup({length_beats, slices, ...rest }) {
     //TODO make bpm dynamic
     this.length_beats = parseFloat(length_beats)
     if(slices){
@@ -42,8 +43,6 @@ class BreakbeatSampler extends SamplerBase {
     }
     this.sampleStart = this.slices[0]
     this.sampleEnd = this.slices[this.slices.length - 1]
-    this.updateParamIfChanged(0, gain) //TODO move this to the parent element
-    //
     //this.buffer is set after super is loaded.
     await super.setup(rest)
 

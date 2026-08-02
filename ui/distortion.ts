@@ -13,7 +13,7 @@ function makeDistortionCurve(k = 50) {
 }
 
 class Distortion extends Effect {
-  static friendlyName = "distortion"
+  static def = { name: "distortion" }
   distortionCurve: Float32Array
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
@@ -31,6 +31,7 @@ class Distortion extends Effect {
 
     this.distortionCurve = makeDistortionCurve(parsedAmount)
     this.webAudioNodes.waveshaper.curve = this.distortionCurve
+    return this
   }
 }
 

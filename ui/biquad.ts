@@ -1,20 +1,20 @@
 import { Effect } from "./effect"
 
 class Biquad extends Effect {
-  static friendlyName = "biquad"
-
-  params = [
-    {
-      name: "frequency",
-      path: "biquadNode.frequency",
-      min: 10,
-      max: 24000,
-      logScale: true,
+  static def = {
+    name: "biquad",
+    params: {
+      frequency: {
+        at: (n) => n.biquadNode.frequency,
+        min: 10,
+        max: 24000,
+        log: true,
+      },
+      detune: { at: (n) => n.biquadNode.detune, min: -1200, max: 1200 },
+      Q: { at: (n) => n.biquadNode.Q, min: 0.0001, max: 1000, log: true },
+      gain: { at: (n) => n.biquadNode.gain, min: -40, max: 40 },
     },
-    { name: "detune", path: "biquadNode.detune", min: -1200, max: 1200 },
-    { name: "Q", path: "biquadNode.Q", min: 0.0001, max: 1000, logScale: true },
-    { name: "gain", path: "biquadNode.gain", min: -40, max: 40 },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -30,13 +30,8 @@ class Biquad extends Effect {
     this.setupKnobs()
   }
 
-  async setup({ filter_type, frequency, detune, Q, gain }) {
+  async setup({ filter_type }) {
     this.webAudioNodes.biquadNode.type = filter_type ? filter_type : "lowpass"
-    this.updateParamIfChanged(0, frequency)
-    this.updateParamIfChanged(1, detune)
-    this.updateParamIfChanged(2, Q)
-    this.updateParamIfChanged(3, gain)
-
     return this
   }
 }

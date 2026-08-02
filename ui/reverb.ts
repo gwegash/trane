@@ -2,9 +2,12 @@ import { Effect } from "./effect"
 import { loadSample } from "./utils"
 
 class ConvolutionReverb extends Effect {
-  static friendlyName = "reverb"
-
-  params = [{ name: "wet-dry", path: "crossfaderNode.panner.pan", min: -1, max: 1 }]
+  static def = {
+    name: "reverb",
+    params: {
+      "wet-dry": { at: (n) => n.crossfaderNode.panner.pan, min: -1, max: 1 },
+    },
+  }
 
   impulseBuffer: AudioBuffer
   impulseURL: string
@@ -59,7 +62,6 @@ class ConvolutionReverb extends Effect {
   }
 
   async setup({impulse, ...rest}) {
-    this.updateParamIfChanged(0, rest["wet-dry"])
     if(impulse){
       if (this.impulseURL != impulse) {
         const arraybuffer = await loadSample(impulse)

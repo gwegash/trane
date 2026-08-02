@@ -3,45 +3,35 @@ import { note_to_frequency } from "./utils"
 import { nullGain } from "./audio"
 
 class PitchedSampler extends SamplerBase {
-  static friendlyName = "sample"
+  static def = {
+    name: "sample",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 1, default: 1.0 },
+      attack: { at: (n) => n.attackNode.offset, min: 0, max: 1, default: 0.01 },
+      release: {
+        at: (n) => n.releaseNode.offset,
+        min: 0,
+        max: 1,
+        default: 0.01,
+      },
+      // defaults are deliberately out of range so that the first loop_start /
+      // loop_end the code sets always differs from the baseline and gets applied
+      loop_start: {
+        at: (n) => n.loopStart.offset,
+        min: 0,
+        max: 1,
+        default: Number.POSITIVE_INFINITY,
+      },
+      loop_end: {
+        at: (n) => n.loopEnd.offset,
+        min: 0,
+        max: 1,
+        default: Number.NEGATIVE_INFINITY,
+      },
+    },
+  }
+
   samplePitch: number
-	params = [ // TODO why do we override the defaults??
-		{
-			name: "gain",
-			path: "gainNode.gain",
-			min: 0.001,
-			max: 1,
-			lastValue: 1.0,
-		},
-		{
-			name: "attack",
-			path: "attackNode.offset",
-			min: 0,
-			max: 1,
-			lastValue: 0.01,
-		},
-		{
-			name: "release",
-			path: "releaseNode.offset",
-			min: 0,
-			max: 1,
-			lastValue: 0.01,
-		},
-		{
-			name: "loop_start",
-			path: "loopStart.offset",
-			min: 0,
-			max: 1,
-			lastValue: Number.POSITIVE_INFINITY,
-		},
-		{
-			name: "loop_end",
-			path: "loopEnd.offset",
-			min: 0,
-			max: 1,
-			lastValue: Number.NEGATIVE_INFINITY,
-		},
-	]
 
   //TODO this is shared almost verbatim between the synth and this. Maybe refactor into instrument?
   addVoice() {
@@ -86,25 +76,27 @@ class PitchedSampler extends SamplerBase {
     this.setupUI()
   }
 
-  async setup({ url, pitch, gain, attack, release, loop_start, loop_end }) {
+  async setup({ url, pitch }) {
     if (pitch) {
       this.samplePitch = parseFloat(pitch)
     } else {
       this.samplePitch = 69.0
     }
 
-    this.updateParamIfChanged(0, gain)
-    this.updateParamIfChanged(1, attack)
-    this.updateParamIfChanged(2, release)
-    this.updateParamIfChanged(3, loop_start)
-    this.updateParamIfChanged(4, loop_end)
-
-    super.setup({url})
+    await super.setup({ url })
 
     return this
   }
 
   play(note, startTime, dur) {
+    if (!this.buffer) {
+      // The sample hasn't finished loading -- tracks that fetch one from the web can
+      // schedule a note before it arrives. Nothing can be sounding yet, so there is
+      // no note-off to honour either. Reading this.buffer.duration for the loop
+      // points below would throw.
+      return
+    }
+
     let voice
 
     const sampleFreq = note_to_frequency(this.samplePitch)

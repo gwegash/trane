@@ -10,10 +10,10 @@
   (map (fn [step] (if step pat :tie)) hits)
 )
 
-(defmacro bpm
-  ````Sets the bpm (beats per minute) of the current track. 
+(defn bpm
+  ````Sets the bpm (beats per minute) of the current track.
 
-  Can only be set once per track, BPM changes are currently unsupported. 
+  Can only be set once per track, BPM changes are currently unsupported.
   To change BPM, reload the page
   **Example**
   ```
@@ -21,127 +21,108 @@
   ```
   ````
   [beats_per_minute]
-  (assert (not (dyn *bpm*)) (string "bpm already defined"))
-  (assert (number? beats_per_minute) (string "bpm not a literal number"))
-  (setdyn *bpm* beats_per_minute)
-)
+  (assert (not (dyn *bpm*)) "bpm already defined")
+  (assert (number? beats_per_minute) "bpm is not a number")
+  # the env table doubles as the fiber's dyn table, which is how driver.cpp reads :bpm
+  (setdyn *bpm* beats_per_minute))
 
-(defmacro sleep
+(defn sleep
   ````Advances time in the current 'live-loop' by the specified `length`, in beats
-  
+
   **Example**
   ```
   (sleep 4) # advance time by 4 beats
   ```
   ````
  [length]
-  ~(setdyn :current-time (+ (dyn :current-time) ,length))
-)
+  (setdyn :current-time (+ (dyn :current-time) length)))
 
-## Eww, this is very nested, refactor me pleaaaaase
-(defmacro change 
+(defn change
   ````Changes the parameter `param` knob of a module `instName` to `to`
-  
+
   **Example**
   ```
   (change :gain-example :gain 0.5) # changes the gain knob on a gain module ':gain-example' to 0.5
   ```
   ````
-  [instName param to & rest]
-  (with-syms [$inst $instChannel $instMap $paramIdx]
-    ~(let [,$inst (get (dyn ,*instruments*) ,instName)]
-      (let [,$instChannel (first ,$inst)]
-        (if ,$instChannel
-          (assert ,$instChannel (string "instrument not found: " ,instName ))
-          (pp (dyn ,*instruments*))
-        )
+  [instName param to &named cType dur]
+  # Unknown instruments and parameters are caught before anything plays, by
+  # validate-references at the end of evaluate. These asserts are the backstop for
+  # names that were not literal keywords and so could not be checked then.
+  (def inst (assert (get (dyn *instruments*) instName)
+                    (string "instrument not found: " instName)))
+  (def [channel instType] inst)
+  (def instMap (assert (get *inst_params* instType)
+                       (string "instrument type not found: " instType)))
+  (def paramIdx (assert (get instMap param)
+                        (string "parameter " param " does not exist on " instName
+                                " (" instType ")")))
+  (array/push (get (dyn *self*) :notes)
+              (change_ (encodeParam channel paramIdx) to :cType cType :dur dur)))
 
-        (let [,$instChannel (first ,$inst)]
-          (let [,$instMap (get ,*inst_params* (get ,$inst 1))]
-            (assert ,$instMap (string "instrument type not found " (get ,$inst 1)))
-
-            (let [,$paramIdx (get ,$instMap ,param)]
-              (assert ,$paramIdx (string "paramater " ,param " does not exist in instrument " (get ,$inst 1)))
-              (array/push (get (dyn *self*) :notes) (change_ (encodeParam ,$instChannel ,$paramIdx) ,to ,;rest))
-            )
-          )
-        )
-      )
-    )
-  )
-)
-
-(defmacro lin
+(defn lin
   ````Changes the parameter `param` knob of a module `instName` to `to`
   Approaches `to` from its last value linearly
-   
+
   **Example**
   ```
   (lin :gain-example :gain 0.5) # linearly changes the gain knob on a gain module ':gain-example' to 0.5
   ```
   ````
   [instName paramIdx to]
-  ~(change ,instName ,paramIdx ,to ,:cType 0)
-)
+  (change instName paramIdx to :cType 0))
 
-(defmacro exp
+(defn exp
   ````Changes the parameter `param` knob of a module `instName` to `to`
   Approaches `to` from its last value exponentially
-   
+
   **Example**
   ```
   (exp :gain-example :gain 0.5) # changes the gain knob on a gain module ':gain-example' to 0.5, approaches exponentially
   ```
   ````
   [instName paramIdx to]
-  ~(change ,instName ,paramIdx ,to ,:cType 1)
-)
+  (change instName paramIdx to :cType 1))
 
-(defmacro itarget
+(defn itarget
   ````Instantaneously changes the parameter `param` knob of a module `instName` to `to`
-   
+
   **Example**
   ```
   (itarget :gain-example :gain 0.5) # instantaneously changes the gain knob on a gain module ':gain-example' to 0.5
   ```
   ````
   [instName paramIdx to]
-  ~(change ,instName ,paramIdx ,to ,:cType 2)
-)
+  (change instName paramIdx to :cType 2))
 
-(defmacro target [instName paramIdx to k] # see change() in instruments.ts
+(defn target
   ````changes the parameter `param` knob of a module `instName` to `to`
   Approaches the `to` by a rate defined by the constant `k`
-    
+
   **Example**
   ```
   (target :gain-example :gain 0.5 0.1) # changes the gain knob on a gain module ':gain-example' to 0.5, by a rate 0.1
   ```
   ````
-  (with-syms [$k]
-    ~(let [,$k (if ,k ,k 0.01)]
-      (assert (> ,$k 0) "time constant must be positive")
-      (change ,instName ,paramIdx ,to ,:cType (- ,$k))
-    )
-  )
-)
+  [instName paramIdx to k] # see change() in ui/instruments.ts
+  (def rate (if k k 0.01))
+  (assert (> rate 0) "time constant must be positive")
+  (change instName paramIdx to :cType (- rate)))
 
-(defmacro time
+(defn time
   ````Returns the current time, in beats, of the containing live-loop
-    
+
   **Example**
   ```
-  (time) # -> 32 
+  (time) # -> 32
   ```
   ````
-
   []
-  ~(dyn :current-time)
-)
+  (dyn :current-time))
 
-(defmacro til 
+(defn til
   ````Returns the time until the next measure of `when_beats`
-    
+
   **Example**
   ```
   (time) # -> 32
@@ -149,8 +130,7 @@
   ```
   ````
   [when_beats]
-  ~(quantiseModulo (- ,when_beats (mod (time) ,when_beats)) ,when_beats)
-)
+  (quantiseModulo (- when_beats (mod (time) when_beats)) when_beats))
 
 (defn rep 
   ````Returns a repeated array filled with `what` #times
@@ -164,10 +144,10 @@
   (array/new-filled times what)
 )
 
-(defmacro wire 
+(defn wire
   ````Wires the output of 'from' the input of `to`
   Accepts an optional `toParam` which specifies a named parameter, or knob, of `to` to wire the output to.
-    
+
   **Example**
   ```
   # Wires the output of :signal into the :frequency parameter of :filter
@@ -175,25 +155,21 @@
   ```
   ````
   [from to &opt toParam]
-  (with-syms [$fromInstName $toInstName $toInst $instType $instMap]
-    ~(let [,$fromInstName ,from ,$toInstName ,to]
-      (assert (get (dyn ,*instruments*) ,$toInstName) (string "dest instrument not found: " ,$toInstName))
-      (assert (get (dyn ,*instruments*) ,$fromInstName) (string "source inst not found: " ,$fromInstName))
+  (def instruments (dyn *instruments*))
+  (assert (get instruments to) (string "dest instrument not found: " to))
+  (assert (get instruments from) (string "source inst not found: " from))
 
-      (if ,toParam 
-        (let [,$instType (get (get (dyn ,*instruments*) ,$toInstName) 1)]  
-          (let [,$instMap (get ,*inst_params* ,$instType)]  
-            (assert ,$instMap (string "instrument type not found " ,$instType))
-            (assert (or (not ,toParam) (get ,$instMap ,toParam)) (string "paramater " ,toParam " does not exist in instrument " ,$instType))
-          )
-        )
-      )
+  (when toParam
+    (def instType (get (get instruments to) 1))
+    (def instMap (assert (get *inst_params* instType)
+                         (string "instrument type not found: " instType)))
+    (assert (get instMap toParam)
+            (string "parameter " toParam " does not exist on " to " (" instType ")")))
 
-      # TODO assert to can recieve audio, ie is an effect
-      (inst ,:wire (string ,$fromInstName "->wire->" ,$toInstName ;(if ,toParam ["," ,toParam] [])) :from ,$fromInstName :to ,$toInstName :toParam ,toParam)
-    )
-  )
-)
+  # TODO assert to can recieve audio, ie is an effect
+  (inst :wire
+        (string from "->wire->" to ;(if toParam ["," toParam] []))
+        :from from :to to :toParam toParam))
 
 (defn chain [& forms]
   ````Chaining function, chains together modules. Wires the output of the first into the input of the second,
@@ -239,7 +215,7 @@
   )
 )
 
-(defmacro play
+(defn play
   ````Plays a `note` on a given instrument `instName`
   Also accepts a `:dur` duration parameter, in beats.
 
@@ -249,17 +225,16 @@
   (play 0 :my-drum :dur 2) # plays a note 0 on :my-drum for 2 beats
   ```
   ````
-  [note instName & rest]
-  (if note
-    (do
-      (def instChannel (first (get (dyn *instruments*) instName)))
-      (assert instChannel (string "instrument not found: " instName))
-      ~(array/push (get (dyn *self*) :notes) ;(play_ ,note ,instChannel ,;rest))
-    )
-  )
-)
+  [note instName &named vel dur]
+  (when note
+    # literal instrument names were already checked by validate-references, before
+    # anything played; this catches the computed ones
+    (def inst (assert (get (dyn *instruments*) instName)
+                      (string "instrument not found: " instName)))
+    (array/concat (get (dyn *self*) :notes)
+                  (play_ note (first inst) :vel vel :dur dur))))
 
-(defmacro pick 
+(defn pick
   ````Picks an item randomly from the arguments `picks`
 
   **Example**
@@ -269,8 +244,7 @@
   ```
   ````
   [& picks]
-  ~(get [,;picks] (math/rng-int (get (dyn *self*) :rng) (length [,;picks])))
-)
+  (get picks (math/rng-int (get (dyn *self*) :rng) (length picks))))
 
 (defn rand 
   ````Picks a number uniformly between `lo` and `hi`
@@ -284,21 +258,20 @@
   (+ lo (* (- hi lo) (math/rng-uniform (get (dyn *self*) :rng))))
 )
 
-(defmacro timesel
+(defn timesel
   ````Indexes into the array or tuple `arr` with the current time, with the index increasing by one after `changeEvery` time has passed, modulo the length `arr`.
 
   **Example**
   ```
-  (time) # -> 5 
+  (time) # -> 5
   (timesel [1 2 3 4] 1) # -> 2
   (timesel [1 2 3 4] 2) # -> 3
   ```
   ````
   [arr changeEvery]
-  ~(get ,arr (% (math/floor (/ (dyn :current-time) ,changeEvery)) (length ,arr)))
-)
+  (get arr (% (math/floor (/ (dyn :current-time) changeEvery)) (length arr))))
 
-(defmacro seed 
+(defn seed
   ````Sets the random seed of the current live-loop. Useful for repeatable random patterns
 
   **Example**
@@ -307,8 +280,7 @@
   ```
   ````
   [seed]
-  ~(set ((dyn *self*) :rng) (math/rng ,seed))
-)
+  (put (dyn *self*) :rng (math/rng seed)))
 
 (defmacro live_loop
   ````Creates a live-loop of a given name to schedule notes or parameter changes from
@@ -322,6 +294,11 @@
   ```
   ````
   [name & instructions]
+  # One of only two forms that must be a macro: the body is data until the loop runs.
+  # That makes this the one place that can see inside a loop while the script is still
+  # compiling, so it is where instrument/param references get noted for checking.
+  (each instruction instructions
+    (record-references instruction))
   ~(put (dyn ,*lloops*) ,name (fiber/new (fn []
        (with-dyns [*self* @{:notes @[] :rng (math/rng)}]
          (forever 

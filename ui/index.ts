@@ -1,6 +1,6 @@
 import InitializeWasm from "wasm-runtime"
 import type { Module } from "wasm-runtime"
-import { initAudio, newInstrumentMappings } from "./audio"
+import { initAudio, newInstrumentMappings, paramsAsJanet } from "./audio"
 import {
   initCodeEditor,
   saveCurrentScript,
@@ -21,6 +21,11 @@ let instrumentElement: HTMLElement
 
 async function main(runtime: Module) {
   janetRuntime = runtime
+
+  // Janet resolves param names against this table while compiling, so it has to
+  // arrive before the first onChange() below. Derived from the instrument defs, so
+  // there is no generated params.janet to keep in step.
+  janetRuntime.trane_set_params(paramsAsJanet())
 
   instrumentElement = document.createElement("div")
   instrumentElement.className = "instruments"

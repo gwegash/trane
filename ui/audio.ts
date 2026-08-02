@@ -21,7 +21,7 @@ import { Panner } from "./panner"
 import { LadderFilter } from "./ladder_filter"
 import { TB303 } from "./tb303"
 import { Keyboard } from "./keyboard"
-import type { GraphNode, Instrument } from "./instruments"
+import type { GraphNode, Instrument, NodeDef } from "./instruments"
 import { Wire } from "./wire"
 import "./css/fonts.css"
 import { instrumentElement as instrumentEl } from "./index"
@@ -58,16 +58,29 @@ const instMap = Object.fromEntries(
     LineIn,
     LadderFilter,
     TB303,
-  ].map((instDef) => [instDef.friendlyName, instDef]),
+  ].map((nodeType) => [nodeType.def.name, nodeType]),
 )
 
-function friendlyNameToInstrument(friendlyName, name) {
-  //TODO refactor this
-  if (friendlyName === "wire") {
+function createNode(typeName: string, name: string) {
+  if (typeName === Wire.def.name) {
     return new Wire(name)
-  } else {
-    return new instMap[friendlyName](context, instrumentEl, name)
   }
+  return new instMap[typeName](context, instrumentEl, name)
+}
+
+//This populates a table of instruments and their respective parameters, and passes it to janet so that the parameters can be checked and encoded
+function paramsAsJanet() {
+  const types = Object.values(instMap)
+    .map((nodeType) => {
+      const names = Object.keys((nodeType.def as NodeDef).params ?? {})
+      if (names.length === 0) {
+        return undefined
+      }
+      const entries = names.map((name, i) => `:${name} ${i}`).join(" ")
+      return `:${nodeType.def.name} @{${entries}}`
+    })
+    .filter(Boolean)
+  return `@{${types.join(" ")}}`
 }
 
 async function initWorklets() {
@@ -87,7 +100,6 @@ async function initAudio() {
     return
   }
 
-  console.log(Output.friendlyName)
   context = new AudioContext({ sampleRate: 48000, latencyHint: 0.00001 })
   initLoopManager() //no-op if already initialised
   nullGain = context.createGain()
@@ -114,9 +126,9 @@ async function newInstrumentMappings(new_instrument_mappings) {
       inst = instrumentsByName[instrument_mapping.name]
     } else {
       //we need to instantiate it
-      inst = friendlyNameToInstrument(
+      inst = createNode(
         instrument_mapping.args.get(0).slice(1),
-        instrument_mapping.name
+        instrument_mapping.name,
       )
       instrumentsByName[instrument_mapping.name] = inst
     }
@@ -128,6 +140,9 @@ async function newInstrumentMappings(new_instrument_mappings) {
       argsMap[instrument_mapping.args.get(j).slice(1)] = val === "nil" ? undefined : val
     }
 
+    // Params first, by name, for anything with a def; then the instrument's own
+    // handling of the args that aren't params. Wire has no params, hence the ?.
+    inst.applyArgs?.(argsMap)
     inst.setup(argsMap)
 
     newInstruments[instrument_mapping.channel] = inst
@@ -172,7 +187,7 @@ function play(channel, note, vel, startTime, dur) {
 
 function instruments2GraphViz() {
   return instruments
-    .filter((inst) => inst.friendlyName == "wire")
+    .filter((inst) => inst instanceof Wire)
     .map((wire) => {
       return `\"${wire.from}\" -> \"${wire.to}\" [label = \"${wire.toParam ? ":" + wire.toParam : ""}\"];`
     })
@@ -188,5 +203,6 @@ export {
   newInstrumentMappings,
   instrumentsByName,
   instMap,
+  paramsAsJanet,
   nullGain,
 }

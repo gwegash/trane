@@ -1,17 +1,17 @@
 import { Effect } from "./effect"
 
 class Oscillator extends Effect {
-  static friendlyName = "oscillator"
-
-  params = [
-    {
-      name: "frequency",
-      path: "oscillatorNode.frequency",
-      min: 10,
-      max: 24000,
-      logScale: true,
+  static def = {
+    name: "oscillator",
+    params: {
+      frequency: {
+        at: (n) => n.oscillatorNode.frequency,
+        min: 10,
+        max: 24000,
+        log: true,
+      },
     },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -28,9 +28,9 @@ class Oscillator extends Effect {
     this.setupKnobs()
   }
 
-  async setup({ wave, frequency }) {
+  async setup({ wave }) {
     this.webAudioNodes.oscillatorNode.type = wave ? wave : "sine"
-    this.updateParamIfChanged(0, frequency)
+    return this
   }
 }
 

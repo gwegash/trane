@@ -17,7 +17,49 @@ import filterWasm from "../src/cpp/ladder_filter.wasm"
 //         at playback time rather than at schedule time.
 
 class TB303 extends Instrument {
-  static friendlyName = "tb303"
+  static def = {
+    name: "tb303",
+    params: {
+      gain: { at: (n) => n.gainNode.gain, min: 0.001, max: 1, default: 0.5 },
+      cutoff: {
+        at: (n) => n.filterNode.parameters.get("cutoff"),
+        min: 40,
+        max: 8000,
+        log: true,
+        default: 800,
+      },
+      resonance: {
+        at: (n) => n.filterNode.parameters.get("Q"),
+        min: 0.02,
+        max: 2,
+        default: 0.8,
+      },
+      envMod: {
+        at: (n) => n.envModNode.offset,
+        min: 0,
+        max: 1,
+        default: 0.5,
+      },
+      decay: {
+        at: (n) => n.envNode.parameters.get("decay"),
+        min: 0.01,
+        max: 2,
+        default: 0.3,
+      },
+      attack: {
+        at: (n) => n.envNode.parameters.get("attack"),
+        min: 0.001,
+        max: 0.1,
+        default: 0.005,
+      },
+      slide: {
+        at: (n) => n.slideNode.offset,
+        min: 0.001,
+        max: 0.5,
+        default: 0.05,
+      },
+    },
+  }
 
   osc: OscillatorNode
   filterNode: AudioWorkletNode
@@ -27,16 +69,6 @@ class TB303 extends Instrument {
   envModNode: ConstantSourceNode
   slideNode: ConstantSourceNode
   _sliding = false
-
-  params = [
-    { name: "gain",      path: "gainNode.gain",       min: 0.001, max: 1,    logScale: false, lastValue: 0.5   },
-    { name: "cutoff",    path: "filterNode.cutoff",   isWorklet: true, min: 40, max: 8000, logScale: true, lastValue: 800  },
-    { name: "resonance", path: "filterNode.Q",        isWorklet: true, min: 0.02, max: 2, logScale: false, lastValue: 0.8  },
-    { name: "envMod",    path: "envModNode.offset",   min: 0,    max: 1,    logScale: false, lastValue: 0.5   },
-    { name: "decay",     path: "envNode.decay",       isWorklet: true, min: 0.01, max: 2, logScale: false, lastValue: 0.3  },
-    { name: "attack",    path: "envNode.attack",      isWorklet: true, min: 0.001, max: 0.1, logScale: false, lastValue: 0.005 },
-    { name: "slide",     path: "slideNode.offset",    min: 0.001, max: 0.5, logScale: false, lastValue: 0.05  },
-  ]
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -111,15 +143,8 @@ class TB303 extends Instrument {
     this.setupUI()
   }
 
-  async setup({ wave, gain, cutoff, resonance, envMod, decay, attack, slide }: Record<string, any>) {
+  async setup({ wave }: Record<string, any>) {
     if (wave) this.osc.type = wave as OscillatorType
-    this.updateParamIfChanged(0, gain)
-    this.updateParamIfChanged(1, cutoff)
-    this.updateParamIfChanged(2, resonance)
-    this.updateParamIfChanged(3, envMod)  // updates envModNode.offset → flows through audio graph
-    this.updateParamIfChanged(4, decay)
-    this.updateParamIfChanged(5, attack)
-    this.updateParamIfChanged(6, slide)
     return this
   }
 

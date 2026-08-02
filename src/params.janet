@@ -1,79 +1,25 @@
-(def *inst_params* @{
-    :biquad @{
-      :frequency 0
-      :detune 1
-      :Q 2
-      :gain 3
-    }
-    :breakbeat @{
-      :gain 0
-    }
-    :chorus @{
-      :rate 0
-      :amount 1
-      :wet-dry 2
-    }
-    :compressor @{
-      :threshold 0
-      :knee 1
-      :ratio 2
-      :attack 3
-      :release 4
-    }
-    :constant @{
-      :constant 0
-    }
-    :delay @{
-      :feedback 0
-    }
-    :gain @{
-      :gain 0
-    }
-    :ladder @{
-      :cutoff 0
-      :Q 1
-    }
-    :lfo @{
-      :frequency 0
-      :magnitude 1
-    }
-    :looper @{
-      :latency 0
-    }
-    :out @{
-      :gain 0
-    }
-    :octaver @{
-      :wet-dry 0
-    }
-    :oscillator @{
-      :frequency 0
-    }
-    :panner @{
-      :pan 0
-    }
-    :sample @{
-      :gain 0
-      :attack 1
-      :release 2
-      :loop_start 3
-      :loop_end 4
-    }
-    :reverb @{
-      :wet-dry 0
-    }
-    :synth @{
-      :gain 0
-      :attack 1
-      :release 2
-    }
-    :tb303 @{
-      :gain 0
-      :cutoff 1
-      :resonance 2
-      :envMod 3
-      :decay 4
-      :attack 5
-      :slide 6
-    }
-})
+# Param table: instrument type -> param name -> wire index.
+#
+# This used to be a generated file, scraped out of the TypeScript sources. It is now
+# empty in the compiled image and filled in at startup by the UI layer, which derives
+# it from the same `def` objects it builds the audio graph from (see paramsAsJanet in
+# ui/audio.ts). There is therefore no second copy to keep in sync.
+#
+# The index is what `change` packs into 5 bits via encodeParam, so it must match the
+# declaration order of `def.params` on the TypeScript side exactly.
+(def *inst_params* @{})
+
+(defn set-params
+  ````Replaces the param table from `source`, Janet source text for a table.
+
+  Mutates in place rather than rebinding: dsl.janet's `change` and `wire` macros
+  capture this exact table when they expand, so the binding must never be replaced.
+
+  Called once from JS, before the first compile.
+  ````
+  [source]
+  (def parsed (parse source))
+  (each k (keys *inst_params*)
+    (put *inst_params* k nil))
+  (merge-into *inst_params* parsed)
+  *inst_params*)

@@ -1,5 +1,4 @@
 import { base0B as atomColor } from "./dark_theme"
-import { resolvePath } from "./utils"
 import { Knob } from "./knob"
 
 let tabIndex = 0
@@ -18,28 +17,54 @@ function isVoice(audioNode: AudioNode | Voice) {
   return "signal" in audioNode && "envelopeGain" in audioNode
 }
 
+// The bag of Web Audio nodes beloging to a particular GraphNode, used to keep the nodes subgraph for easy cleanup
+type WebAudioNodes = Record<string, any>
+
 interface Param {
-  name: string
-  path: string // string representation of a WebAudioNode parameter. Take a look at the WebAudioNodes interface below. Each of those Nodes has several params. Used to map names to WebAudio paths in the janet code
-  min: number
-  max: number
-  logScale: boolean
-  lastValue: number //sets the last value this was changed from the instrument definition. We set the param to this value if the setup() function recieves a different value to this one. We don't want to always override in case this is performance. Also the initial value that the node is set to
-  isWorklet?: boolean //AudioworkletNodes, unlike regular audioNodes place their parameters in a ParameterMap, which makes resolution a bit trickier
+  at: (nodes: WebAudioNodes) => AudioParam
+  min?: number //can be left undefined, defaults to AudioParam's own minValue
+  max?: number //can be left undefined, defaults to AudioParam's own maxValue
+  log?: boolean //draw/scrub the knob logarithmically
+  default?: number //baseline `applyArgs` compares against; see resolveParams
 }
 
-type WebAudioNodes = Record<any, AudioNode | AudioWorkletNode>
+/*
+ * The single source of truth for a node type. `name` is the name it goes by in the
+ * Janet DSL: it is what (gain :foo) emits as a type keyword, what instMap is keyed
+ * by, and what audio.ts sends to Janet as the param table at startup.
+ *
+ * The DECLARATION ORDER of `params` defines each param's wire index. That index is
+ * packed into 5 bits by encodeParam in dsl_helpers.janet, so a node may have at most
+ * 32 params. dont write one of these indices by hand, let the DSL do it
+ */
+interface NodeDef {
+  name: string
+  params?: Record<string, Param>
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type InstArgs = any
 
 class GraphNode {
-  static friendlyName: string //name given in the language
-  static params: Array<Param>
+  static def: NodeDef
   audioContext: AudioContext
   webAudioNodes: WebAudioNodes = {}
   outputNode: AudioNode
   name: string
   el: HTMLElement
   knobsEl: Element
-  resolvedParams: Array<AudioParam>
+  paramNames: Array<string> = [] //declaration order == wire index order
+  resolvedParams: Array<AudioParam> = []
+  private lastApplied: Record<string, number> = {}
+
+  get def(): NodeDef {
+    return (this.constructor as typeof GraphNode).def
+  }
+
+  /* Index on the wire for a named param, or -1. */
+  paramIndex(name: string) {
+    return this.paramNames.indexOf(name)
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     this.audioContext = context
@@ -56,65 +81,57 @@ class GraphNode {
     this.el.appendChild(nameEl)
   }
 
-  async setup() {
+  //Use setup to handle DSL instrument arguments that are not params. Ie ones that cannot be changed from a live_loop, like sample URLs. Because these don't map to audioParams they need to be handled separately, and most often uniquely
+  async setup(args: InstArgs) {
     return this
   }
 
   setupKnobs() {
     //TODO knob deletion
-    this.params.forEach((param) => {
-      const resolvedParam = this.resolveParam(param)
+    this.paramNames.forEach((name, i) => {
+      const param = this.def.params[name]
       new Knob(
         this.audioContext,
         this.knobsEl,
-        resolvedParam,
-        param.name,
+        this.resolvedParams[i],
+        name,
         param.min,
         param.max,
-        param.logScale,
+        param.log,
       )
     })
   }
 
-  updateParamIfChanged(paramIndex, newVal) {
-    if (newVal) {
-      const parsed = parseFloat(newVal)
-      if (parsed !== this.params[paramIndex].lastValue) {
-        this.params[paramIndex].lastValue = parsed
-        this.resolvedParams[paramIndex].setTargetAtTime(
-          parsed,
-          this.audioContext.currentTime,
-          0.01,
-        )
+  // params are only written when the value differs from the last via code changes
+  applyArgs(args: Record<string, string | undefined>) {
+    this.paramNames.forEach((name, i) => {
+      const raw = args[name]
+      if (raw === undefined) {
+        return
       }
-    }
+      const value = parseFloat(raw)
+      if (Number.isNaN(value) || value === this.lastApplied[name]) {
+        return
+      }
+      this.lastApplied[name] = value
+      this.resolvedParams[i].setTargetAtTime(
+        value,
+        this.audioContext.currentTime,
+        0.01,
+      )
+    })
   }
 
-  /*
-   * Resolves this effects parameters, puts a reference to each audio param inside of resolvedParams in the order they appear in params for fast lookup at play time.
-   */
-  resolveParam(param: Parameter) {
-    if (!param.isWorklet) {
-      const splitPath = param.path.split(".")
-      const resolvedParam = resolvePath(this.webAudioNodes, splitPath)
-      return resolvedParam
-    } else {
-      const splitPath = param.path.split(".") // worklet paths are of the form "node.param"
-      const node = this.webAudioNodes[splitPath[0]]
-      const resolvedParam = node.parameters.get(splitPath[1])
-      return resolvedParam
-    }
-  }
-
-  /*
-   * Resolves this effects parameters, puts a reference to each audio param inside of resolvedParams in the order they appear in params for fast lookup at play time.
-   */
   resolveParams() {
-    this.resolvedParams = []
-
-    this.params.forEach((param) => {
-      const resolvedParam = this.resolveParam(param)
-      this.resolvedParams.push(resolvedParam)
+    const params = this.def.params ?? {}
+    this.paramNames = Object.keys(params)
+    this.resolvedParams = this.paramNames.map((name) =>
+      params[name].at(this.webAudioNodes),
+    )
+    this.paramNames.forEach((name) => {
+      if (params[name].default !== undefined) {
+        this.lastApplied[name] = params[name].default
+      }
     })
   }
 
@@ -147,15 +164,6 @@ class GraphNode {
     this.el?.remove()
   }
 
-  _generate_params() {
-    //gyah, get rid of this somewhere
-    console.log(
-      `:${this.friendlyName} @{
-        ${this.params?.map((param, i) => ":" + param.name + " " + i).join("\n")}
-        }
-    `,
-    )
-  }
 }
 
 class Instrument extends GraphNode {
@@ -180,4 +188,12 @@ class Instrument extends GraphNode {
   }
 }
 
-export { GraphNode, Instrument, WebAudioNodes, Param, getTabIndex }
+export {
+  GraphNode,
+  Instrument,
+  WebAudioNodes,
+  Param,
+  NodeDef,
+  InstArgs,
+  getTabIndex,
+}

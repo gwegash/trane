@@ -1,23 +1,23 @@
 import { Effect } from "./effect"
 
 class LFO extends Effect {
-  static friendlyName = "lfo"
-  params = [
-    {
-      name: "frequency",
-      path: "oscillatorNode.frequency",
-      min: 0.001,
-      max: 200,
-      logScale: true,
+  static def = {
+    name: "lfo",
+    params: {
+      frequency: {
+        at: (n) => n.oscillatorNode.frequency,
+        min: 0.001,
+        max: 200,
+        log: true,
+      },
+      magnitude: {
+        at: (n) => n.magnitudeGain.gain,
+        min: 0.001,
+        max: 1000,
+        log: true,
+      },
     },
-    {
-      name: "magnitude",
-      path: "magnitudeGain.gain",
-      min: 0.001,
-      max: 1000,
-      logScale: true,
-    },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -43,10 +43,8 @@ class LFO extends Effect {
     this.setupKnobs()
   }
 
-  async setup({ wave, frequency, magnitude }) {
+  async setup({ wave }) {
     this.webAudioNodes.oscillatorNode.type = wave ? wave : "sine"
-    this.updateParamIfChanged(0, frequency)
-    this.updateParamIfChanged(1, magnitude)
     return this
   }
 }

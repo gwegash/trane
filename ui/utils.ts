@@ -8,15 +8,6 @@ function note_to_frequency(note: number) {
   return 440.0 * 2.0 * Math.pow(2, (note - 69.0) / 12.0)
 }
 
-const resolvePath = (obj, pathArr: Array<string>) => {
-  if (pathArr.length == 0) {
-    return obj
-  } else {
-    const field = pathArr.shift()
-    return resolvePath(obj[field], pathArr)
-  }
-}
-
 const clamp = (x, min, max) => {
   return Math.max(min, Math.min(max, x))
 }
@@ -61,4 +52,4 @@ const loadSample = async (sampleURLRaw) => {
   }
 }
 
-export { findClosest, clamp, lerp, loadSample, note_to_frequency, resolvePath }
+export { findClosest, clamp, lerp, loadSample, note_to_frequency }

@@ -36,7 +36,7 @@ const keyToSemitone = {
 }
 
 class Keyboard extends Effect {
-  static friendlyName = "keyboard"
+  static def = { name: "keyboard" }
   canvasCtx
   height = 65
   width = 120

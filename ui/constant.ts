@@ -2,17 +2,17 @@ import { Effect } from "./effect"
 import { nullGain } from "./audio"
 
 class Constant extends Effect {
-  static friendlyName = "constant"
-
-  params = [
-    {
-      name: "constant",
-      path: "constantSource.offset",
-      min: 0.001,
-      max: 12000.0,
-      logScale: true,
+  static def = {
+    name: "constant",
+    params: {
+      constant: {
+        at: (n) => n.constantSource.offset,
+        min: 0.001,
+        max: 12000.0,
+        log: true,
+      },
     },
-  ]
+  }
 
   constructor(context: AudioContext, parentEl: Element, name: string) {
     super(context, parentEl, name)
@@ -29,11 +29,6 @@ class Constant extends Effect {
 
     this.resolveParams() //always call me after settings up your webAudioNodes!
     this.setupKnobs()
-  }
-
-  async setup({ constant }) {
-    this.updateParamIfChanged(0, constant)
-    return this
   }
 }
 

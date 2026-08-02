@@ -1,4 +1,4 @@
-import { Instrument } from "./instruments"
+import { Instrument, InstArgs } from "./instruments"
 import { loadSample, clamp } from "./utils"
 import { AudioMipmap } from "./audio_mipmap"
 import { Timestretcher } from "timestretcher"
@@ -39,7 +39,7 @@ class SamplerBase extends Instrument {
     this.outputNode = this.webAudioNodes.gainNode
   }
 
-  async setup({url, timestretch, transpose}) {
+  async setup({url, timestretch, transpose}: InstArgs) {
     const timeRatio : number = timestretch ? parseFloat(timestretch) : 1.0 
     const semitones : number = transpose ? parseFloat(transpose) : 0
     if (this.sampleURL !== url || this.timestretch !== timeRatio || this.transpose !== semitones) {
