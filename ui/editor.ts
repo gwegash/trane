@@ -10,8 +10,9 @@ import { tutor } from "./tutor"
 import { basicDark } from "./dark_theme"
 
 import localforage from "localforage"
+import {findInstrumentTreeNodes} from "./buffer_update"
 
-let editor
+let editor: EditorView
 
 //TODO move evaluator to a web worker
 const evaluateAfter_ms = 300 //stops thrashing of the evaluator and keeps good scheduling
@@ -103,6 +104,8 @@ async function initCodeEditor(el, onCodeChange, onCodeReload) {
   el.ondragenter = dragenter
   el.ondragover = dragover
   el.ondrop = dropFile
+  window.editor = editor
+  window.findInstrumentTreeNodes = findInstrumentTreeNodes
 }
 
 async function saveCurrentScript() {

@@ -89,15 +89,9 @@ class GraphNode {
   setupKnobs() {
     //TODO knob deletion
     this.paramNames.forEach((name, i) => {
-      const param = this.def.params[name]
       new Knob(
-        this.audioContext,
-        this.knobsEl,
-        this.resolvedParams[i],
-        name,
-        param.min,
-        param.max,
-        param.log,
+        this,
+        i,
       )
     })
   }

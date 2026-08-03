@@ -13,6 +13,7 @@ Replaces the old Selenium suite. Three things changed beyond the framework:
     keyboards track never ran at all.
 """
 
+import re
 import time
 
 import pytest
@@ -79,6 +80,41 @@ def test_track_plays(page: Page, page_errors, play_seconds, base_url, track):
     assert graph > 0, "no instruments were instantiated"
 
     time.sleep(play_seconds)  # let the live loops reschedule a few times
+    assert_clean(page, page_errors)
+
+
+def test_knob_writes_value_back_to_the_buffer(page: Page, page_errors):
+    """Shift-clicking a knob's label writes its current value into the source.
+
+    etude declares `(gain :hello-gain)` with no :gain argument, so the first click
+    exercises the insert path and the second the replace path. The second click is
+    the interesting one: a bug there appends a duplicate pair rather than updating
+    the existing one, and it compounds on every click.
+    """
+    boot(page, "/?t=tracks/etude.janet")
+    evaluate_track(page)
+
+    doc = lambda: page.evaluate("() => window.editor.state.doc.toString()")
+    assert "(gain :hello-gain)" in doc(), "etude no longer declares the bare gain"
+
+    label = page.locator(".instrument").filter(has_text=":hello-gain").locator(
+        "p.heading", has_text="gain"
+    )
+    label.click(modifiers=["Shift"])
+
+    written = re.search(r"\(gain :hello-gain[^)]*\)", doc())
+    assert written, "the gain declaration went missing"
+    assert re.search(r":gain [\d.]+", written.group()), (
+        f"expected a :gain value to be inserted, got {written.group()!r}"
+    )
+
+    label.click(modifiers=["Shift"])
+
+    rewritten = re.search(r"\(gain :hello-gain[^)]*\)", doc()).group()
+    assert len(re.findall(r":gain [\d.]+", rewritten)) == 1, (
+        f"second write should replace, not append: {rewritten!r}"
+    )
+
     assert_clean(page, page_errors)
 
 

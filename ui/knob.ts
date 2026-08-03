@@ -1,5 +1,7 @@
 import { lerp } from "./utils"
 import { registerCC } from "./midi_manager"
+import type { GraphNode } from "./instruments"
+import { updateParam } from "./buffer_update"
 import "./css/knob.css"
 
 const SIZE_PX = 40
@@ -10,7 +12,8 @@ const KNOB_KNOTCH_LENGTH = 0.5 //How much of the circle the indicator shows
 const CC_PRINT_TIMEOUT = 1 //Stop showing the message 1s after midi
 
 class Knob {
-  parameter
+  parameter: AudioParam
+  paramName
   min
   max
 
@@ -69,26 +72,26 @@ class Knob {
   }
 
   constructor(
-    audioContext,
-    parentEl,
-    parameter,
-    knobName,
-    min,
-    max,
-    logScale = false,
+    instrument: GraphNode,
+    paramIndex : number,
   ) {
-    this.audioContext = audioContext
-    this.parameter = parameter
-    this.min = min !== undefined ? min : parameter.minValue
-    this.max = max !== undefined ? max : parameter.maxValue
+    this.audioContext = instrument.audioContext
+
+    this.paramName = instrument.paramNames[paramIndex]
+    this.parameter = instrument.resolvedParams[paramIndex]
+
+    const min = instrument.def.params[this.paramName].min
+    const max = instrument.def.params[this.paramName].max
+    this.min = min !== undefined ? min : this.parameter.minValue
+    this.max = max !== undefined ? max : this.parameter.maxValue
 
     this.logMin = Math.log2(min)
     this.logMax = Math.log2(max)
-    this.logScale = logScale
+    this.logScale = instrument.def.params[this.paramName].log
 
     this.headingEl = document.createElement("p")
     this.headingEl.className = "heading"
-    this.headingEl.innerText = knobName
+    this.headingEl.innerText = this.paramName
 
     this.canvas = document.createElement("canvas")
 
@@ -100,12 +103,18 @@ class Knob {
     this.containerEl.appendChild(this.headingEl)
     this.containerEl.appendChild(this.canvas)
     this.containerEl.style.userSelect = "none"
-    parentEl.appendChild(this.containerEl)
+    instrument.knobsEl.appendChild(this.containerEl)
 
     this.canvasCtx = this.canvas.getContext("2d")
     this.canvasCtx.fillStyle = "white"
     this.canvasCtx.strokeStyle = "white"
     this.draw()
+
+    this.headingEl.addEventListener("mouseup", (e) => {
+      if (e.shiftKey) {
+        updateParam(instrument, this.paramName, this.parameter.value)
+      }
+    })
 
     this.canvas.addEventListener("mousedown", (e) => {
       if (e.shiftKey) {

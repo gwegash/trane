@@ -8,6 +8,7 @@
     "dev": "esbuild ui/index.ts filter_worklet=ui/worklets/filter_worklet.js loop_worker=ui/worklets/loop_worker.js envelope_worklet=ui/worklets/envelope_worklet.js --define:DEBUG=true --external:module --loader:.wasm=binary --sourcemap --alias:wasm-runtime=./build/wasm.js --bundle --outdir=dist --allow-overwrite --watch --loader:.woff2=dataurl --servedir=dist --define:DEV=true",
     "format": "npx prettier ui --write --no-semi",
     "lint": "eslint ui scripts",
+    "typecheck": "tsc --noEmit",
     "test": "jpm_tree/bin/judge ./test",
     "docs": "./scripts/create-docs.sh",
     "build-jimage": "./scripts/build-jimage.sh"
