@@ -2,7 +2,7 @@
 
   ## dsl
 
-  [*](#), [+](#-1), [-](#-), [/](#-2), [P](#P), [bpm](#bpm), [chain](#chain), [change](#change), [exp](#exp), [itarget](#itarget), [lin](#lin), [live_loop](#live_loop), [pick](#pick), [play](#play), [rand](#rand), [rep](#rep), [seed](#seed), [sleep](#sleep), [target](#target), [til](#til), [time](#time), [timesel](#timesel), [uclid](#uclid), [wire](#wire)
+  [*](#), [+](#-1), [-](#-), [/](#-2), [P](#P), [bpm](#bpm), [chain](#chain), [change](#change), [exp](#exp), [itarget](#itarget), [lin](#lin), [live_loop](#live_loop), [pick](#pick), [play](#play), [rand](#rand), [rep](#rep), [seed](#seed), [sleep](#sleep), [target](#target), [til](#til), [time](#time), [timesel](#timesel), [uclid](#uclid), [use-lib](#use-lib), [wire](#wire)
 
   ### *
 
@@ -14,7 +14,7 @@
 
   
 
-  [1]: ../src/dsl.janet#L321
+  [1]: ../src/dsl.janet#L335
 
   ### +
 
@@ -26,7 +26,7 @@
 
   
 
-  [2]: ../src/dsl.janet#L315
+  [2]: ../src/dsl.janet#L329
 
   ### -
 
@@ -38,7 +38,7 @@
 
   
 
-  [3]: ../src/dsl.janet#L317
+  [3]: ../src/dsl.janet#L331
 
   ### /
 
@@ -50,7 +50,7 @@
 
   
 
-  [4]: ../src/dsl.janet#L319
+  [4]: ../src/dsl.janet#L333
 
   ### P
 
@@ -68,7 +68,7 @@ Returns a list of `[note, duration]` pairs that can be scheduled.
 (P [0 [1 1] 0 0] 4) # -> @[(0 1) (1 0.5) (1 0.5) (0 1) (0 1)]
 ```
 
-  [5]: ../src/dsl.janet#L199
+  [5]: ../src/dsl.janet#L213
 
   ### bpm
 
@@ -87,7 +87,7 @@ To change BPM, reload the page
 (bpm 120) # Sets the BPM to 120 beats per minute
 ```
 
-  [6]: ../src/dsl.janet#L13
+  [6]: ../src/dsl.janet#L27
 
   ### chain
 
@@ -99,7 +99,7 @@ To change BPM, reload the page
 
   
 
-  [7]: ../src/dsl.janet#L174
+  [7]: ../src/dsl.janet#L188
 
   ### change
 
@@ -116,7 +116,7 @@ To change BPM, reload the page
 (change :gain-example :gain 0.5) # changes the gain knob on a gain module ':gain-example' to 0.5
 ```
 
-  [8]: ../src/dsl.janet#L40
+  [8]: ../src/dsl.janet#L54
 
   ### exp
 
@@ -134,7 +134,7 @@ Approaches `to` from its last value exponentially
 (exp :gain-example :gain 0.5) # changes the gain knob on a gain module ':gain-example' to 0.5, approaches exponentially
 ```
 
-  [9]: ../src/dsl.janet#L75
+  [9]: ../src/dsl.janet#L89
 
   ### itarget
 
@@ -151,7 +151,7 @@ Approaches `to` from its last value exponentially
 (itarget :gain-example :gain 0.5) # instantaneously changes the gain knob on a gain module ':gain-example' to 0.5
 ```
 
-  [10]: ../src/dsl.janet#L87
+  [10]: ../src/dsl.janet#L101
 
   ### lin
 
@@ -169,7 +169,7 @@ Approaches `to` from its last value linearly
 (lin :gain-example :gain 0.5) # linearly changes the gain knob on a gain module ':gain-example' to 0.5
 ```
 
-  [11]: ../src/dsl.janet#L63
+  [11]: ../src/dsl.janet#L77
 
   ### live_loop
 
@@ -189,7 +189,7 @@ Approaches `to` from its last value linearly
 )
 ```
 
-  [12]: ../src/dsl.janet#L285
+  [12]: ../src/dsl.janet#L299
 
   ### pick
 
@@ -207,7 +207,7 @@ Approaches `to` from its last value linearly
 (pick 1 2 3) # -> 3
 ```
 
-  [13]: ../src/dsl.janet#L237
+  [13]: ../src/dsl.janet#L251
 
   ### play
 
@@ -226,7 +226,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (play 0 :my-drum :dur 2) # plays a note 0 on :my-drum for 2 beats
 ```
 
-  [14]: ../src/dsl.janet#L218
+  [14]: ../src/dsl.janet#L232
 
   ### rand
 
@@ -243,7 +243,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (rand 0 1) # -> 0.566847
 ```
 
-  [15]: ../src/dsl.janet#L249
+  [15]: ../src/dsl.janet#L263
 
   ### rep
 
@@ -260,7 +260,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (rep [1 2 3] 3) # -> @[(1 2 3) (1 2 3) (1 2 3)]
 ```
 
-  [16]: ../src/dsl.janet#L135
+  [16]: ../src/dsl.janet#L149
 
   ### seed
 
@@ -277,7 +277,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (seed 5)
 ```
 
-  [17]: ../src/dsl.janet#L274
+  [17]: ../src/dsl.janet#L288
 
   ### sleep
 
@@ -294,7 +294,7 @@ Also accepts a `:dur` duration parameter, in beats.
 (sleep 4) # advance time by 4 beats
 ```
 
-  [18]: ../src/dsl.janet#L29
+  [18]: ../src/dsl.janet#L43
 
   ### target
 
@@ -312,7 +312,7 @@ Approaches the `to` by a rate defined by the constant `k`
 (target :gain-example :gain 0.5 0.1) # changes the gain knob on a gain module ':gain-example' to 0.5, by a rate 0.1
 ```
 
-  [19]: ../src/dsl.janet#L98
+  [19]: ../src/dsl.janet#L112
 
   ### til
 
@@ -330,7 +330,7 @@ Approaches the `to` by a rate defined by the constant `k`
 (sleep (til 64)) # -> (sleep 32)
 ```
 
-  [20]: ../src/dsl.janet#L123
+  [20]: ../src/dsl.janet#L137
 
   ### time
 
@@ -347,7 +347,7 @@ Approaches the `to` by a rate defined by the constant `k`
 (time) # -> 32
 ```
 
-  [21]: ../src/dsl.janet#L112
+  [21]: ../src/dsl.janet#L126
 
   ### timesel
 
@@ -366,7 +366,7 @@ Approaches the `to` by a rate defined by the constant `k`
 (timesel [1 2 3 4] 2) # -> 3
 ```
 
-  [22]: ../src/dsl.janet#L261
+  [22]: ../src/dsl.janet#L275
 
   ### uclid
 
@@ -378,11 +378,31 @@ Approaches the `to` by a rate defined by the constant `k`
 
   
 
-  [23]: ../src/dsl.janet#L8
+  [23]: ../src/dsl.janet#L22
+
+  ### use-lib
+
+  **function**  | [source][24]
+
+  ```janet
+  (use-lib url)
+  ```
+
+  load up some janet code before your track runs
+
+Libraries can hold macros, functions and constants.
+This is implemented in quite an ugly/magic way, so a page refresh is required after a new library is added.
+
+**Example**
+```
+(use-lib "https://lisp.trane.studio/libs/drums.janet")
+```
+
+  [24]: ../src/dsl.janet#L8
 
   ### wire
 
-  **function**  | [source][24]
+  **function**  | [source][25]
 
   ```janet
   (wire from to &opt toParam)
@@ -397,7 +417,7 @@ Accepts an optional `toParam` which specifies a named parameter, or knob, of `to
 (wire :signal :filter :frequency)
 ```
 
-  [24]: ../src/dsl.janet#L147
+  [25]: ../src/dsl.janet#L161
 
   ## harmony
 
@@ -405,7 +425,7 @@ Accepts an optional `toParam` which specifies a named parameter, or knob, of `to
 
   ### chord
 
-  **function**  | [source][25]
+  **function**  | [source][26]
 
   ```janet
   (chord root quality)
@@ -421,11 +441,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 ((chord :C3 :min) 0) # -> 36
 ```
 
-  [25]: ../src/harmony.janet#L618
+  [26]: ../src/harmony.janet#L618
 
   ### note
 
-  **function**  | [source][26]
+  **function**  | [source][27]
 
   ```janet
   (note quality)
@@ -439,11 +459,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (note [:c4 :d4]) # -> [48 50]
 ```
 
-  [26]: ../src/harmony.janet#L560
+  [27]: ../src/harmony.janet#L560
 
   ### note?
 
-  **function**  | [source][27]
+  **function**  | [source][28]
 
   ```janet
   (note? n)
@@ -451,11 +471,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [27]: ../src/harmony.janet#L534
+  [28]: ../src/harmony.janet#L534
 
   ### notes?
 
-  **function**  | [source][28]
+  **function**  | [source][29]
 
   ```janet
   (notes? n)
@@ -463,11 +483,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [28]: ../src/harmony.janet#L541
+  [29]: ../src/harmony.janet#L541
 
   ### scale
 
-  **function**  | [source][29]
+  **function**  | [source][30]
 
   ```janet
   (scale root quality)
@@ -483,7 +503,7 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 ((scale :C3 :minor) 0) # -> 36
 ```
 
-  [29]: ../src/harmony.janet#L598
+  [30]: ../src/harmony.janet#L598
 
   ## instruments
 
@@ -491,7 +511,7 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   ### biquad
 
-  **function**  | [source][30]
+  **function**  | [source][31]
 
   ```janet
   (biquad name &named filter_type frequency detune Q gain)
@@ -499,11 +519,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [30]: ../src/instruments.janet#L97
+  [31]: ../src/instruments.janet#L97
 
   ### breakbeat
 
-  **function**  | [source][31]
+  **function**  | [source][32]
 
   ```janet
   (breakbeat name &named url length_beats slices gain timestretch transpose)
@@ -511,11 +531,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [31]: ../src/instruments.janet#L83
+  [32]: ../src/instruments.janet#L83
 
   ### chorus
 
-  **function**  | [source][32]
+  **function**  | [source][33]
 
   ```janet
   (chorus name)
@@ -523,11 +543,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [32]: ../src/instruments.janet#L75
+  [33]: ../src/instruments.janet#L75
 
   ### compressor
 
-  **function**  | [source][33]
+  **function**  | [source][34]
 
   ```janet
   (compressor name &named threshold knee ratio attack release)
@@ -535,11 +555,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [33]: ../src/instruments.janet#L51
+  [34]: ../src/instruments.janet#L51
 
   ### constant
 
-  **function**  | [source][34]
+  **function**  | [source][35]
 
   ```janet
   (constant name &named constant)
@@ -547,11 +567,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [34]: ../src/instruments.janet#L121
+  [35]: ../src/instruments.janet#L121
 
   ### delay
 
-  **function**  | [source][35]
+  **function**  | [source][36]
 
   ```janet
   (delay name &named delay_time feedback)
@@ -567,11 +587,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (delay :hello-delay :delay_time 0.75 :feedback 0.5)
 ```
 
-  [35]: ../src/instruments.janet#L18
+  [36]: ../src/instruments.janet#L18
 
   ### distortion
 
-  **function**  | [source][36]
+  **function**  | [source][37]
 
   ```janet
   (distortion name &named amount)
@@ -579,11 +599,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [36]: ../src/instruments.janet#L47
+  [37]: ../src/instruments.janet#L47
 
   ### drums
 
-  **function**  | [source][37]
+  **function**  | [source][38]
 
   ```janet
   (drums name &named hits)
@@ -591,11 +611,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [37]: ../src/instruments.janet#L63
+  [38]: ../src/instruments.janet#L63
 
   ### gain
 
-  **function**  | [source][38]
+  **function**  | [source][39]
 
   ```janet
   (gain name &named gain)
@@ -603,11 +623,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [38]: ../src/instruments.janet#L67
+  [39]: ../src/instruments.janet#L67
 
   ### keyboard
 
-  **function**  | [source][39]
+  **function**  | [source][40]
 
   ```janet
   (keyboard name)
@@ -615,11 +635,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [39]: ../src/instruments.janet#L71
+  [40]: ../src/instruments.janet#L71
 
   ### ladder
 
-  **function**  | [source][40]
+  **function**  | [source][41]
 
   ```janet
   (ladder name &named cutoff Q)
@@ -627,11 +647,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [40]: ../src/instruments.janet#L113
+  [41]: ../src/instruments.janet#L113
 
   ### lfo
 
-  **function**  | [source][41]
+  **function**  | [source][42]
 
   ```janet
   (lfo name &named wave frequency magnitude)
@@ -639,11 +659,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [41]: ../src/instruments.janet#L105
+  [42]: ../src/instruments.janet#L105
 
   ### line_in
 
-  **function**  | [source][42]
+  **function**  | [source][43]
 
   ```janet
   (line_in name)
@@ -651,11 +671,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [42]: ../src/instruments.janet#L55
+  [43]: ../src/instruments.janet#L55
 
   ### looper
 
-  **function**  | [source][43]
+  **function**  | [source][44]
 
   ```janet
   (looper name &named loop_time)
@@ -670,11 +690,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 (looper :hello-looper :loop_time 4)
 ```
 
-  [43]: ../src/instruments.janet#L33
+  [44]: ../src/instruments.janet#L33
 
   ### oscillator
 
-  **function**  | [source][44]
+  **function**  | [source][45]
 
   ```janet
   (oscillator name &named wave frequency)
@@ -682,11 +702,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [44]: ../src/instruments.janet#L101
+  [45]: ../src/instruments.janet#L101
 
   ### panner
 
-  **function**  | [source][45]
+  **function**  | [source][46]
 
   ```janet
   (panner name &named pan)
@@ -694,11 +714,11 @@ For qualities see [harmony.janet](https://github.com/gwegash/trane/blob/master/s
 
   
 
-  [45]: ../src/instruments.janet#L79
+  [46]: ../src/instruments.janet#L79
 
   ### reverb
 
-  **function**  | [source][46]
+  **function**  | [source][47]
 
   ```janet
   (reverb name &named impulse wet-dry decay-time predelay)
@@ -712,11 +732,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 (reverb :hello-verb :impulse "http://impulses.com/big_impulse.wav")
 ```
 
-  [46]: ../src/instruments.janet#L4
+  [47]: ../src/instruments.janet#L4
 
   ### sample
 
-  **function**  | [source][47]
+  **function**  | [source][48]
 
   ```janet
   (sample name &named url pitch gain attack release loop-start loop-end)
@@ -724,11 +744,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [47]: ../src/instruments.janet#L59
+  [48]: ../src/instruments.janet#L59
 
   ### scope
 
-  **function**  | [source][48]
+  **function**  | [source][49]
 
   ```janet
   (scope name)
@@ -736,11 +756,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [48]: ../src/instruments.janet#L109
+  [49]: ../src/instruments.janet#L109
 
   ### synth
 
-  **function**  | [source][49]
+  **function**  | [source][50]
 
   ```janet
   (synth name &named wave gain attack release)
@@ -748,11 +768,11 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [49]: ../src/instruments.janet#L93
+  [50]: ../src/instruments.janet#L93
 
   ### tb303
 
-  **function**  | [source][50]
+  **function**  | [source][51]
 
   ```janet
   (tb303 name &named wave gain cutoff resonance envMod decay attack slide)
@@ -760,5 +780,5 @@ Grabs an impulse from the URL of the `impulse` parameter
 
   
 
-  [50]: ../src/instruments.janet#L117
+  [51]: ../src/instruments.janet#L117
 

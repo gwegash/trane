@@ -11,10 +11,12 @@ import { OutputChannel } from "./errors"
 import { editor } from "./editor"
 import { background } from "./dark_theme"
 import { continueTutorial } from "./tutor"
+import { findLibraryUrls, loadLibraries } from "./libraries"
 import "./css/main.css"
 
 let bpm
 let janetRuntime
+let librariesReady = false
 let compiledImage //the image that is compiling, but not yet ready been pushed to the running loops, TODO MAYBE set this to null/undefined if the compilation hasn't succeeded?
 let outputChannel: OutputChannel
 let instrumentElement: HTMLElement
@@ -22,9 +24,6 @@ let instrumentElement: HTMLElement
 async function main(runtime: Module) {
   janetRuntime = runtime
 
-  // Janet resolves param names against this table while compiling, so it has to
-  // arrive before the first onChange() below. Derived from the instrument defs, so
-  // there is no generated params.janet to keep in step.
   janetRuntime.trane_set_params(paramsAsJanet())
 
   instrumentElement = document.createElement("div")
@@ -48,13 +47,17 @@ async function main(runtime: Module) {
 
   await initCodeEditor(codeElement, onChange, onCodeReload)
   window.editor = editor
-  onChange()
-  continueTutorial()
 
   const outputChannelElement = document.createElement("pre")
   outputChannelElement.className = "output-channel"
   codeElement.appendChild(outputChannelElement)
   outputChannel.target = outputChannelElement
+
+  await loadLibraries(janetRuntime, findLibraryUrls(editor))
+  librariesReady = true
+
+  onChange()
+  continueTutorial()
 
   if(DEV){
     onCodeReload()
@@ -62,6 +65,9 @@ async function main(runtime: Module) {
 }
 
 function onChange() {
+  if (!librariesReady) {
+    return
+  }
   outputChannel.clearErrors()
   const result = janetRuntime.trane_compile(editor.state.doc.toString())
   if (!result.isError) {
@@ -72,6 +78,10 @@ function onChange() {
 }
 
 async function onCodeReload() {
+  if (!librariesReady) {
+    console.warn("still loading libraries, not evaluating yet")
+    return
+  }
   scheduleCompilation(0, onChange) //TODO this is a bit wasteful. In reality we need to check if there have been any edits to the buffer since the last compilation and schedule one if so.
   console.log("got code reload message")
   if (compiledImage) {

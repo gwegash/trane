@@ -12,6 +12,7 @@ static JanetFunction *janetfn_run = NULL;
 static JanetFunction *janetfn_print_instruments = NULL;
 static JanetFunction *janetfn_print_loops = NULL;
 static JanetFunction *janetfn_set_params = NULL;
+static JanetFunction *janetfn_load_library = NULL;
 
 Janet env_lookup(JanetTable *env, const char *name) {
     Janet out;
@@ -125,6 +126,21 @@ bool trane_set_params(string source) {
     Janet out;
     const Janet args[1] = { janet_cstringv(source.c_str()) };
     return call_fn(janetfn_set_params, 1, args, &out);
+}
+
+// Evaluates a library into the environment that
+// tracks are compiled against. its bindings should be in scope for every later compile.
+bool trane_load_library(string name, string source) {
+    if (janetfn_load_library == NULL) {
+        fprintf(stderr, "unable to initialize library loader\n");
+        return false;
+    }
+    Janet out;
+    const Janet args[2] = {
+        janet_cstringv(name.c_str()),
+        janet_cstringv(source.c_str()),
+    };
+    return call_fn(janetfn_load_library, 2, args, &out);
 }
 
 CompileResult trane_compile(string source) {
@@ -348,6 +364,8 @@ int main() {
     janet_gcroot(janet_wrap_function(janetfn_print_loops));
     janetfn_set_params = env_lookup_function(janet_unwrap_table(environment), "params/set-params");
     janet_gcroot(janet_wrap_function(janetfn_set_params));
+    janetfn_load_library = env_lookup_function(janet_unwrap_table(environment), "evaluator/load-library");
+    janet_gcroot(janet_wrap_function(janetfn_load_library));
 }
 
 EMSCRIPTEN_BINDINGS(module) {
@@ -392,6 +410,7 @@ EMSCRIPTEN_BINDINGS(module) {
         ;
 
     function("trane_set_params", &trane_set_params);
+    function("trane_load_library", &trane_load_library);
     function("trane_compile", &trane_compile);
     function("trane_start", &trane_start);
     function("trane_continue", &trane_continue);

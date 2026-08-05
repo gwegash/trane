@@ -5,6 +5,20 @@
 (use ./instruments)
 (use ./dsl_helpers)
 
+(defn use-lib
+  ````load up some janet code before your track runs
+
+  Libraries can hold macros, functions and constants.
+  This is implemented in quite an ugly/magic way, so a page refresh is required after a new library is added.
+
+  **Example**
+  ```
+  (use-lib "https://lisp.trane.studio/libs/drums.janet")
+  ```
+  ````
+  [url]
+  nil)
+
 (defn uclid [pat n steps]
   (def hits (euclid n steps))
   (map (fn [step] (if step pat :tie)) hits)

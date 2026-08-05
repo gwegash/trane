@@ -1,28 +1,14 @@
-import { EditorView } from "@codemirror/view"
 import { syntaxTree } from "@codemirror/language"
-import {SyntaxNodeRef, SyntaxNode, TreeCursor} from '@lezer/common'
+import {SyntaxNode, TreeCursor} from '@lezer/common'
 import {instrumentsByName} from './audio'
 import {editor as ed} from './editor'
+import {elementsOf, nodeToString} from './janet_syntax'
 import type { GraphNode } from './instruments'
 
 const SIGNIFICANT_FIGURES = 4
 
 const formatValue = (value: number): string =>
   String(Number(value.toPrecision(SIGNIFICANT_FIGURES))) //weird trick, but drops the trailing zeros
-
-const elementsOf = (node: SyntaxNode) => {
-  const els: Array<SyntaxNodeRef> = []
-  for (let c = node.firstChild; c; c = c.nextSibling){
-    if (c.name !== "(" && c.name !== ")" && c.name !== "LineComment"){ //We ignore linecomments so that we don't insert anything after them. might break? probably fine.
-      els.push(c)
-    }
-  }
-  return els
-}
-
-const nodeToString = (node: SyntaxNodeRef, ed: EditorView): string => {
-  return ed.state.sliceDoc(node.from, node.to)
-}
 
 const findInstrumentTreeNodes = (): Record<string, SyntaxNode> => {
   const treeNodes: Record<string, SyntaxNode> = {}
